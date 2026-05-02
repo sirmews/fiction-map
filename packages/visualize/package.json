@@ -1,0 +1,61 @@
+{
+  "name": "@fiction-map/visualize",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./primitives": {
+      "types": "./dist/primitives/index.d.ts",
+      "import": "./dist/primitives/index.js"
+    },
+    "./presets": {
+      "types": "./dist/presets/index.d.ts",
+      "import": "./dist/presets/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/primitives/index.ts src/presets/index.ts --format esm --dts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@fiction-map/core": "workspace:*",
+    "@xyflow/react": "^12.0.0",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "jsdom": "^26.1.0",
+    "react-dom": "^18.3.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@fiction-map/runtime": "workspace:*",
+    "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@fiction-map/runtime": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "react-flow",
+    "graph",
+    "narrative",
+    "editor",
+    "visualization"
+  ],
+  "license": "MIT"
+}

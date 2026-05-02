@@ -1,0 +1,11 @@
+id: effect-handler-immutability
+severity: warn
+message: "Effect handlers must return new state, never mutate. Use structuredClone or spread."
+language: TypeScript
+note: "Prevents state mutation bugs"
+rule:
+  any:
+    - pattern: |
+        $STATE.$PROP = $VALUE
+    - pattern: |
+        $STATE[$PROP] = $VALUE

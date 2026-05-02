@@ -1,0 +1,32 @@
+{
+  "name": "@fiction-map/dev-server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fiction-map/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  },
+  "keywords": [
+    "dev-server",
+    "dashboard",
+    "metadata"
+  ],
+  "license": "MIT"
+}

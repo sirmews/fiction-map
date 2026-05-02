@@ -1,0 +1,159 @@
+import { describe, it, expect } from "vitest";
+import {
+  createInitialState,
+  cloneState,
+  navigateToNode,
+  setFlag,
+  setVariable,
+  incrementVariable,
+  hasVisited,
+  hasFlag,
+  getFlag,
+  getVariable,
+  serializeState,
+  deserializeState,
+} from "../core/state";
+import type { GraphRuntimeState } from "../types";
+
+describe("createInitialState", () => {
+  it("creates state with start node", () => {
+    const state = createInitialState("scene-1");
+    
+    expect(state.currentNodeId).toBe("scene-1");
+    expect(state.history).toEqual([]);
+    expect(state.visited).toContain("scene-1");
+    expect(state.variables).toEqual({});
+    expect(state.flags).toEqual({});
+  });
+  
+  it("creates state with initial variables", () => {
+    const state = createInitialState("scene-1", { gold: 100, health: 50 });
+    
+    expect(state.variables.gold).toBe(100);
+    expect(state.variables.health).toBe(50);
+  });
+  
+  it("creates state with extensions", () => {
+    const state = createInitialState("scene-1", {}, { character: { name: "Hero" } });
+    
+    expect(state.extensions?.character).toEqual({ name: "Hero" });
+  });
+});
+
+describe("cloneState", () => {
+  it("creates a deep copy", () => {
+    const original = createInitialState("scene-1", { gold: 100 });
+    original.flags["has-key"] = true;
+    
+    const cloned = cloneState(original);
+    
+    expect(cloned).not.toBe(original);
+    expect(cloned.variables).not.toBe(original.variables);
+    expect(cloned.flags).not.toBe(original.flags);
+    expect(cloned.visited).not.toBe(original.visited);
+    
+    cloned.variables.gold = 200;
+    expect(original.variables.gold).toBe(100);
+  });
+});
+
+describe("navigateToNode", () => {
+  it("updates current node and history", () => {
+    let state = createInitialState("scene-1");
+    state = navigateToNode(state, "scene-2");
+    
+    expect(state.currentNodeId).toBe("scene-2");
+    expect(state.history).toEqual(["scene-1"]);
+    expect(state.visited).toContain("scene-2");
+  });
+  
+  it("preserves previous state", () => {
+    const original = createInitialState("scene-1");
+    const navigated = navigateToNode(original, "scene-2");
+    
+    expect(original.currentNodeId).toBe("scene-1");
+    expect(original.history).toEqual([]);
+    expect(navigated.currentNodeId).toBe("scene-2");
+  });
+});
+
+describe("flags", () => {
+  it("sets and checks flags", () => {
+    let state = createInitialState("scene-1");
+    
+    expect(hasFlag(state, "has-key")).toBe(false);
+    
+    state = setFlag(state, "has-key", true);
+    
+    expect(hasFlag(state, "has-key")).toBe(true);
+    expect(getFlag(state, "has-key")).toBe(true);
+  });
+  
+  it("clears flags", () => {
+    let state = createInitialState("scene-1");
+    state = setFlag(state, "has-key", true);
+    
+    expect(hasFlag(state, "has-key")).toBe(true);
+    
+    state = setFlag(state, "has-key", false);
+    
+    expect(getFlag(state, "has-key")).toBe(false);
+  });
+});
+
+describe("variables", () => {
+  it("sets and gets variables", () => {
+    let state = createInitialState("scene-1");
+    
+    expect(getVariable(state, "gold")).toBeUndefined();
+    
+    state = setVariable(state, "gold", 100);
+    
+    expect(getVariable(state, "gold")).toBe(100);
+  });
+  
+  it("increments numeric variables", () => {
+    let state = createInitialState("scene-1", { gold: 100 });
+    
+    state = incrementVariable(state, "gold", 50);
+    
+    expect(getVariable(state, "gold")).toBe(150);
+  });
+  
+  it("ignores increment on non-numeric", () => {
+    let state = createInitialState("scene-1", { name: "Hero" });
+    
+    state = incrementVariable(state, "name", 1);
+    
+    expect(getVariable(state, "name")).toBe("Hero");
+  });
+});
+
+describe("visited", () => {
+  it("tracks visited nodes", () => {
+    const state = createInitialState("scene-1");
+    
+    expect(hasVisited(state, "scene-1")).toBe(true);
+    expect(hasVisited(state, "scene-2")).toBe(false);
+  });
+});
+
+describe("serialization", () => {
+  it("serializes and deserializes state", () => {
+    let state = createInitialState("scene-1", { gold: 100 });
+    state = setFlag(state, "has-key", true);
+    state = navigateToNode(state, "scene-2");
+    
+    const serialized = serializeState(state);
+    const json = JSON.stringify(serialized);
+    const parsed = JSON.parse(json);
+    const restored = deserializeState(parsed);
+    
+    expect(restored.currentNodeId).toBe("scene-2");
+    expect(restored.history).toEqual(["scene-1"]);
+    expect(restored.variables.gold).toBe(100);
+    expect(restored.flags["has-key"]).toBe(true);
+    expect(restored.visited.has("scene-1")).toBe(true);
+    expect(restored.visited.has("scene-2")).toBe(true);
+  });
+});

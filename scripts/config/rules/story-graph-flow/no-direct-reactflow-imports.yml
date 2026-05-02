@@ -1,0 +1,6 @@
+id: no-direct-reactflow-imports
+severity: warn
+message: "Import from @your-org/story-graph-flow instead of @xyflow/react directly to ensure consistency"
+language: TypeScript
+rule:
+  pattern: import { $$$NAMES } from "@xyflow/react"

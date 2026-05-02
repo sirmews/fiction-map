@@ -1,0 +1,12 @@
+id: runtime-state-readonly
+severity: error
+message: "GraphRuntimeState properties should not be reassigned. Create new state instead."
+language: TypeScript
+rule:
+  any:
+    - pattern: |
+        $STATE.currentNodeId = $VALUE
+    - pattern: |
+        $STATE.history = $VALUE
+    - pattern: |
+        $STATE.variables[$KEY] = $VALUE

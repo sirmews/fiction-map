@@ -1,0 +1,163 @@
+{
+  "nodeTypes": [
+    {
+      "id": "scene",
+      "name": "sceneNode",
+      "location": {
+        "file": "nodes/scene.node.ts",
+        "line": 7,
+        "column": 26
+      },
+      "description": "A scene in the story graph",
+      "aiRule": "Scenes must have content or be marked as endings",
+      "properties": {
+        "title": {
+          "type": "string",
+          "required": true
+        },
+        "content": {
+          "type": "richtext"
+        },
+        "isEnding": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "outgoingEdges": [
+        "choice"
+      ],
+      "incomingEdges": [
+        "choice"
+      ]
+    }
+  ],
+  "edgeTypes": [
+    {
+      "id": "choice",
+      "name": "choiceEdge",
+      "location": {
+        "file": "edges/choice.edge.ts",
+        "line": 7,
+        "column": 27
+      },
+      "description": "A choice the player can make",
+      "aiRule": "Choices must have display text",
+      "properties": {
+        "text": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "sourceTypes": [
+        "scene"
+      ],
+      "targetTypes": [
+        "scene"
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "has-item",
+      "name": "hasItemCondition",
+      "location": {
+        "file": "conditions/has-item.condition.ts",
+        "line": 6,
+        "column": 33
+      },
+      "description": "Check if player has an item",
+      "parameters": {
+        "itemId": {
+          "type": "string",
+          "required": true
+        }
+      }
+    }
+  ],
+  "effects": [
+    {
+      "id": "give-item",
+      "name": "giveItemEffect",
+      "location": {
+        "file": "effects/give-item.effect.ts",
+        "line": 6,
+        "column": 31
+      },
+      "description": "Give an item to the player",
+      "parameters": {
+        "itemId": {
+          "type": "string",
+          "required": true
+        },
+        "quantity": {
+          "type": "number",
+          "default": 1
+        }
+      }
+    }
+  ],
+  "graphs": [
+    {
+      "id": "story",
+      "name": "storyGraph",
+      "location": {
+        "file": "graphs/story.graph.ts",
+        "line": 6,
+        "column": 22
+      },
+      "description": "A simple story graph",
+      "nodes": [
+        {
+          "id": "start",
+          "type": "scene",
+          "title": "The Beginning"
+        },
+        {
+          "id": "middle",
+          "type": "scene",
+          "title": "The Middle"
+        },
+        {
+          "id": "end",
+          "type": "scene",
+          "title": "The End",
+          "isEnding": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "c1",
+          "type": "choice",
+          "source": "start",
+          "target": "middle",
+          "text": "Continue"
+        },
+        {
+          "id": "c2",
+          "type": "choice",
+          "source": "middle",
+          "target": "end",
+          "text": "Finish"
+        }
+      ],
+      "nodeCount": 3,
+      "edgeCount": 2,
+      "maxDepth": 0,
+      "endings": [],
+      "nodeTypesUsed": [
+        "scene"
+      ],
+      "edgeTypesUsed": [
+        "choice"
+      ],
+      "conditionsUsed": [],
+      "effectsUsed": [],
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "validation": {
+    "errors": [],
+    "warnings": []
+  }
+}
