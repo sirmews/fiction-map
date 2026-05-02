@@ -29,6 +29,11 @@ export interface DevServerRefreshResult<TMetadata extends object = DevServerMeta
   refreshedAt: Date
 }
 
+export interface DevServerRefreshTask<TMetadata extends object = DevServerMetadataRecord> {
+  cycleId: symbol
+  promise: Promise<DevServerRefreshResult<TMetadata>>
+}
+
 export interface DevServerStateOptions<TMetadata extends object = DevServerMetadataRecord> {
   rootDir: string
   loadMetadata: MetadataLoader<TMetadata>
@@ -37,6 +42,7 @@ export interface DevServerStateOptions<TMetadata extends object = DevServerMetad
 }
 
 interface RefreshCycle<TMetadata extends object> {
+  id: symbol
   deferred: Deferred<DevServerRefreshResult<TMetadata>>
 }
 
@@ -74,19 +80,35 @@ export class DevServerState<TMetadata extends object = DevServerMetadataRecord> 
   }
 
   async refresh(): Promise<DevServerRefreshResult<TMetadata>> {
-    return this.ensureActiveCycle().deferred.promise
+    return this.refreshTask().promise
   }
 
   async queueRefresh(): Promise<DevServerRefreshResult<TMetadata>> {
+    return this.queueRefreshTask().promise
+  }
+
+  refreshTask(): DevServerRefreshTask<TMetadata> {
+    const cycle = this.ensureActiveCycle()
+
+    return {
+      cycleId: cycle.id,
+      promise: cycle.deferred.promise,
+    }
+  }
+
+  queueRefreshTask(): DevServerRefreshTask<TMetadata> {
     if (!this.activeCycle) {
-      return this.refresh()
+      return this.refreshTask()
     }
 
     if (!this.queuedCycle) {
       this.queuedCycle = createRefreshCycle<TMetadata>()
     }
 
-    return this.queuedCycle.deferred.promise
+    return {
+      cycleId: this.queuedCycle.id,
+      promise: this.queuedCycle.deferred.promise,
+    }
   }
 
   private ensureActiveCycle(): RefreshCycle<TMetadata> {
@@ -188,7 +210,10 @@ function cloneMetadataValue(value: DevServerMetadataValue): DevServerMetadataVal
 
 function createRefreshCycle<TMetadata extends object>(): RefreshCycle<TMetadata> {
   const deferred = createDeferred<DevServerRefreshResult<TMetadata>>()
-  return { deferred }
+  return {
+    id: Symbol("dev-server-refresh-cycle"),
+    deferred,
+  }
 }
 
 function createDeferred<TValue>(): Deferred<TValue> {

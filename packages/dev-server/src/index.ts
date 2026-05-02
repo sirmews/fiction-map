@@ -12,6 +12,7 @@ export {
   type DevServerMetadataValue,
   type DevServerRefreshError,
   type DevServerRefreshResult,
+  type DevServerRefreshTask,
   type DevServerStateOptions,
   type DevServerStateSnapshot,
   type MetadataLoader,
@@ -74,3 +75,19 @@ export {
   jsonRpcSuccess,
   type DispatchRpcRequestOptions,
 } from "./rpc"
+
+export {
+  startDevServer,
+  type DevServer,
+  type StartDevServerOptions,
+} from "./server"
+
+export {
+  createDevServerWatcher,
+  type DevServerWatchCallback,
+  type DevServerWatchFactory,
+  type DevServerWatcher,
+  type DevServerWatcherEvent,
+  type DevServerWatcherOptions,
+  type FSWatcherLike,
+} from "./watcher"

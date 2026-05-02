@@ -1,4 +1,7 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, describe, expect, test } from "bun:test"
+import { join } from "node:path"
+import { tmpdir } from "node:os"
+import { mkdtemp, rm } from "node:fs/promises"
 import { DevServerState } from "./state"
 import {
   createMetadataChangedNotification,
@@ -6,6 +9,7 @@ import {
   jsonRpcError,
   type JsonRpcRequest,
 } from "./rpc"
+import { startDevServer, type DevServer, type StartDevServerOptions } from "./server"
 import type {
   DefinitionOpenParams,
   DevServerGraphMetadata,
@@ -14,6 +18,12 @@ import {
   DEV_SERVER_RPC_ERROR_CODES,
   DEV_SERVER_RPC_ERRORS,
 } from "./protocol"
+import {
+  createDevServerWatcher,
+  type DevServerWatcher,
+  type DevServerWatcherEvent,
+  type DevServerWatcherOptions,
+} from "./watcher"
 
 function deferred<T>(): {
   promise: Promise<T>
@@ -146,6 +156,23 @@ function createState(
     initialLastRefreshAt: new Date("2026-05-03T10:00:00.000Z"),
   })
 }
+
+const serversToStop = new Set<DevServer>()
+const tempDirsToRemove = new Set<string>()
+
+afterEach(async () => {
+  for (const server of serversToStop) {
+    server.stop()
+  }
+  serversToStop.clear()
+
+  await Promise.all(
+    Array.from(tempDirsToRemove, async (directory) => {
+      await rm(directory, { recursive: true, force: true })
+    })
+  )
+  tempDirsToRemove.clear()
+})
 
 describe("RPC contract", () => {
   test("dispatches metadata and graph methods against current state", async () => {
@@ -563,3 +590,472 @@ describe("RPC contract", () => {
     expect(queuedResult.metadata).toEqual(refreshedMetadata)
   })
 })
+
+describe("dev server transport", () => {
+  test("serves a health endpoint for readiness/debugging", async () => {
+    const watcher = createManualWatcher()
+    const server = startTestServer({
+      state: createState(),
+      createWatcher: watcher.factory,
+    })
+
+    const response = await fetch(server.healthUrl)
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      ok: true,
+      rootDir: "/workspace/story",
+      websocketPath: "/ws",
+    })
+  })
+
+  test("handles websocket json-rpc requests through the existing dispatcher", async () => {
+    const watcher = createManualWatcher()
+    const server = startTestServer({
+      state: createState(),
+      createWatcher: watcher.factory,
+    })
+    const socket = await openJsonRpcSocket(server.websocketUrl)
+
+    try {
+      socket.send(JSON.stringify({ jsonrpc: "2.0", id: 21, method: "metadata/get" }))
+
+      await expect(readNextJsonMessage(socket)).resolves.toEqual({
+        jsonrpc: "2.0",
+        id: 21,
+        result: {
+          metadata: TEST_METADATA,
+          lastRefreshAt: "2026-05-03T10:00:00.000Z",
+          refreshError: null,
+        },
+      })
+    } finally {
+      await closeSocket(socket)
+    }
+  })
+
+  test("broadcasts metadata-changed after a successful watcher refresh", async () => {
+    const watcher = createManualWatcher()
+    const refreshedMetadata: DevServerGraphMetadata = {
+      ...TEST_METADATA,
+      validation: {
+        errors: [],
+        warnings: [],
+      },
+    }
+
+    let currentMetadata = TEST_METADATA
+    const state = new DevServerState({
+      rootDir: "/workspace/story",
+      loadMetadata: async () => currentMetadata,
+      initialMetadata: TEST_METADATA,
+      initialLastRefreshAt: new Date("2026-05-03T10:00:00.000Z"),
+    })
+
+    const server = startTestServer({
+      state,
+      createWatcher: watcher.factory,
+    })
+
+    const firstClient = await openJsonRpcSocket(server.websocketUrl)
+    const secondClient = await openJsonRpcSocket(server.websocketUrl)
+
+    try {
+      currentMetadata = refreshedMetadata
+
+      const firstNotification = readNextJsonMessage(firstClient)
+      const secondNotification = readNextJsonMessage(secondClient)
+      await watcher.trigger({ changedPath: "nodes/scene.node.ts" })
+
+      await expect(firstNotification).resolves.toEqual({
+        jsonrpc: "2.0",
+        method: "notify/metadata-changed",
+        params: {
+          reason: "file-change",
+          changedPath: "nodes/scene.node.ts",
+          refreshedAt: expect.any(String),
+        },
+      })
+      await expect(secondNotification).resolves.toEqual({
+        jsonrpc: "2.0",
+        method: "notify/metadata-changed",
+        params: {
+          reason: "file-change",
+          changedPath: "nodes/scene.node.ts",
+          refreshedAt: expect.any(String),
+        },
+      })
+    } finally {
+      await Promise.all([closeSocket(firstClient), closeSocket(secondClient)])
+    }
+  })
+
+  test("preserves last good metadata on failed watcher refresh and does not broadcast success", async () => {
+    const watcher = createManualWatcher()
+    let shouldFail = false
+
+    const state = new DevServerState({
+      rootDir: "/workspace/story",
+      loadMetadata: async () => {
+        if (shouldFail) {
+          throw new Error("watch refresh failed")
+        }
+        return TEST_METADATA
+      },
+      initialMetadata: TEST_METADATA,
+      initialLastRefreshAt: new Date("2026-05-03T10:00:00.000Z"),
+    })
+
+    const server = startTestServer({
+      state,
+      createWatcher: watcher.factory,
+    })
+    const socket = await openJsonRpcSocket(server.websocketUrl)
+
+    try {
+      shouldFail = true
+      await watcher.trigger({ changedPath: "graphs/story.graph.ts" })
+
+      await expect(readNextJsonMessage(socket, 100)).rejects.toThrow("Timed out")
+
+      socket.send(JSON.stringify({ jsonrpc: "2.0", id: 22, method: "metadata/get" }))
+      await expect(readNextJsonMessage(socket)).resolves.toEqual({
+        jsonrpc: "2.0",
+        id: 22,
+        result: {
+          metadata: TEST_METADATA,
+          lastRefreshAt: "2026-05-03T10:00:00.000Z",
+          refreshError: {
+            message: "watch refresh failed",
+          },
+        },
+      })
+    } finally {
+      await closeSocket(socket)
+    }
+  })
+
+  test("broadcasts the latest changedPath when multiple watcher triggers share one queued refresh", async () => {
+    const watcher = createManualWatcher()
+    const firstRefresh = deferred<DevServerGraphMetadata>()
+    const secondRefresh = deferred<DevServerGraphMetadata>()
+    let loadCallCount = 0
+
+    const refreshedMetadata: DevServerGraphMetadata = {
+      ...TEST_METADATA,
+      validation: {
+        errors: [],
+        warnings: [],
+      },
+    }
+
+    const state = new DevServerState({
+      rootDir: "/workspace/story",
+      loadMetadata: async () => {
+        loadCallCount += 1
+        return loadCallCount === 1 ? firstRefresh.promise : secondRefresh.promise
+      },
+      initialMetadata: TEST_METADATA,
+      initialLastRefreshAt: new Date("2026-05-03T10:00:00.000Z"),
+    })
+
+    const currentRefresh = state.refresh()
+    const queuedRefresh = state.queueRefresh()
+    const server = startTestServer({
+      state,
+      createWatcher: watcher.factory,
+    })
+    const socket = await openJsonRpcSocket(server.websocketUrl)
+
+    try {
+      const queuedRefreshA = watcher.trigger({ changedPath: "nodes/second.node.ts" })
+      const queuedRefreshB = watcher.trigger({ changedPath: "graphs/story.graph.ts" })
+      const notification = readNextJsonMessage(socket)
+
+      firstRefresh.resolve(TEST_METADATA)
+      secondRefresh.resolve(refreshedMetadata)
+
+      await expect(notification).resolves.toEqual({
+        jsonrpc: "2.0",
+        method: "notify/metadata-changed",
+        params: {
+          reason: "file-change",
+          changedPath: "graphs/story.graph.ts",
+          refreshedAt: expect.any(String),
+        },
+      })
+      await expect(readNextJsonMessage(socket, 100)).rejects.toThrow("Timed out")
+
+      await Promise.all([currentRefresh, queuedRefresh, queuedRefreshA, queuedRefreshB])
+      expect(loadCallCount).toBe(2)
+    } finally {
+      await closeSocket(socket)
+    }
+  })
+
+  test("does not start the transport when watcher construction fails", () => {
+    let serveCallCount = 0
+
+    expect(() =>
+      startDevServer({
+        state: createState(),
+        port: 0,
+        bunRuntime: createFakeBun({
+          serve() {
+            serveCallCount += 1
+            throw new Error("serve should not be called")
+          },
+        }),
+        createWatcher: () => {
+          throw new Error("watcher startup failed")
+        },
+      })
+    ).toThrow("watcher startup failed")
+
+    expect(serveCallCount).toBe(0)
+  })
+
+  test("closes the watcher if transport startup fails after watcher creation", () => {
+    let watcherClosed = false
+
+    expect(() =>
+      startDevServer({
+        state: createState(),
+        port: 0,
+        bunRuntime: createFakeBun({
+          serve() {
+            throw new Error("serve failed")
+          },
+        }),
+        createWatcher: () => ({
+          close() {
+            watcherClosed = true
+          },
+        }),
+      })
+    ).toThrow("serve failed")
+
+    expect(watcherClosed).toBe(true)
+  })
+})
+
+describe("dev server watcher", () => {
+  test("debounces rapid file changes into one queued refresh callback", async () => {
+    const events: DevServerWatcherEvent[] = []
+    const watchController = createFsWatchController()
+    const tempRoot = await mkdtemp(join(tmpdir(), "fiction-map-dev-server-"))
+    tempDirsToRemove.add(tempRoot)
+
+    const watcher = createDevServerWatcher({
+      rootDir: tempRoot,
+      debounceMs: 20,
+      onChange: async (event) => {
+        events.push(event)
+      },
+      watchFactory: watchController.factory,
+    })
+
+    try {
+      watchController.emit("change", "nodes/first.node.ts")
+      watchController.emit("change", "nodes/second.node.ts")
+      watchController.emit("rename", "graphs/story.graph.ts")
+      await Bun.sleep(60)
+
+      expect(events).toEqual([{ changedPath: "graphs/story.graph.ts" }])
+    } finally {
+      watcher.close()
+    }
+  })
+
+  test("ignores unsupported file types", async () => {
+    const events: DevServerWatcherEvent[] = []
+    const watchController = createFsWatchController()
+    const tempRoot = await mkdtemp(join(tmpdir(), "fiction-map-dev-server-"))
+    tempDirsToRemove.add(tempRoot)
+
+    const watcher = createDevServerWatcher({
+      rootDir: tempRoot,
+      debounceMs: 20,
+      onChange: async (event) => {
+        events.push(event)
+      },
+      watchFactory: watchController.factory,
+    })
+
+    try {
+      watchController.emit("change", "notes/readme.md")
+      watchController.emit("change", "scripts/generate.ts")
+      await Bun.sleep(60)
+
+      expect(events).toEqual([])
+    } finally {
+      watcher.close()
+    }
+  })
+
+  test("ignores supported files inside excluded directories", async () => {
+    const events: DevServerWatcherEvent[] = []
+    const watchController = createFsWatchController()
+    const tempRoot = await mkdtemp(join(tmpdir(), "fiction-map-dev-server-"))
+    tempDirsToRemove.add(tempRoot)
+
+    const watcher = createDevServerWatcher({
+      rootDir: tempRoot,
+      debounceMs: 20,
+      onChange: async (event) => {
+        events.push(event)
+      },
+      watchFactory: watchController.factory,
+    })
+
+    try {
+      watchController.emit("change", "node_modules/pkg/example.node.ts")
+      watchController.emit("change", "dist/generated.story.graph.ts")
+      watchController.emit("change", "build/types/scene.node.ts")
+      watchController.emit("change", "generated/effects/example.effect.ts")
+      await Bun.sleep(60)
+
+      expect(events).toEqual([])
+    } finally {
+      watcher.close()
+    }
+  })
+})
+
+function startTestServer(options: Omit<StartDevServerOptions, "port">): DevServer {
+  const server = startDevServer({
+    ...options,
+    port: 0,
+  })
+  serversToStop.add(server)
+  return server
+}
+
+function createManualWatcher(): {
+  factory(options: DevServerWatcherOptions): DevServerWatcher
+  trigger(event: DevServerWatcherEvent): Promise<void>
+} {
+  let onChange: ((event: DevServerWatcherEvent) => void | Promise<void>) | null = null
+
+  return {
+    factory(options) {
+      onChange = options.onChange
+      return {
+        close() {
+          onChange = null
+        },
+      }
+    },
+    async trigger(event) {
+      if (!onChange) {
+        throw new Error("Watcher callback is not registered")
+      }
+      await onChange(event)
+    },
+  }
+}
+
+function createFsWatchController(): {
+  factory: DevServerWatcherOptions["watchFactory"]
+  emit(eventType: string, changedPath?: string): void
+} {
+  let listener: ((eventType: string, filename: string | Buffer | null) => void) | null = null
+
+  return {
+    factory(_rootDir, _options, callback) {
+      listener = callback
+      return {
+        close() {
+          listener = null
+        },
+      }
+    },
+    emit(eventType, changedPath) {
+      listener?.(eventType, changedPath ?? null)
+    },
+  }
+}
+
+function createFakeBun(
+  overrides: Pick<NonNullable<StartDevServerOptions["bunRuntime"]>, "serve">
+): NonNullable<StartDevServerOptions["bunRuntime"]> {
+  return {
+    serve: overrides.serve,
+  }
+}
+
+async function openJsonRpcSocket(url: string): Promise<WebSocket> {
+  const socket = new WebSocket(url)
+
+  await new Promise<void>((resolve, reject) => {
+    const onOpen = () => {
+      cleanup()
+      resolve()
+    }
+    const onError = () => {
+      cleanup()
+      reject(new Error(`Failed to open websocket: ${url}`))
+    }
+
+    const cleanup = () => {
+      socket.removeEventListener("open", onOpen)
+      socket.removeEventListener("error", onError)
+    }
+
+    socket.addEventListener("open", onOpen, { once: true })
+    socket.addEventListener("error", onError, { once: true })
+  })
+
+  return socket
+}
+
+async function closeSocket(socket: WebSocket): Promise<void> {
+  if (socket.readyState >= WebSocket.CLOSING) {
+    return
+  }
+
+  await new Promise<void>((resolve) => {
+    socket.addEventListener(
+      "close",
+      () => {
+        resolve()
+      },
+      { once: true }
+    )
+    socket.close()
+  })
+}
+
+async function readNextJsonMessage<T>(socket: WebSocket, timeoutMs = 1_000): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      cleanup()
+      reject(new Error(`Timed out waiting for websocket message after ${timeoutMs}ms`))
+    }, timeoutMs)
+
+    const onMessage = (event: MessageEvent<string | Buffer | Uint8Array>) => {
+      cleanup()
+      try {
+        const payload =
+          typeof event.data === "string" ? event.data : Buffer.from(event.data).toString("utf8")
+        resolve(JSON.parse(payload) as T)
+      } catch (error) {
+        reject(error)
+      }
+    }
+
+    const onError = () => {
+      cleanup()
+      reject(new Error("Websocket error while waiting for message"))
+    }
+
+    const cleanup = () => {
+      clearTimeout(timeout)
+      socket.removeEventListener("message", onMessage as EventListener)
+      socket.removeEventListener("error", onError)
+    }
+
+    socket.addEventListener("message", onMessage as EventListener, { once: true })
+    socket.addEventListener("error", onError, { once: true })
+  })
+}
