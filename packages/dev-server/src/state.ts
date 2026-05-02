@@ -1,14 +1,14 @@
+import type { JsonObject, JsonPrimitive, JsonValue } from "./protocol"
+
 export interface MetadataLoaderOptions {
   rootDir: string
 }
 
-export type DevServerMetadataPrimitive = string | number | boolean | null
-export type DevServerMetadataValue =
-  | DevServerMetadataPrimitive
-  | DevServerMetadataValue[]
-  | { [key: string]: DevServerMetadataValue }
+export type DevServerMetadataPrimitive = JsonPrimitive
+export interface DevServerMetadataRecord extends JsonObject {}
+export type DevServerMetadataValue = JsonValue
 
-export type MetadataLoader<TMetadata = DevServerMetadataValue> = (
+export type MetadataLoader<TMetadata extends object = DevServerMetadataRecord> = (
   options: MetadataLoaderOptions
 ) => Promise<TMetadata>
 
@@ -17,26 +17,26 @@ export interface DevServerRefreshError {
   stack?: string
 }
 
-export interface DevServerStateSnapshot<TMetadata = DevServerMetadataValue> {
+export interface DevServerStateSnapshot<TMetadata extends object = DevServerMetadataRecord> {
   metadata: TMetadata | null
   lastRefreshAt: Date | null
   isRefreshing: boolean
   refreshError: DevServerRefreshError | null
 }
 
-export interface DevServerRefreshResult<TMetadata = DevServerMetadataValue> {
+export interface DevServerRefreshResult<TMetadata extends object = DevServerMetadataRecord> {
   metadata: TMetadata
   refreshedAt: Date
 }
 
-export interface DevServerStateOptions<TMetadata = DevServerMetadataValue> {
+export interface DevServerStateOptions<TMetadata extends object = DevServerMetadataRecord> {
   rootDir: string
   loadMetadata: MetadataLoader<TMetadata>
   initialMetadata?: TMetadata | null
   initialLastRefreshAt?: Date | null
 }
 
-interface RefreshCycle<TMetadata> {
+interface RefreshCycle<TMetadata extends object> {
   deferred: Deferred<DevServerRefreshResult<TMetadata>>
 }
 
@@ -46,7 +46,7 @@ interface Deferred<TValue> {
   resolve(value: TValue): void
 }
 
-export class DevServerState<TMetadata = DevServerMetadataValue> {
+export class DevServerState<TMetadata extends object = DevServerMetadataRecord> {
   readonly rootDir: string
 
   private readonly loadMetadata: MetadataLoader<TMetadata>
@@ -161,7 +161,7 @@ function cloneDate(value: Date | null): Date | null {
   return value ? new Date(value) : null
 }
 
-function cloneValue<T>(value: T): T {
+function cloneValue<T extends object | null>(value: T): T {
   if (value === null || value === undefined) {
     return value
   }
@@ -186,7 +186,7 @@ function cloneMetadataValue(value: DevServerMetadataValue): DevServerMetadataVal
   return clone
 }
 
-function createRefreshCycle<TMetadata>(): RefreshCycle<TMetadata> {
+function createRefreshCycle<TMetadata extends object>(): RefreshCycle<TMetadata> {
   const deferred = createDeferred<DevServerRefreshResult<TMetadata>>()
   return { deferred }
 }

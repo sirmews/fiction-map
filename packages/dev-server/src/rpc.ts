@@ -1,19 +1,24 @@
-import type { GraphMetadata } from "@fiction-map/core"
 import { DevServerState } from "./state"
 import {
+  DEV_SERVER_RPC_ERROR_CODES,
+  DEV_SERVER_RPC_ERRORS,
   DEV_SERVER_RPC_METHODS,
   DEV_SERVER_RPC_NOTIFICATIONS,
   JSON_RPC_VERSION,
   toGraphSummary,
   toMetadataSnapshot,
+  toWireRefreshError,
   type DefinitionOpenParams,
   type DefinitionOpenResult,
+  type DevServerGraphMetadata,
   type GraphGetParams,
   type JsonRpcId,
   type JsonRpcNotification,
   type JsonRpcRequest,
   type JsonRpcResponse,
   type JsonRpcSuccessResponse,
+  type JsonObject,
+  type JsonValue,
   type MetadataChangedNotificationParams,
   type MetadataRefreshResult,
   type MetadataSnapshot,
@@ -21,7 +26,7 @@ import {
 
 export interface DispatchRpcRequestOptions {
   request: JsonRpcRequest
-  state: DevServerState<GraphMetadata>
+  state: DevServerState<DevServerGraphMetadata>
   openDefinition?: (
     params: DefinitionOpenParams
   ) => Promise<DefinitionOpenResult> | DefinitionOpenResult
@@ -42,7 +47,7 @@ export function jsonRpcError(
   id: JsonRpcId,
   code: number,
   message: string,
-  data?: unknown
+  data?: JsonValue
 ): JsonRpcResponse {
   return {
     jsonrpc: JSON_RPC_VERSION,
@@ -65,14 +70,27 @@ export async function dispatchRpcRequest(
       return jsonRpcSuccess(request.id, getMetadataSnapshot(state))
 
     case DEV_SERVER_RPC_METHODS.metadataRefresh: {
-      const refreshResult = await state.refresh()
-      const snapshot = getMetadataSnapshot(state)
-      const result: MetadataRefreshResult = {
-        ...snapshot,
-        metadata: refreshResult.metadata,
-        refreshedAt: refreshResult.refreshedAt.toISOString(),
+      try {
+        const refreshResult = await state.refresh()
+        const snapshot = getMetadataSnapshot(state)
+        const result: MetadataRefreshResult = {
+          ...snapshot,
+          metadata: refreshResult.metadata,
+          refreshedAt: refreshResult.refreshedAt.toISOString(),
+        }
+        return jsonRpcSuccess(request.id, result)
+      } catch (_error) {
+        const snapshot = state.getSnapshot()
+        const data: JsonObject = {
+          refreshError: toWireRefreshError(snapshot.refreshError),
+        }
+        return jsonRpcError(
+          request.id,
+          DEV_SERVER_RPC_ERRORS.metadataRefreshFailed.code,
+          DEV_SERVER_RPC_ERRORS.metadataRefreshFailed.message,
+          data
+        )
       }
-      return jsonRpcSuccess(request.id, result)
     }
 
     case DEV_SERVER_RPC_METHODS.graphList: {
@@ -84,13 +102,21 @@ export async function dispatchRpcRequest(
     case DEV_SERVER_RPC_METHODS.graphGet: {
       const params = request.params
       if (!isGraphGetParams(params)) {
-        return jsonRpcError(request.id, -32602, "Invalid params for graph/get")
+        return jsonRpcError(
+          request.id,
+          DEV_SERVER_RPC_ERRORS.invalidGraphGetParams.code,
+          DEV_SERVER_RPC_ERRORS.invalidGraphGetParams.message
+        )
       }
 
       const metadata = state.getSnapshot().metadata
       const graph = metadata?.graphs.find((candidate) => candidate.id === params.graphId)
       if (!graph) {
-        return jsonRpcError(request.id, -32004, `Graph not found: ${params.graphId}`)
+        return jsonRpcError(
+          request.id,
+          DEV_SERVER_RPC_ERRORS.graphNotFound.code,
+          `${DEV_SERVER_RPC_ERRORS.graphNotFound.messagePrefix}: ${params.graphId}`
+        )
       }
 
       return jsonRpcSuccess(request.id, graph)
@@ -99,22 +125,48 @@ export async function dispatchRpcRequest(
     case DEV_SERVER_RPC_METHODS.definitionOpen: {
       const params = request.params
       if (!isDefinitionOpenParams(params)) {
-        return jsonRpcError(request.id, -32602, "Invalid params for definition/open")
+        return jsonRpcError(
+          request.id,
+          DEV_SERVER_RPC_ERRORS.invalidDefinitionOpenParams.code,
+          DEV_SERVER_RPC_ERRORS.invalidDefinitionOpenParams.message
+        )
       }
 
-      const result = await (openDefinition?.(params) ??
-        Promise.resolve<DefinitionOpenResult>({
-          ok: false,
-          location: params,
-          code: "NOT_SUPPORTED",
-          message: "definition/open is not implemented yet",
-        }))
+      if (!openDefinition) {
+        return jsonRpcError(
+          request.id,
+          DEV_SERVER_RPC_ERRORS.definitionOpenUnavailable.code,
+          DEV_SERVER_RPC_ERRORS.definitionOpenUnavailable.message,
+          {
+            location: params,
+          }
+        )
+      }
 
-      return jsonRpcSuccess(request.id, result)
+      try {
+        const result = await openDefinition(params)
+
+        return jsonRpcSuccess(request.id, result)
+      } catch (error) {
+        const data: JsonObject = {
+          location: params,
+          reason: toErrorMessage(error),
+        }
+        return jsonRpcError(
+          request.id,
+          DEV_SERVER_RPC_ERRORS.definitionOpenFailed.code,
+          DEV_SERVER_RPC_ERRORS.definitionOpenFailed.message,
+          data
+        )
+      }
     }
 
     default:
-      return jsonRpcError(request.id, -32601, `Method not found: ${request.method}`)
+      return jsonRpcError(
+        request.id,
+        DEV_SERVER_RPC_ERRORS.methodNotFound.code,
+        `${DEV_SERVER_RPC_ERRORS.methodNotFound.messagePrefix}: ${request.method}`
+      )
   }
 }
 
@@ -136,7 +188,9 @@ export function createMetadataChangedNotification(
   }
 }
 
-function getMetadataSnapshot(state: DevServerState<GraphMetadata>): MetadataSnapshot {
+function getMetadataSnapshot(
+  state: DevServerState<DevServerGraphMetadata>
+): MetadataSnapshot {
   const snapshot = state.getSnapshot()
   return toMetadataSnapshot(snapshot.metadata, snapshot.lastRefreshAt, snapshot.refreshError)
 }
@@ -162,9 +216,18 @@ function isDefinitionOpenParams(value: unknown): value is DefinitionOpenParams {
   )
 }
 
+function toErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return String(error)
+}
+
 export type {
   DefinitionOpenParams,
   DefinitionOpenResult,
+  DevServerGraphMetadata,
   GraphGetParams,
   JsonRpcNotification,
   JsonRpcRequest,

@@ -84,6 +84,9 @@
 - Avoid a separate always-on background daemon. Follow the repo research direction: on-demand dev process started by `fiction-map dev`, local-only by default.
 - Use push notifications for file changes. Polling would be a regression against the stated hot-reload experience.
 - Treat click-to-code as a first-class API with graceful failure; do not hardwire one editor or assume a shell-specific `open` flow.
+- Treat `metadata/refresh` as a request-surface operation that joins the current refresh or starts one if idle. Do not let the RPC layer implicitly queue extra refresh cycles; watcher-driven invalidation should call a distinct queued-refresh path in state.
+- Treat `graph/get` missing ids as JSON-RPC errors, not nullable success envelopes. `graph/list` is the discovery surface; `graph/get` is a strict lookup.
+- Expose one dashboard protocol surface for Milestone 4: JSON-RPC over WebSocket, plus a minimal HTTP health endpoint for readiness/debugging. Do not add a parallel HTTP JSON API in the first slice.
 
 ## Task 1: Refactor Generator Reuse For Dev-Server Consumption
 
