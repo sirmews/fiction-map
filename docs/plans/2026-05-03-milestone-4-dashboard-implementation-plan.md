@@ -138,20 +138,7 @@
 - [ ] On refresh success, update the metadata snapshot and broadcast `notify/metadata-changed`; on refresh failure, preserve the prior good snapshot and expose the error state.
 - [ ] Add tests that prove a refresh notification is broadcast after a watched change and that bad refreshes do not crash the process or erase the last valid metadata.
 
-## Task 5: Add Click-To-Code As A Supported Server Capability
-
-**Files:**
-- Create: `packages/dev-server/src/open-editor.ts`
-- Modify: `packages/dev-server/src/protocol.ts`
-- Modify: `packages/dev-server/src/rpc.ts`
-- Test: `packages/dev-server/src/server.test.ts`
-
-- [ ] Implement `definition/open` so the dashboard can request a source location jump using metadata file, line, and column.
-- [ ] Support an explicit `--editor` option or environment-based editor detection before falling back to platform defaults.
-- [ ] Return structured success and failure responses so the UI can show when a location cannot be opened instead of silently failing.
-- [ ] Test command construction and failure paths without launching a real editor process.
-
-## Task 6: Add The Dashboard App Package And Live Data Client
+## Task 5: Build The Dashboard App Package And Live Metadata Client
 
 **Files:**
 - Create: `packages/dashboard/package.json`
@@ -168,20 +155,33 @@
 - [ ] Build `useMetadata` around the protocol contract: initial load, loading state, refresh state, reconnect state, and server error state.
 - [ ] Run the dashboard package typecheck and any package-local tests before moving on to graph rendering.
 
-## Task 7: Build The First Honest Dashboard Slice
+## Task 6: Build The First Honest Dashboard Slice For Human Understanding
 
 **Files:**
 - Create: `packages/dashboard/src/lib/metadata.ts`
 - Create: `packages/dashboard/src/components/GraphPanel.tsx`
 - Create: `packages/dashboard/src/components/CatalogPanel.tsx`
 - Create: `packages/dashboard/src/components/ValidationPanel.tsx`
+- Create: `packages/dashboard/src/components/ArchitecturePanel.tsx`
 - Create: `packages/dashboard/src/components/DefinitionDetails.tsx`
 - Test: `packages/dashboard/src/components/__tests__/...`
 
-- [ ] Adapt `GraphMetadata` into `@xyflow/react` node and edge models instead of bypassing the metadata layer with example-only code.
-- [ ] Render graph visualization using `@fiction-map/visualize`, plus catalog and validation panels from the same live metadata source.
-- [ ] Add selection details that show source location and can invoke `definition/open`.
+- [ ] Adapt `GraphMetadata` into explicit dashboard view-models instead of bypassing the metadata layer with example-only code.
+- [ ] Render graph visualization using `@fiction-map/visualize`, plus catalog, validation, and architecture/mechanics panels from the same live metadata source.
+- [ ] Keep source locations visible as provenance and evidence for how the system is assembled, without making editor-launch a requirement for this slice.
 - [ ] Cover loading, empty metadata, refresh, and validation-error states with UI tests so the first dashboard slice is resilient rather than demo-only.
+
+## Task 7: Add LLM-Oriented Context Packs And Prompt Seeds
+
+**Files:**
+- Create: `packages/dashboard/src/lib/context-packs.ts`
+- Create: `packages/dashboard/src/components/ContextPackPanel.tsx`
+- Test: `packages/dashboard/src/lib/context-packs.test.ts`
+
+- [ ] Generate a whole-project architecture summary from live metadata plus curated repo references, without trying to inline the entire repository into one prompt.
+- [ ] Add copyable context packs for at least project summary, graph system, dev runtime, and validation so humans and LLMs can start from the right abstraction level.
+- [ ] Make each pack include: purpose, system view, key concepts, important files/docs to inspect next, and a suggested follow-up prompt.
+- [ ] Test context-pack generation as pure derived logic so outputs stay deterministic, concise, and grounded in current metadata rather than ad hoc UI strings.
 
 ## Task 8: Wire `fiction-map dev` End To End
 
@@ -192,23 +192,23 @@
 - Modify: `packages/cli/package.json`
 - Modify: `package.json`
 
-- [ ] Add `fiction-map dev` to the CLI with options for `--root-dir`, `--port`, `--open`, and `--editor`.
+- [ ] Add `fiction-map dev` to the CLI with options for `--root-dir`, `--port`, and `--open`, leaving `--editor` out unless editor integration is later reinstated as a real requirement.
 - [ ] Have the command start the dev server against the requested root, then either serve the built dashboard assets or proxy to a dashboard dev server, depending on mode.
 - [ ] Make startup behavior explicit: print dashboard URL, show refresh status, and fail loudly on port conflicts or invalid root directories.
 - [ ] Add at least one CLI-level smoke test or scripted verification path that proves the command boots and exposes the expected endpoint.
 
-## Task 9: Verify The Vertical Slice Against The Example Project
+## Task 9: Verify The Legibility Slice Against The Example Project
 
 **Files:**
 - Modify: `examples/story/...` only if needed for realistic validation coverage
 - Test: integration scripts or package tests added during Milestone 4
 
-- [ ] Run `fiction-map dev` against `examples/story` and verify that the dashboard loads current metadata, renders the graph, shows catalog entries, and exposes validation state.
+- [ ] Run `fiction-map dev` against `examples/story` and verify that the dashboard loads current metadata, renders the graph, shows catalog entries, exposes validation state, and surfaces an architecture/mechanics summary.
 - [ ] Edit a watched example file and verify the dashboard updates through `notify/metadata-changed` rather than requiring a page reload.
-- [ ] Trigger click-to-code from the dashboard and verify a source location opens or a structured error is surfaced.
+- [ ] Verify that each required context pack can be copied and gives a useful starting point for further LLM analysis, including clear directions on where to inspect next.
 - [ ] Capture any gaps found during this manual integration pass as follow-up issues before claiming Milestone 4’s first slice is done.
 
-## Task 10: Close The Slice With Docs And Guardrails
+## Task 10: Close The Slice With Docs And Deferred Editor Integration
 
 **Files:**
 - Modify: `README.md`
@@ -216,16 +216,17 @@
 - Create or modify: package READMEs for any new packages
 
 - [ ] Document the real `fiction-map dev` workflow, what it currently supports, and what is still intentionally out of scope for Milestone 4.
-- [ ] Update milestone wording so graph view, catalog, validation, notifications, and click-to-code are marked according to the implemented slice, while playtest and traces remain pending if they were not built.
-- [ ] Add troubleshooting notes for root directory scanning, port conflicts, and editor integration failures.
+- [ ] Update milestone wording so graph view, catalog, validation, notifications, architecture/context packs, and source provenance are marked according to the implemented slice, while playtest, traces, and editor integration remain pending if they were not built.
+- [ ] Add troubleshooting notes for root directory scanning, port conflicts, and stale or low-signal context pack outputs.
+- [ ] Record editor integration as a deferred capability rather than an assumed next step, unless a real user workflow later justifies it.
 - [ ] Run the full workspace verification pass: `bun test`, `bun typecheck`, and the agreed manual dashboard smoke test before closing the milestone slice.
 
 ## Risks To Watch
 
-- Generator metadata and dashboard UI can drift if the view-model layer is not explicit.
+- Generator metadata and dashboard UI can drift if the view-model and context-pack layers are not explicit.
 - File watching can become noisy if generated files or build outputs are included in the watch set.
-- Click-to-code becomes brittle if file paths are not normalized relative to the scanned root.
-- Trying to add playtest/traces in the same slice will likely overload the first Milestone 4 delivery and blur verification.
+- Whole-project prompt export can become low-signal if it tries to inline too much raw repo detail instead of pointing to the right next files and docs.
+- Trying to add playtest, traces, or editor integration in the same slice will likely overload the first Milestone 4 delivery and blur verification.
 
 ## Recommended Execution Order
 
