@@ -759,6 +759,197 @@ Cautions:
 }
 ```
 
+## Canonical Example: Dev Runtime Pack
+
+This example tests the same schema against a narrower and more implementation-facing subsystem. If the model works here too, it is much safer to let it guide dashboard work.
+
+```ts
+const exampleDevRuntimePack: ContextPack = {
+  id: "dev-runtime",
+  title: "Fiction Map Dev Runtime",
+  audience: "both",
+  intent: "orientation",
+  scope: "subsystem",
+  kind: "dev-runtime",
+  summary:
+    "Fiction Map's current dev runtime is the local path from generated metadata to a live dashboard transport. The CLI is still incomplete for `fiction-map dev`, but the reusable generator boundary, dev-server state model, watcher, JSON-RPC contract, and WebSocket transport are already implemented.",
+  purpose:
+    "Use this pack when you need to understand how live metadata refresh, server state, watcher invalidation, and dashboard transport fit together.",
+  systemView: [
+    "`packages/cli` owns command orchestration, but long-lived runtime state does not live there.",
+    "`packages/dev-server/src/state.ts` owns current metadata, refresh lifecycle, queued invalidation, and last-good-state behavior.",
+    "`packages/dev-server/src/server.ts` owns HTTP health, WebSocket transport, and metadata-changed broadcasts to clients.",
+    "`packages/dev-server/src/watcher.ts` converts filesystem changes into debounced invalidation events for supported graph-definition file types.",
+    "The dashboard client is not implemented yet, so the runtime currently stops at transport and protocol readiness rather than browser rendering.",
+  ],
+  keyConcepts: [
+    {
+      name: "refresh versus queued refresh",
+      explanation:
+        "Manual refresh joins or starts the active cycle, while watcher invalidation queues a follow-up cycle when work is already in flight.",
+    },
+    {
+      name: "last good metadata",
+      explanation:
+        "A failed refresh does not erase the last valid metadata snapshot; the error is surfaced while the previous good state remains available.",
+    },
+    {
+      name: "JSON-RPC contract",
+      explanation:
+        "The server uses a typed JSON-RPC layer for metadata access, graph lookup, refresh requests, and dashboard notifications.",
+    },
+    {
+      name: "watcher filtering",
+      explanation:
+        "Only supported graph-definition file types trigger debounced refresh behavior, while excluded build/generated paths are ignored.",
+    },
+  ],
+  evidence: [
+    {
+      kind: "code",
+      label: "Dev server state lifecycle",
+      path: "packages/dev-server/src/state.ts",
+      reason: "Defines refresh semantics, queued refresh behavior, and error preservation.",
+      priority: 1,
+    },
+    {
+      kind: "code",
+      label: "RPC protocol contract",
+      path: "packages/dev-server/src/protocol.ts",
+      reason: "Defines the wire-level request, response, and notification surface.",
+      priority: 2,
+    },
+    {
+      kind: "code",
+      label: "RPC dispatcher",
+      path: "packages/dev-server/src/rpc.ts",
+      reason: "Shows how requests are adapted into state reads, refresh behavior, and errors.",
+      priority: 3,
+    },
+    {
+      kind: "code",
+      label: "Server transport",
+      path: "packages/dev-server/src/server.ts",
+      reason: "Shows the health endpoint, WebSocket transport, watcher integration, and notification broadcasts.",
+      priority: 4,
+    },
+    {
+      kind: "code",
+      label: "Watcher boundary",
+      path: "packages/dev-server/src/watcher.ts",
+      reason: "Shows supported file patterns, exclusions, and debounce handling.",
+      priority: 5,
+    },
+    {
+      kind: "doc",
+      label: "Milestone 4 execution plan",
+      path: "docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md",
+      reason: "Explains what has already been built and what remains to complete the dashboard slice.",
+      priority: 6,
+    },
+  ],
+  nextLook: [
+    {
+      kind: "code",
+      label: "Inspect state lifecycle",
+      path: "packages/dev-server/src/state.ts",
+      reason: "This is the core of refresh semantics and snapshot preservation.",
+      focus: "Look at `refresh()`, `queueRefresh()`, `refreshTask()`, and `queueRefreshTask()` semantics.",
+      priority: 1,
+    },
+    {
+      kind: "code",
+      label: "Inspect transport and watcher integration",
+      path: "packages/dev-server/src/server.ts",
+      reason: "This is where watcher-driven invalidation becomes client-visible runtime behavior.",
+      focus: "Look at watcher creation, metadata-changed broadcasting, startup failure handling, and WebSocket request handling.",
+      priority: 2,
+    },
+    {
+      kind: "code",
+      label: "Inspect the watcher filter",
+      path: "packages/dev-server/src/watcher.ts",
+      reason: "This explains which filesystem events actually matter to the runtime.",
+      focus: "Look at supported suffixes, excluded path segments, and debounce logic.",
+      priority: 3,
+    },
+    {
+      kind: "code",
+      label: "Inspect protocol and dispatch",
+      path: "packages/dev-server/src/protocol.ts",
+      reason: "This defines what the dashboard client will be allowed to ask for.",
+      focus: "Look at metadata, graph, and notification types plus error taxonomy.",
+      priority: 4,
+    },
+    {
+      kind: "doc",
+      label: "Inspect remaining milestone tasks",
+      path: "docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md",
+      reason: "This clarifies what is still missing before `fiction-map dev` is end-to-end.",
+      focus: "Look at Tasks 5 through 10, especially the dashboard app and context-pack steps.",
+      priority: 5,
+    },
+  ],
+  implementationStatus: [
+    "Generator reuse for in-process metadata refresh is implemented.",
+    "Dev-server config, state, watcher, RPC, and server transport are implemented.",
+    "The dashboard app package is not implemented yet.",
+    "The CLI does not yet provide a real `fiction-map dev` command.",
+    "Context packs are defined in planning docs only, not in code.",
+  ],
+  contextBlock: `Title: Fiction Map Dev Runtime
+Purpose: Use this pack to understand how live metadata refresh, server state, watcher invalidation, and dashboard transport fit together.
+Intent: orientation
+
+Summary:
+Fiction Map's current dev runtime is the local path from generated metadata to a live dashboard transport. The CLI is still incomplete for fiction-map dev, but the reusable generator boundary, dev-server state model, watcher, JSON-RPC contract, and WebSocket transport are already implemented.
+
+System View:
+- packages/cli owns command orchestration, but long-lived runtime state does not live there.
+- packages/dev-server/src/state.ts owns current metadata, refresh lifecycle, queued invalidation, and last-good-state behavior.
+- packages/dev-server/src/server.ts owns HTTP health, WebSocket transport, and metadata-changed broadcasts to clients.
+- packages/dev-server/src/watcher.ts converts filesystem changes into debounced invalidation events for supported graph-definition file types.
+- The dashboard client is not implemented yet, so the runtime currently stops at transport and protocol readiness rather than browser rendering.
+
+Key Concepts:
+- refresh versus queued refresh: manual refresh joins or starts the active cycle, while watcher invalidation queues a follow-up cycle when work is already in flight.
+- last good metadata: a failed refresh does not erase the last valid metadata snapshot; the error is surfaced while the previous good state remains available.
+- JSON-RPC contract: the server uses a typed JSON-RPC layer for metadata access, graph lookup, refresh requests, and dashboard notifications.
+- watcher filtering: only supported graph-definition file types trigger debounced refresh behavior, while excluded build/generated paths are ignored.
+
+Current Implementation Status:
+- Generator reuse for in-process metadata refresh is implemented.
+- Dev-server config, state, watcher, RPC, and server transport are implemented.
+- The dashboard app package is not implemented yet.
+- The CLI does not yet provide a real fiction-map dev command.
+- Context packs are defined in planning docs only, not in code.
+
+Evidence:
+- packages/dev-server/src/state.ts — defines refresh semantics, queued refresh behavior, and error preservation.
+- packages/dev-server/src/protocol.ts — defines the wire-level request, response, and notification surface.
+- packages/dev-server/src/rpc.ts — shows how requests are adapted into state reads, refresh behavior, and errors.
+- packages/dev-server/src/server.ts — shows the health endpoint, WebSocket transport, watcher integration, and notification broadcasts.
+- packages/dev-server/src/watcher.ts — shows supported file patterns, exclusions, and debounce handling.
+- docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md — explains what has been built and what remains.
+
+Inspect Next:
+- packages/dev-server/src/state.ts — inspect refresh, queued refresh, and last-good-metadata behavior.
+- packages/dev-server/src/server.ts — inspect watcher integration, broadcast behavior, startup failure handling, and WebSocket request handling.
+- packages/dev-server/src/watcher.ts — inspect supported file patterns and excluded path logic.
+- packages/dev-server/src/protocol.ts — inspect request, response, notification, and error types.
+- docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md — inspect what remains to complete the dashboard slice.
+
+Cautions:
+- This pack explains the runtime boundary, not the future dashboard UI.
+- The CLI orchestration step for fiction-map dev is still pending, so the end-to-end user command is not real yet.`,
+  promptSeed: `You are reviewing Fiction Map's dev runtime.\n\nStart by reading:\n- packages/dev-server/src/state.ts\n- packages/dev-server/src/server.ts\n- packages/dev-server/src/watcher.ts\n- packages/dev-server/src/protocol.ts\n- docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md\n\nThen explain:\n1. how refresh lifecycle works\n2. how watcher invalidation reaches clients\n3. what remains to make fiction-map dev a complete end-to-end workflow\n\nDo not summarize the whole repository. Focus on the dev runtime boundary and the missing dashboard/CLI pieces.`,
+  cautions: [
+    "This pack describes current dev-runtime implementation, not the final user-facing dashboard workflow.",
+    "The runtime is real up to transport and notifications, but browser UI and CLI orchestration are still pending.",
+  ],
+}
+```
+
 ## Follow-Up Questions For Review
 
 - Is the first pack set correct, or should project summary and dev runtime be merged initially?
