@@ -2,8 +2,9 @@ import { ContextPackPanel } from "./components/ContextPackPanel"
 import { useMetadata } from "./hooks/useMetadata"
 import { buildPrimaryContextPacks } from "./lib/context-packs"
 import { deriveDashboardMetadataFacts } from "./lib/metadata"
+import type { DevServerRpcClient } from "./lib/rpc-client"
 
-export function App() {
+export function App(props: { client?: DevServerRpcClient }) {
   const {
     connectionState,
     error,
@@ -14,7 +15,7 @@ export function App() {
     refresh,
     refreshError,
     snapshot,
-  } = useMetadata()
+  } = useMetadata(props.client)
   const packs = buildPrimaryContextPacks(deriveDashboardMetadataFacts(snapshot))
 
   return (
@@ -22,10 +23,11 @@ export function App() {
       <section style={styles.hero}>
         <div>
           <p style={styles.kicker}>Fiction Map Dashboard</p>
-          <h1 style={styles.title}>Minimal live metadata shell</h1>
+          <h1 style={styles.title}>Architecture context dashboard</h1>
           <p style={styles.subtitle}>
-            This shell is only here to prove the dev-server connection, metadata refresh
-            loop, and the direction for later dashboard work.
+            This first slice turns the live metadata path into copyable architecture
+            context for humans and LLMs, without pretending the broader dashboard is
+            complete yet.
           </p>
         </div>
         <button

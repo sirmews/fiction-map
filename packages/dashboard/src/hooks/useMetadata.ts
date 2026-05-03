@@ -147,7 +147,7 @@ export function useMetadata(client: DevServerRpcClient = getDefaultClient()): Us
     isLoading,
     isRefreshing,
     lastNotification,
-    metadataAvailable: snapshot?.metadata !== null,
+    metadataAvailable: snapshot?.metadata != null,
     refresh,
     refreshError,
     snapshot,

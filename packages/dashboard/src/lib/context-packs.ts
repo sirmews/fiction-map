@@ -45,6 +45,9 @@ export function buildPrimaryContextPacks(
 }
 
 export function buildProjectSummaryPack(facts: DashboardMetadataFacts): ContextPack {
+  const metadataSnapshotLine = facts.metadataAvailable
+    ? `The current live snapshot exposes ${formatDefinitionCounts(facts.counts)}.`
+    : "Metadata is not available yet, so the dashboard can only describe the intended architecture boundary."
   const summary =
     "Fiction Map defines graph-based systems in code and surfaces their structure through generated metadata, a live dev server, and a dashboard that now prioritizes architecture legibility over code navigation."
   const systemView = [
@@ -52,7 +55,7 @@ export function buildProjectSummaryPack(facts: DashboardMetadataFacts): ContextP
     "`packages/dev-server` owns long-lived metadata state, watcher invalidation, RPC, and WebSocket transport.",
     "Generated metadata is the bridge between handwritten graph definitions and dashboard-readable architecture context.",
     "The dashboard direction is explicitly about helping humans and LLMs understand the platform, not about click-to-code first.",
-    `The current live snapshot exposes ${formatDefinitionCounts(facts.counts)}.`,
+    metadataSnapshotLine,
   ]
   const keyConcepts = [
     {
@@ -78,17 +81,25 @@ export function buildProjectSummaryPack(facts: DashboardMetadataFacts): ContextP
   ]
   const evidence = [
     toMetadataEvidence(facts, 1),
-    ...getCuratedSourcesForPack("project-summary").slice(0, 5).map(toReference),
+    ...selectCuratedReferences("project-summary", [
+      "README.md",
+      "docs/NORTH_STAR.md",
+      "docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md",
+      "packages/cli/src/cli.ts",
+      "packages/dev-server/src/server.ts",
+    ]),
   ]
-  const nextLook = getCuratedSourcesForPack("project-summary")
-    .filter((source) => source.focus)
-    .slice(0, 4)
-    .map(toReference)
+  const nextLook = selectCuratedReferences("project-summary", [
+    "docs/NORTH_STAR.md",
+    "docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md",
+    "packages/dev-server/src/state.ts",
+    "packages/dev-server/src/server.ts",
+  ])
   const implementationStatus = [
     "Generator reuse is implemented.",
     "Dev-server config, state, RPC, server, and watcher are implemented.",
     "Dashboard app package and metadata shell are implemented.",
-    "Context-pack generation is not implemented yet.",
+    "Project Summary Pack and Dev Runtime Pack are implemented in the dashboard.",
     "Editor integration is deferred rather than a current milestone requirement.",
   ]
   const promptSeed = [
@@ -174,18 +185,27 @@ export function buildDevRuntimePack(facts: DashboardMetadataFacts): ContextPack 
   ]
   const evidence = [
     toMetadataEvidence(facts, 1),
-    ...getCuratedSourcesForPack("dev-runtime").slice(0, 5).map(toReference),
+    ...selectCuratedReferences("dev-runtime", [
+      "packages/dev-server/src/state.ts",
+      "packages/dev-server/src/protocol.ts",
+      "packages/dev-server/src/rpc.ts",
+      "packages/dev-server/src/server.ts",
+      "packages/dev-server/src/watcher.ts",
+    ]),
   ]
-  const nextLook = getCuratedSourcesForPack("dev-runtime")
-    .filter((source) => source.focus)
-    .slice(0, 5)
-    .map(toReference)
+  const nextLook = selectCuratedReferences("dev-runtime", [
+    "packages/dev-server/src/state.ts",
+    "packages/dev-server/src/server.ts",
+    "packages/dev-server/src/watcher.ts",
+    "packages/dev-server/src/protocol.ts",
+    "docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md",
+  ])
   const implementationStatus = [
     "Generator reuse for in-process metadata refresh is implemented.",
     "Dev-server config, state, watcher, RPC, and server transport are implemented.",
     "Dashboard app package and metadata shell are implemented.",
+    "Project Summary Pack and Dev Runtime Pack are implemented in the dashboard.",
     "The CLI does not yet provide a real `fiction-map dev` command.",
-    "Context packs are defined in planning docs only, not in code.",
   ]
   const promptSeed = [
     "You are reviewing Fiction Map's dev runtime.",
@@ -264,8 +284,8 @@ function renderContextBlock(input: {
     "",
     "Current Metadata Snapshot:",
     `- Metadata available: ${input.facts.metadataAvailable ? "yes" : "no"}`,
-    `- Definition counts: ${formatDefinitionCounts(input.facts.counts)}`,
-    `- Validation counts: ${input.facts.validationCounts.errors} errors, ${input.facts.validationCounts.warnings} warnings`,
+    `- Definition counts: ${formatDefinitionCountsForPack(input.facts)}`,
+    `- Validation counts: ${formatValidationCountsForPack(input.facts)}`,
     `- Last refresh: ${input.facts.lastRefreshAt ?? "never"}`,
     `- Current refresh error: ${refreshError}`,
     "",
@@ -295,8 +315,39 @@ function toMetadataEvidence(
     label: "Current metadata snapshot",
     path: "live-metadata://snapshot",
     priority,
-    reason: `Current snapshot contains ${formatDefinitionCounts(facts.counts)} with ${facts.validationCounts.errors} errors and ${facts.validationCounts.warnings} warnings.`,
+    reason: facts.metadataAvailable
+      ? `Current snapshot contains ${formatDefinitionCounts(facts.counts)} with ${facts.validationCounts.errors} errors and ${facts.validationCounts.warnings} warnings.`
+      : "Current metadata snapshot is unavailable, so architecture claims must lean on curated references rather than live project structure.",
   }
+}
+
+function formatDefinitionCountsForPack(facts: DashboardMetadataFacts): string {
+  if (!facts.metadataAvailable) {
+    return "metadata unavailable"
+  }
+
+  return formatDefinitionCounts(facts.counts)
+}
+
+function formatValidationCountsForPack(facts: DashboardMetadataFacts): string {
+  if (!facts.metadataAvailable) {
+    return "metadata unavailable"
+  }
+
+  return `${facts.validationCounts.errors} errors, ${facts.validationCounts.warnings} warnings`
+}
+
+function selectCuratedReferences(
+  pack: ContextPackKind,
+  paths: string[]
+): ContextPackReference[] {
+  const byPath = new Map(
+    getCuratedSourcesForPack(pack).map((source) => [source.path, toReference(source)])
+  )
+
+  return paths
+    .map((path) => byPath.get(path))
+    .filter((entry): entry is ContextPackReference => entry !== undefined)
 }
 
 function toReference(source: {
