@@ -172,21 +172,25 @@
 - [ ] Replace the current placeholders with readable, copyable context-pack surfaces that make the dashboard useful for human orientation before graph, catalog, or validation deep dives exist.
 - [ ] Cover loading, empty metadata, copy actions, and pack-generation states with package-local tests so the first dashboard slice is resilient rather than a static demo.
 
-## Task 7: Expand Into Graph, Validation, And Additional Context Packs
+## Task 7: Build The Canonical Graph Understanding Model And First Visual Workspace
 
 **Files:**
-- Modify: `packages/dashboard/src/lib/metadata.ts`
-- Modify: `packages/dashboard/src/lib/context-packs.ts`
+- Create: `packages/dashboard/src/lib/project-model.ts`
+- Create: `packages/dashboard/src/lib/selection.ts`
+- Create: `packages/dashboard/src/lib/graph-canvas-model.ts`
+- Create: `packages/dashboard/src/lib/catalog-model.ts`
+- Create: `packages/dashboard/src/components/DashboardWorkspace.tsx`
 - Create: `packages/dashboard/src/components/GraphPanel.tsx`
 - Create: `packages/dashboard/src/components/CatalogPanel.tsx`
 - Create: `packages/dashboard/src/components/ValidationPanel.tsx`
-- Create: `packages/dashboard/src/components/DefinitionDetails.tsx`
+- Create: `packages/dashboard/src/components/SelectionDetails.tsx`
+- Modify: `packages/dashboard/src/lib/context-packs.ts`
 - Test: `packages/dashboard/src/components/__tests__/...`
 
-- [ ] Extend the dashboard beyond the first two orientation packs into graph-system, validation, and selection-aware surfaces once the shell is already useful.
-- [ ] Add graph, catalog, and validation panels from the same derived metadata layer so the context-pack outputs stay tied to visible dashboard evidence.
-- [ ] Keep source locations visible as provenance and evidence for how the system is assembled, without making editor-launch a requirement for this slice.
-- [ ] Extend pack-generation tests so additional packs remain deterministic, concise, and grounded in current metadata plus curated references.
+- [ ] Build one canonical dashboard project model from `MetadataSnapshot` rather than letting each future panel derive relationships from raw metadata independently.
+- [ ] Introduce explicit shared selection state so graph, catalog, validation, and details surfaces all read from the same current selection.
+- [ ] Add the first visual workspace: catalog/navigation, selected graph canvas, validation summaries, and selection-aware details from the shared project model.
+- [ ] Keep source locations and relationship provenance visible, and ensure future graph-system and validation packs remain consumers of the same understanding model rather than parallel logic.
 
 ## Task 8: Wire `fiction-map dev` End To End
 
