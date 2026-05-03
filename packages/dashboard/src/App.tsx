@@ -1,4 +1,7 @@
+import { ContextPackPanel } from "./components/ContextPackPanel"
 import { useMetadata } from "./hooks/useMetadata"
+import { buildPrimaryContextPacks } from "./lib/context-packs"
+import { deriveDashboardMetadataFacts } from "./lib/metadata"
 
 export function App() {
   const {
@@ -12,6 +15,7 @@ export function App() {
     refreshError,
     snapshot,
   } = useMetadata()
+  const packs = buildPrimaryContextPacks(deriveDashboardMetadataFacts(snapshot))
 
   return (
     <main style={styles.page}>
@@ -111,24 +115,7 @@ export function App() {
         </dl>
       </section>
 
-      <section style={styles.packGrid}>
-        <PlaceholderPack
-          title="Project Summary Pack"
-          description="Reserved for the high-level project context pack. This is not implemented yet in Task 5."
-          points={[
-            "Will summarize the system and point to the right docs and packages.",
-            "Current shell only proves metadata transport and refresh state.",
-          ]}
-        />
-        <PlaceholderPack
-          title="Dev Runtime Pack"
-          description="Reserved for the dev-server and dashboard-boundary context pack. This is not implemented yet in Task 5."
-          points={[
-            "Will explain watcher, state, RPC, and browser-runtime flow.",
-            "Current shell only exposes whether the metadata path is live.",
-          ]}
-        />
-      </section>
+      <ContextPackPanel packs={packs} />
     </main>
   )
 }
@@ -154,27 +141,6 @@ function StatusRow(props: { description: string; term: string }) {
       <dt style={styles.term}>{props.term}</dt>
       <dd style={styles.description}>{props.description}</dd>
     </>
-  )
-}
-
-function PlaceholderPack(props: {
-  description: string
-  points: string[]
-  title: string
-}) {
-  return (
-    <article style={styles.pack}>
-      <div style={styles.packBadge}>Placeholder</div>
-      <h2 style={styles.packTitle}>{props.title}</h2>
-      <p style={styles.packDescription}>{props.description}</p>
-      <ul style={styles.packList}>
-        {props.points.map((point) => (
-          <li key={point} style={styles.packListItem}>
-            {point}
-          </li>
-        ))}
-      </ul>
-    </article>
   )
 }
 
@@ -323,44 +289,5 @@ const styles = {
   description: {
     margin: 0,
     color: "#4a443b",
-  },
-  packGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "16px",
-  },
-  pack: {
-    padding: "22px",
-    borderRadius: "20px",
-    border: "1px dashed rgba(28, 26, 23, 0.24)",
-    background: "rgba(255, 251, 242, 0.88)",
-  },
-  packBadge: {
-    display: "inline-block",
-    marginBottom: "12px",
-    padding: "4px 10px",
-    borderRadius: "999px",
-    background: "#ece1ca",
-    color: "#6b5123",
-    fontSize: "12px",
-    textTransform: "uppercase",
-    letterSpacing: "0.08em",
-  },
-  packTitle: {
-    margin: "0 0 8px",
-    fontSize: "20px",
-  },
-  packDescription: {
-    margin: "0 0 14px",
-    lineHeight: 1.5,
-    color: "#4a443b",
-  },
-  packList: {
-    margin: 0,
-    paddingLeft: "18px",
-    color: "#4a443b",
-  },
-  packListItem: {
-    marginBottom: "8px",
   },
 } as const
