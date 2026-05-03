@@ -155,33 +155,38 @@
 - [ ] Build `useMetadata` around the protocol contract: initial load, loading state, refresh state, reconnect state, and server error state.
 - [ ] Run the dashboard package typecheck and any package-local tests before moving on to graph rendering.
 
-## Task 6: Build The First Honest Dashboard Slice For Human Understanding
+## Task 6: Build The First Real Context-Pack Dashboard Slice
 
 **Files:**
 - Create: `packages/dashboard/src/lib/metadata.ts`
+- Create: `packages/dashboard/src/lib/curated-sources.ts`
+- Create: `packages/dashboard/src/lib/context-packs.ts`
+- Create: `packages/dashboard/src/components/ContextPackPanel.tsx`
+- Create: `packages/dashboard/src/components/ContextPackCard.tsx`
+- Create: `packages/dashboard/src/components/ProjectSummarySection.tsx`
+- Create: `packages/dashboard/src/components/DevRuntimeSection.tsx`
+- Test: `packages/dashboard/src/components/__tests__/...`
+
+- [ ] Add a typed derived view-model layer that combines live metadata snapshot facts with a small code-owned curated reference set rather than reading arbitrary repo files at render time.
+- [ ] Implement deterministic `Project Summary Pack` and `Dev Runtime Pack` generation for the default `orientation` intent, including `summary`, `systemView`, `keyConcepts`, `evidence`, `nextLook`, `implementationStatus`, `contextBlock`, and `promptSeed`.
+- [ ] Replace the current placeholders with readable, copyable context-pack surfaces that make the dashboard useful for human orientation before graph, catalog, or validation deep dives exist.
+- [ ] Cover loading, empty metadata, copy actions, and pack-generation states with package-local tests so the first dashboard slice is resilient rather than a static demo.
+
+## Task 7: Expand Into Graph, Validation, And Additional Context Packs
+
+**Files:**
+- Modify: `packages/dashboard/src/lib/metadata.ts`
+- Modify: `packages/dashboard/src/lib/context-packs.ts`
 - Create: `packages/dashboard/src/components/GraphPanel.tsx`
 - Create: `packages/dashboard/src/components/CatalogPanel.tsx`
 - Create: `packages/dashboard/src/components/ValidationPanel.tsx`
-- Create: `packages/dashboard/src/components/ArchitecturePanel.tsx`
 - Create: `packages/dashboard/src/components/DefinitionDetails.tsx`
 - Test: `packages/dashboard/src/components/__tests__/...`
 
-- [ ] Adapt `GraphMetadata` into explicit dashboard view-models instead of bypassing the metadata layer with example-only code.
-- [ ] Render graph visualization using `@fiction-map/visualize`, plus catalog, validation, and architecture/mechanics panels from the same live metadata source.
+- [ ] Extend the dashboard beyond the first two orientation packs into graph-system, validation, and selection-aware surfaces once the shell is already useful.
+- [ ] Add graph, catalog, and validation panels from the same derived metadata layer so the context-pack outputs stay tied to visible dashboard evidence.
 - [ ] Keep source locations visible as provenance and evidence for how the system is assembled, without making editor-launch a requirement for this slice.
-- [ ] Cover loading, empty metadata, refresh, and validation-error states with UI tests so the first dashboard slice is resilient rather than demo-only.
-
-## Task 7: Add LLM-Oriented Context Packs And Prompt Seeds
-
-**Files:**
-- Create: `packages/dashboard/src/lib/context-packs.ts`
-- Create: `packages/dashboard/src/components/ContextPackPanel.tsx`
-- Test: `packages/dashboard/src/lib/context-packs.test.ts`
-
-- [ ] Generate a whole-project architecture summary from live metadata plus curated repo references, without trying to inline the entire repository into one prompt.
-- [ ] Add copyable context packs for at least project summary, graph system, dev runtime, and validation so humans and LLMs can start from the right abstraction level.
-- [ ] Make each pack include: purpose, system view, key concepts, important files/docs to inspect next, and a suggested follow-up prompt.
-- [ ] Test context-pack generation as pure derived logic so outputs stay deterministic, concise, and grounded in current metadata rather than ad hoc UI strings.
+- [ ] Extend pack-generation tests so additional packs remain deterministic, concise, and grounded in current metadata plus curated references.
 
 ## Task 8: Wire `fiction-map dev` End To End
 
@@ -203,9 +208,9 @@
 - Modify: `examples/story/...` only if needed for realistic validation coverage
 - Test: integration scripts or package tests added during Milestone 4
 
-- [ ] Run `fiction-map dev` against `examples/story` and verify that the dashboard loads current metadata, renders the graph, shows catalog entries, exposes validation state, and surfaces an architecture/mechanics summary.
+- [ ] Run `fiction-map dev` against `examples/story` and verify that the dashboard loads current metadata, renders the first context-pack surfaces, and exposes architecture/runtime summaries grounded in the live project state.
 - [ ] Edit a watched example file and verify the dashboard updates through `notify/metadata-changed` rather than requiring a page reload.
-- [ ] Verify that each required context pack can be copied and gives a useful starting point for further LLM analysis, including clear directions on where to inspect next.
+- [ ] Verify that each implemented context pack can be copied and gives a useful starting point for further LLM analysis, including clear directions on where to inspect next.
 - [ ] Capture any gaps found during this manual integration pass as follow-up issues before claiming Milestone 4’s first slice is done.
 
 ## Task 10: Close The Slice With Docs And Deferred Editor Integration
@@ -216,7 +221,7 @@
 - Create or modify: package READMEs for any new packages
 
 - [ ] Document the real `fiction-map dev` workflow, what it currently supports, and what is still intentionally out of scope for Milestone 4.
-- [ ] Update milestone wording so graph view, catalog, validation, notifications, architecture/context packs, and source provenance are marked according to the implemented slice, while playtest, traces, and editor integration remain pending if they were not built.
+- [ ] Update milestone wording so dashboard shell, architecture/context packs, notifications, and source provenance are marked according to the implemented slice, while graph view, validation deep dives, playtest, traces, and editor integration remain pending if they were not built.
 - [ ] Add troubleshooting notes for root directory scanning, port conflicts, and stale or low-signal context pack outputs.
 - [ ] Record editor integration as a deferred capability rather than an assumed next step, unless a real user workflow later justifies it.
 - [ ] Run the full workspace verification pass: `bun test`, `bun typecheck`, and the agreed manual dashboard smoke test before closing the milestone slice.

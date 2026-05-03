@@ -614,7 +614,7 @@ const exampleProjectSummaryPack: ContextPack = {
     "`packages/dev-server` owns long-lived dev-time state, metadata refresh, watcher behavior, RPC contract, and WebSocket transport.",
     "Generated metadata is the bridge between handwritten graph definitions and the future dashboard surfaces.",
     "The dashboard direction is now focused on architecture legibility and LLM-oriented context packs rather than click-to-code.",
-    "Milestone 4 is partially implemented: generator reuse, RPC, transport, and watcher are real; dashboard UI and context packs are still pending.",
+    "Milestone 4 is partially implemented: generator reuse, RPC, transport, watcher, and the dashboard shell are real; context-pack content and CLI orchestration are still pending.",
   ],
   keyConcepts: [
     {
@@ -705,7 +705,7 @@ const exampleProjectSummaryPack: ContextPack = {
   implementationStatus: [
     "Generator reuse is implemented.",
     "Dev-server config, state, RPC, server, and watcher are implemented.",
-    "Dashboard app package is not implemented yet.",
+    "Dashboard app package and metadata shell are implemented.",
     "Context-pack generation is not implemented yet.",
     "Editor integration is deferred rather than a current milestone requirement.",
   ],
@@ -721,7 +721,7 @@ System View:
 - packages/dev-server owns long-lived dev-time state, metadata refresh, watcher behavior, RPC contract, and WebSocket transport.
 - Generated metadata is the bridge between handwritten graph definitions and the future dashboard surfaces.
 - The dashboard direction is now focused on architecture legibility and LLM-oriented context packs rather than click-to-code.
-- Milestone 4 is partially implemented: generator reuse, RPC, transport, and watcher are real; dashboard UI and context packs are still pending.
+- Milestone 4 is partially implemented: generator reuse, RPC, transport, watcher, and the dashboard shell are real; context-pack content and CLI orchestration are still pending.
 
 Key Concepts:
 - generated metadata: structured project information derived from graph definitions and used as the main dashboard input.
@@ -732,7 +732,7 @@ Key Concepts:
 Current Implementation Status:
 - Generator reuse is implemented.
 - Dev-server config, state, RPC, server, and watcher are implemented.
-- Dashboard app package is not implemented yet.
+- Dashboard app package and metadata shell are implemented.
 - Context-pack generation is not implemented yet.
 - Editor integration is deferred rather than a current milestone requirement.
 
@@ -750,7 +750,7 @@ Inspect Next:
 
 Cautions:
 - This pack is an orientation artifact, not a full repository summary.
-- Dashboard UI and context-pack code are still planned work, not current implementation.`,
+- Context-pack generation and richer dashboard content are still planned work, not current implementation.`,
   promptSeed: `You are reviewing Fiction Map at the architecture level.\n\nStart by reading:\n- docs/NORTH_STAR.md\n- docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md\n- packages/dev-server/src/state.ts\n- packages/dev-server/src/server.ts\n\nThen produce a concise architecture summary that explains:\n1. what the main packages are responsible for\n2. how metadata flows toward the future dashboard\n3. what parts of Milestone 4 are already implemented versus still pending\n\nDo not summarize the whole repository exhaustively. Focus on the top-level architecture and the current dev-runtime boundary.`,
   cautions: [
     "This pack is a starting point, not a complete repository export.",
@@ -780,7 +780,7 @@ const exampleDevRuntimePack: ContextPack = {
     "`packages/dev-server/src/state.ts` owns current metadata, refresh lifecycle, queued invalidation, and last-good-state behavior.",
     "`packages/dev-server/src/server.ts` owns HTTP health, WebSocket transport, and metadata-changed broadcasts to clients.",
     "`packages/dev-server/src/watcher.ts` converts filesystem changes into debounced invalidation events for supported graph-definition file types.",
-    "The dashboard client is not implemented yet, so the runtime currently stops at transport and protocol readiness rather than browser rendering.",
+    "The dashboard shell is implemented, but the runtime-facing architecture content and CLI orchestration are still incomplete.",
   ],
   keyConcepts: [
     {
@@ -893,7 +893,7 @@ const exampleDevRuntimePack: ContextPack = {
   implementationStatus: [
     "Generator reuse for in-process metadata refresh is implemented.",
     "Dev-server config, state, watcher, RPC, and server transport are implemented.",
-    "The dashboard app package is not implemented yet.",
+    "The dashboard app package and metadata shell are implemented.",
     "The CLI does not yet provide a real `fiction-map dev` command.",
     "Context packs are defined in planning docs only, not in code.",
   ],
@@ -909,7 +909,7 @@ System View:
 - packages/dev-server/src/state.ts owns current metadata, refresh lifecycle, queued invalidation, and last-good-state behavior.
 - packages/dev-server/src/server.ts owns HTTP health, WebSocket transport, and metadata-changed broadcasts to clients.
 - packages/dev-server/src/watcher.ts converts filesystem changes into debounced invalidation events for supported graph-definition file types.
-- The dashboard client is not implemented yet, so the runtime currently stops at transport and protocol readiness rather than browser rendering.
+- The dashboard shell is implemented, but the runtime-facing architecture content and CLI orchestration are still incomplete.
 
 Key Concepts:
 - refresh versus queued refresh: manual refresh joins or starts the active cycle, while watcher invalidation queues a follow-up cycle when work is already in flight.
@@ -920,7 +920,7 @@ Key Concepts:
 Current Implementation Status:
 - Generator reuse for in-process metadata refresh is implemented.
 - Dev-server config, state, watcher, RPC, and server transport are implemented.
-- The dashboard app package is not implemented yet.
+- The dashboard app package and metadata shell are implemented.
 - The CLI does not yet provide a real fiction-map dev command.
 - Context packs are defined in planning docs only, not in code.
 
@@ -945,7 +945,7 @@ Cautions:
   promptSeed: `You are reviewing Fiction Map's dev runtime.\n\nStart by reading:\n- packages/dev-server/src/state.ts\n- packages/dev-server/src/server.ts\n- packages/dev-server/src/watcher.ts\n- packages/dev-server/src/protocol.ts\n- docs/plans/2026-05-03-milestone-4-dashboard-implementation-plan.md\n\nThen explain:\n1. how refresh lifecycle works\n2. how watcher invalidation reaches clients\n3. what remains to make fiction-map dev a complete end-to-end workflow\n\nDo not summarize the whole repository. Focus on the dev runtime boundary and the missing dashboard/CLI pieces.`,
   cautions: [
     "This pack describes current dev-runtime implementation, not the final user-facing dashboard workflow.",
-    "The runtime is real up to transport and notifications, but browser UI and CLI orchestration are still pending.",
+    "The runtime is real through transport, notifications, and the basic dashboard shell, but richer architecture content and CLI orchestration are still pending.",
   ],
 }
 ```
