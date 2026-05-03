@@ -11,7 +11,8 @@
     "types": ["vite/client", "vitest/globals"],
     "baseUrl": ".",
     "paths": {
-      "@fiction-map/dev-server": ["../dev-server/src/protocol.ts"]
+      "@fiction-map/dev-server": ["../dev-server/src/protocol.ts"],
+      "@fiction-map/visualize": ["../visualize/src/index.ts"]
     }
   },
   "include": ["src/**/*"],

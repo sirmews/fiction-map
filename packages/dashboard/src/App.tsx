@@ -1,7 +1,10 @@
+import { useMemo } from "react"
+import { DashboardWorkspace } from "./components/DashboardWorkspace"
 import { ContextPackPanel } from "./components/ContextPackPanel"
 import { useMetadata } from "./hooks/useMetadata"
 import { buildPrimaryContextPacks } from "./lib/context-packs"
 import { deriveDashboardMetadataFacts } from "./lib/metadata"
+import { buildDashboardProjectModel } from "./lib/project-model"
 import type { DevServerRpcClient } from "./lib/rpc-client"
 
 export function App(props: { client?: DevServerRpcClient }) {
@@ -16,6 +19,7 @@ export function App(props: { client?: DevServerRpcClient }) {
     refreshError,
     snapshot,
   } = useMetadata(props.client)
+  const projectModel = useMemo(() => buildDashboardProjectModel(snapshot), [snapshot])
   const packs = buildPrimaryContextPacks(deriveDashboardMetadataFacts(snapshot))
 
   return (
@@ -116,6 +120,10 @@ export function App(props: { client?: DevServerRpcClient }) {
           />
         </dl>
       </section>
+
+      {projectModel.snapshot.metadataAvailable ? (
+        <DashboardWorkspace projectModel={projectModel} />
+      ) : null}
 
       <ContextPackPanel packs={packs} />
     </main>

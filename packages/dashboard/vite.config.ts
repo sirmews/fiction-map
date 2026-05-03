@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@fiction-map/dev-server": resolve(__dirname, "../dev-server/src/protocol.ts"),
+      "@fiction-map/visualize": resolve(__dirname, "../visualize/src/index.ts"),
     },
   },
   test: {
