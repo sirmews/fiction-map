@@ -9,8 +9,8 @@
 It applies Encore's "infrastructure from code" approach to graphs:
 - Define graph primitives in code
 - Static analysis extracts structure
-- Dashboard visualizes the graph
-- Runtime executes traversals
+- Metadata feeds agents, CI, and runtimes
+- Runtime executes traversals with full traceability
 
 ---
 
@@ -56,31 +56,33 @@ export const story = defineGraph({
 })
 ```
 
-### What the Developer Gets
+### What Agents and CI Get
 
 ```bash
-$ fiction-map dev
+$ fiction-map generate
 
 ✓ Discovered 1 node type, 1 edge type
 ✓ Parsed 1 graph with 2 nodes, 1 edge
 ✓ No validation errors
 
-→ Dashboard running at http://localhost:9400
+→ .fiction-map/metadata.json  — structured graph data
+→ SEMANTICS.md                — LLM-friendly semantic summary
 ```
 
-**Dashboard shows:**
-- Graph visualization
-- Node/edge catalog
-- Validation status
-- Playtest mode
-- Traces
+**An agent or CI pipeline can:**
+- Read `metadata.json` for structured graph data
+- Parse `SEMANTICS.md` for LLM-friendly context
+- Run `GraphRuntime` to simulate traversals and find bugs
+- Validate that every path is solvable in CI
 
-**Developer clicks a node:**
-- Opens their editor at the exact line
+**`fiction-map generate` hooks into:**
+- Pre-commit hooks (re-generate on `*.node.ts` changes)
+- CI checks (fail on validation errors)
+- AI coding assistants (read metadata for context)
 
 ---
 
-## The Three Products
+## The Products
 
 ### 1. Core Framework
 
@@ -88,75 +90,52 @@ $ fiction-map dev
 
 **Packages:**
 - `@fiction-map/core` — defineNodeType, defineEdgeType, defineCondition, defineEffect
-- `@fiction-map/runtime` — GraphRuntime, traversal, state management, traces
+- `@fiction-map/runtime` — `GraphRuntime` class, traversal, validation, path enumeration
 
 **Delivery:** npm packages
 
 **User:** Developer building a graph-based system
 
----
+### 2. CLI
 
-### 2. Development Tools
+**What:** Metadata extraction and generation
 
-**What:** CLI + daemon + dashboard
-
-**Commands:**
-- `fiction-map generate` — Extract metadata from code
-- `fiction-map dev` — Start dashboard with hot reload
-- `fiction-map build` — Bundle for production
-- `fiction-map validate` — Check for errors
+**Command:**
+- `fiction-map generate` — Discover files, extract metadata, write structured output
 
 **Delivery:** CLI tool (npm global or npx)
 
-**User:** Developer during development
-
----
-
-### 3. Visualization Components
-
-**What:** React components for graph visualization
-
-**Packages:**
-- `@fiction-map/graph-canvas` — Interactive graph view
-- `@fiction-map/trace-viewer` — Execution trace visualization
-- `@fiction-map/playtest` — Interactive playtest UI
-
-**Delivery:** npm packages
-
-**User:** Developer building a custom editor
+**User:** Developers, CI pipelines, AI agents
 
 ---
 
 ## Success Criteria
 
-### The Developer Experience
+### The Workflow
 
 1. **Write code** — Define types and graphs in TypeScript
-2. **Run `fiction-map dev`** — Dashboard opens
-3. **See the graph** — Visual representation of structure
-4. **Find errors** — Invalid connections highlighted
-5. **Click to code** — Opens editor at definition
-6. **Playtest** — Traverse the graph interactively
-7. **See traces** — Understand what happened
-8. **Build** — Produce standalone bundle
+2. **Run `fiction-map generate`** — Structured metadata produced
+3. **Read metadata.json** — Agents understand graph structure
+4. **Validate** — Invalid connections flagged in CI
+5. **Simulate** — `GraphRuntime.walk()` or `.enumeratePaths()` in tests
+6. **Commit** — Pre-commit hook re-generates metadata
+7. **PR checks** — CI validates graph integrity
 
 ### The "Aha" Moment
 
-Developer thinks: *"I defined my graph in code, and Fiction Map understood it, visualized it, and runs it."*
+Developer thinks: *"I defined my graph in code, and Fiction Map extracted it, validated it, and an AI assistant can reason about it."*
 
-Like Encore's: *"I defined my backend in code, and Encore provisioned everything."*
+Like Encore's: *"I defined my backend in code, and Encore understood my infrastructure."*
 
 ---
 
 ## Delivery Milestones
 
-### Milestone 1: Core Types (Week 1-2) ✅ COMPLETE
+### Milestone 1: Core Types ✅ COMPLETE
 
 - [x] Design metadata schema
-- [x] Implement `defineNodeType`
-- [x] Implement `defineEdgeType`
-- [x] Implement `defineCondition`
-- [x] Implement `defineEffect`
+- [x] Implement `defineNodeType`, `defineEdgeType`
+- [x] Implement `defineCondition`, `defineEffect`
 - [x] Implement `defineGraph`
 - [x] Basic validation
 
@@ -164,7 +143,7 @@ Like Encore's: *"I defined my backend in code, and Encore provisioned everything
 
 ---
 
-### Milestone 2: Generator (Week 3-4) ✅ COMPLETE
+### Milestone 2: Generator ✅ COMPLETE
 
 - [x] File discovery (`*.node.ts`, `*.edge.ts`, etc.)
 - [x] Metadata extraction
@@ -172,51 +151,38 @@ Like Encore's: *"I defined my backend in code, and Encore provisioned everything
 - [x] Graph extraction
 - [x] SEMANTICS.md generation
 
-**Deliverable:** `@fiction-map/cli` package with `generate` command
+**Deliverable:** `fiction-map generate` command
 
 ---
 
-### Milestone 3: Runtime (Week 5-6) ✅ COMPLETE
+### Milestone 3: Runtime ✅ COMPLETE
 
 - [x] State management
 - [x] Condition evaluation
 - [x] Effect application
 - [x] Transition engine
-- [x] Graph validation
+- [x] Graph validation (static + dynamic)
 - [x] Built-in evaluators and handlers
+- [x] `GraphRuntime` class with walk + path enumeration
+- [x] Adapter for loading graphs from plain JSON
 
 **Deliverable:** `@fiction-map/runtime` package
 
 ---
 
-### Milestone 3.5: Visualization (Week 6) ✅ COMPLETE
+### Milestone 4: Agent & CI Integration
 
-- [x] React Flow components
-- [x] Auto-layout algorithm
-- [x] Node/edge primitives
-- [x] Validation hooks
+- [ ] Git hooks (pre-commit metadata generation)
+- [ ] CI validation action
+- [ ] Better SEMANTICS.md format for LLM consumption
+- [ ] `fiction-map validate` standalone command
+- [ ] MCP server (optional, for assisted coding)
 
-**Deliverable:** `@fiction-map/visualize` package
-
----
-
-### Milestone 4: Dashboard (Week 7-10)
-
-- [ ] Daemon architecture
-- [ ] WebSocket server
-- [ ] React dashboard
-- [ ] Graph visualization (React Flow)
-- [ ] Catalog view
-- [ ] Validation view
-- [ ] Playtest view
-- [ ] Trace viewer
-- [ ] Click-to-code
-
-**Deliverable:** `fiction-map dev` command
+**Deliverable:** production-grade metadata pipeline
 
 ---
 
-### Milestone 5: Polish (Week 11-12)
+### Milestone 5: Polish
 
 - [ ] Error messages
 - [ ] Documentation
@@ -230,27 +196,26 @@ Like Encore's: *"I defined my backend in code, and Encore provisioned everything
 
 ## What We're NOT Building (Yet)
 
-- Visual graph editor (drag-and-drop)
+- Browser dashboard / visual graph editor (backed up at `archive/browser-dashboard`)
 - Cloud hosting
 - Collaboration features
-- Mobile support
-- Custom themes
+- Drag-and-drop graph editing
 
 ---
 
 ## The One-Liner
 
-**Fiction Map lets you define graph-based systems in code, then visualizes and runs them automatically.**
+**Fiction Map lets you define graph-based systems in code, extracts structured metadata, and validates them automatically.**
 
 ---
 
 ## How We'll Know We Succeeded
 
-1. **A story author** defines SceneNode and ChoiceEdge, runs `fiction-map dev`, sees their story visualized, playtests it, finds a broken path, fixes it.
+1. **A story author** defines SceneNode and ChoiceEdge, runs a pre-commit hook, and CI catches a broken path before it reaches staging.
 
-2. **A workflow designer** defines TaskNode and FlowEdge, runs `fiction-map dev`, sees their workflow, validates it, builds it into a standalone runner.
+2. **An AI assistant** reads `SEMANTICS.md` and correctly suggests graph edits without being told the schema.
 
-3. **A game developer** defines StateNode and TransitionEdge, runs `fiction-map dev`, sees their state machine, playtests it, integrates runtime into their game.
+3. **A CI pipeline** loads `metadata.json` into `GraphRuntime`, enumerates all paths, and fails the build if any path is unsolvable.
 
 ---
 
@@ -261,9 +226,9 @@ Like Encore's: *"I defined my backend in code, and Encore provisioned everything
 Everything flows from this:
 - File conventions discover graph primitives
 - Metadata describes graph structure
-- Dashboard visualizes the graph
-- Runtime traverses the graph
+- Runtime validates and traverses the graph
 - Traces explain graph execution
+- Agents consume metadata directly
 
 Not: "Add graphs to your app"
 But: "Your app IS a graph"

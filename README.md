@@ -2,7 +2,7 @@
 
 **A framework for building node-based systems.**
 
-Define graphs in code. Get visualization, validation, and execution automatically.
+Define graphs in code. Get structured metadata, validation, and execution automatically.
 
 ---
 
@@ -29,14 +29,11 @@ export const story = defineGraph({
 
 ```bash
 # Run this:
-$ fiction-map dev
+$ fiction-map generate
 
 # Get this:
-✓ Dashboard at http://localhost:9400
-✓ Graph visualization
-✓ Validation
-✓ Playtest mode
-✓ Click-to-code
+✓ .fiction-map/metadata.json  — structured graph data
+✓ SEMANTICS.md                — LLM-friendly semantic summary
 ```
 
 ---
@@ -46,8 +43,8 @@ $ fiction-map dev
 | Package | Purpose |
 |---------|---------|
 | [`@fiction-map/core`](packages/core) | Define node types, edge types, conditions, effects |
-| [`@fiction-map/runtime`](packages/story-runtime) | Execute graphs, manage state, collect traces |
-| [`@fiction-map/visualize`](packages/visualize) | React Flow components for graph visualization |
+| [`@fiction-map/runtime`](packages/story-runtime) | Execute graphs, manage state, validate traversals |
+| [`fiction-map`](packages/cli) | CLI — discover files, extract metadata, generate output |
 
 ---
 
@@ -89,9 +86,6 @@ const story = defineGraph({
 ## Documentation
 
 - [North Star](docs/NORTH_STAR.md) — The vision and delivery plan
-- [Conceptual Guide](docs/design/conceptual-guide.md) — Deep dive into concepts
-- [Simple Explanation](docs/design/simple-explanation.md) — Plain-English overview
-- [Side-by-Side Examples](docs/design/side-by-side-examples.md) — Encore vs Fiction Map
 
 ---
 
@@ -100,7 +94,7 @@ const story = defineGraph({
 Fiction Map applies [Encore's](https://encore.dev) "infrastructure from code" approach to graphs:
 
 - Encore: Define backend in code → Get dashboard, deployment, tracing
-- Fiction Map: Define graphs in code → Get dashboard, validation, execution
+- Fiction Map: Define graphs in code → Get structured metadata, validation, execution
 
 ---
 
@@ -109,11 +103,8 @@ Fiction Map applies [Encore's](https://encore.dev) "infrastructure from code" ap
 | Milestone | Status | Description |
 |-----------|--------|-------------|
 | **Core Types** | ✅ Complete | `@fiction-map/core` package |
-| **Generator** | ✅ Complete | `@fiction-map/cli` — file discovery, metadata extraction |
-| **Runtime** | ✅ Complete | `@fiction-map/runtime` — state, transitions, validation |
-| **Visualize** | ✅ Complete | `@fiction-map/visualize` — React Flow components |
-| **Dashboard** | 🚧 Next | Daemon, WebSocket, playtest, click-to-code |
-| **Editor** | 📋 Planned | Visual graph editor |
+| **Generator** | ✅ Complete | `fiction-map` CLI — file discovery, metadata extraction |
+| **Runtime** | ✅ Complete | `@fiction-map/runtime` — state, transitions, validation, path enumeration |
 
 ---
 
