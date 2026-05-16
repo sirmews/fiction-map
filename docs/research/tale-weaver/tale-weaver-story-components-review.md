@@ -1,6 +1,9 @@
 # Tale Weaver Stats — Story Components & Architecture Review
 
 > **This document has been split.** See split documents in `reviews/tale-weaver/`
+>
+> Historical reference only. It describes extraction ideas from Tale Weaver and does not
+> define the current Fiction Map package surface.
 
 ---
 
@@ -32,7 +35,6 @@
 | Package | Location | Purpose | Status |
 |---------|----------|---------|--------|
 | `@your-org/story-runtime` | [`packages/story-runtime/`](../packages/story-runtime/) | Schema-driven runtime engine extracted from Tale Weaver's domain package. Pluggable condition evaluators, effect handlers, transition engine, graph validation. | ✅ 34 tests passing |
-| `@your-org/story-graph-flow` | [`packages/story-graph-flow/`](../packages/story-graph-flow/) | React Flow canvas for narrative visualization. Auto-layout, edge validation, node primitives. | ✅ 12 tests passing |
 
 ---
 
@@ -41,7 +43,6 @@
 | Document | Purpose |
 |----------|---------|
 | [`story-runtime-design.md`](story-runtime-design.md) | Design document for the extracted story-runtime package |
-| [`story-graph-flow-design.md`](story-graph-flow-design.md) | Design document for the React Flow visualization layer |
 
 ---
 

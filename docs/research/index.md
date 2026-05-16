@@ -2,6 +2,13 @@
 
 External research and reference materials for Fiction Map.
 
+These files are exploratory and historical. They are not the canonical package contract.
+For the current product boundary, use:
+
+- [README.md](../../README.md)
+- [docs/NORTH_STAR.md](../NORTH_STAR.md)
+- [docs/decisions/2026-05-16-headless-engine-direction.md](../decisions/2026-05-16-headless-engine-direction.md)
+
 ## Encore
 
 | File | Description |
@@ -19,6 +26,21 @@ External research and reference materials for Fiction Map.
 - **Graph as primary artifact** — not retrofitted
 - **TraceNode pattern** — each node has location + type + context
 - **Explicit relationship tracking** — packages track what they call, topics track publishers/subscribers
+
+## Adjacent Platforms and Packages
+
+Research on comparable engines, authoring platforms, and explicitly excluded visual libraries.
+
+| File | Description |
+|------|-------------|
+| [adjacent-platforms/README.md](adjacent-platforms/README.md) | Index and comparison matrix |
+| [adjacent-platforms/ink-inky.md](adjacent-platforms/ink-inky.md) | ink as a headless narrative engine plus authoring app |
+| [adjacent-platforms/yarn-spinner.md](adjacent-platforms/yarn-spinner.md) | Yarn Spinner as a reusable runtime plus host bridge |
+| [adjacent-platforms/twine.md](adjacent-platforms/twine.md) | Twine as a contrast case for product/runtime coupling |
+| [adjacent-platforms/arcweave.md](adjacent-platforms/arcweave.md) | Arcweave as a consumer-app/product reference |
+| [adjacent-platforms/articy-draft.md](adjacent-platforms/articy-draft.md) | articy:draft as a platform/schema/export reference |
+| [adjacent-platforms/xstate-stately.md](adjacent-platforms/xstate-stately.md) | XState/Stately as a package-boundary reference |
+| [adjacent-platforms/visual-libraries-out-of-scope.md](adjacent-platforms/visual-libraries-out-of-scope.md) | Why React Flow, Rete, JointJS, and GoJS are not target models for Fiction Map |
 
 ## Tale Weaver Stats
 

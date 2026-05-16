@@ -1,6 +1,10 @@
 # Encore Daemon Architecture
 
 > Retrieved 2026-05-01 from source code analysis
+>
+> Historical exploration only. This file compares possible directions and is not the
+> canonical Fiction Map package boundary. For the current direction, see `README.md`
+> and `docs/NORTH_STAR.md`.
 
 ---
 
@@ -83,11 +87,11 @@ Fiction Map is... what?
 
 ```
 packages/story-runtime/      # Runtime engine
-packages/story-graph-flow/   # React Flow components
+consumer-app/                # App-owned UI and editor shell
 
 # Usage:
 import { StoryRuntime } from "@your-org/story-runtime"
-import { StoryCanvas } from "@your-org/story-graph-flow"
+import { StoryCanvas } from "consumer-app"
 
 // User builds their own app
 ```
@@ -98,7 +102,7 @@ import { StoryCanvas } from "@your-org/story-graph-flow"
 
 ```
 packages/story-runtime/
-packages/story-graph-flow/
+consumer-app/
 
 # CLI for playtesting:
 $ fiction-map play my-story.json
@@ -131,7 +135,7 @@ $ fiction-map run
 ### Phase 1: SDK (No Daemon)
 
 - `@your-org/story-runtime` — Pure runtime engine
-- `@your-org/story-graph-flow` — React Flow components
+- Consumer app owns UI components
 - Users build their own apps
 
 ### Phase 2: Dev Tools (Lightweight Daemon)

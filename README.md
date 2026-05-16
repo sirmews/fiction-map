@@ -1,12 +1,26 @@
 # Fiction Map
 
-**A framework for building node-based systems.**
+**A framework for building graph-based engines, not end-user apps.**
 
-Define graphs in code. Get structured metadata, validation, and execution automatically.
+Fiction Map provides the headless packages and tooling that consumer apps use to define,
+validate, and execute graph-based systems.
 
 ---
 
 ## What It Does
+
+Fiction Map focuses on the engine layer:
+
+- `@fiction-map/core` provides the abstractions for defining node types, edge types,
+  conditions, effects, and graph shapes.
+- `@fiction-map/runtime` provides traversal, simulation, and runtime validation.
+- `fiction-map` CLI provides metadata and semantics generation for tooling, CI, and AI use.
+
+Consumer apps own their own schemas and UI:
+
+- app-specific node and edge definitions
+- editor UX, forms, canvas, panels, and routing
+- persistence, auth, autosave, and product behavior
 
 ```typescript
 // You write this:
@@ -48,13 +62,29 @@ $ fiction-map generate
 
 ---
 
+## Boundary
+
+Fiction Map is the engine/framework.
+
+A consumer app, whether it lives in a separate repo or in the same monorepo, is responsible
+for defining its own concrete schemas and building its own UI on top of these packages.
+
+That means:
+
+- `@fiction-map/core` does not hardcode story-specific schemas like `SceneNode` or `ChoiceEdge`
+- the consumer app defines those schemas using the abstractions from `core`
+- the consumer app can use any UI stack, including ShadCN, Vite, React, or another frontend
+- the runtime and CLI remain UI-agnostic
+
+---
+
 ## Quick Start
 
 ```bash
 # Install
 npm install @fiction-map/core @fiction-map/runtime
 
-# Define types
+# Define app-specific types in your consumer app
 import { defineNodeType, defineEdgeType, defineGraph } from "@fiction-map/core"
 
 const SceneNode = defineNodeType({
@@ -86,6 +116,10 @@ const story = defineGraph({
 ## Documentation
 
 - [North Star](docs/NORTH_STAR.md) — The vision and delivery plan
+- [Headless Engine Decision](docs/decisions/2026-05-16-headless-engine-direction.md) — The
+  accepted boundary between Fiction Map and consumer apps
+- [Block Editor Research](docs/design/block-editor-research.md) — Research notes on how
+  consumer apps should sit on top of a headless engine
 
 ---
 
@@ -121,7 +155,7 @@ bun test
 bun typecheck
 
 # Build all packages
-bun build
+bun run build
 ```
 
 ---

@@ -12,6 +12,18 @@ It applies Encore's "infrastructure from code" approach to graphs:
 - Metadata feeds agents, CI, and runtimes
 - Runtime executes traversals with full traceability
 
+The key boundary is:
+
+- Fiction Map owns the engine/framework layer
+- Consumer apps own concrete schemas and end-user UI
+
+Consumer apps may live in a separate repo or in the same monorepo, but they are not part of
+the package contract of Fiction Map itself.
+
+The accepted decision record for this boundary is:
+
+- [Headless Engine Direction](decisions/2026-05-16-headless-engine-direction.md)
+
 ---
 
 ## The Problem
@@ -22,11 +34,14 @@ TaleWeaver retrofitted graph concepts onto a story engine. It was confusing.
 
 Start with graphs as the primary artifact. Stories, workflows, games, decision trees — they're all graphs.
 
+Fiction Map should make it easier for another app to build and operate those graphs, not try to
+be the app itself.
+
 ---
 
 ## The Delivery
 
-### What the Developer Writes
+### What the Consumer App Writes
 
 ```typescript
 // nodes/scene.node.ts
@@ -56,7 +71,10 @@ export const story = defineGraph({
 })
 ```
 
-### What Agents and CI Get
+These are app-specific definitions. `SceneNode`, `ChoiceEdge`, and the story graph belong to the
+consumer app, not to `@fiction-map/core`.
+
+### What Agents, CI, and Runtimes Get
 
 ```bash
 $ fiction-map generate
@@ -94,7 +112,7 @@ $ fiction-map generate
 
 **Delivery:** npm packages
 
-**User:** Developer building a graph-based system
+**User:** Developer building a graph-based system or a consumer app on top of Fiction Map
 
 ### 2. CLI
 
@@ -107,13 +125,24 @@ $ fiction-map generate
 
 **User:** Developers, CI pipelines, AI agents
 
+### 3. Consumer App Boundary
+
+**What:** The end-user story editor or product built on top of Fiction Map
+
+**Owns:**
+- concrete story schemas such as `SceneNode`, `ChoiceEdge`, and domain conditions/effects
+- editor UI, ShadCN components, routing, panels, canvas, and forms
+- persistence, auth, autosave, and product workflows
+
+**Does not belong inside the Fiction Map package surface**
+
 ---
 
 ## Success Criteria
 
 ### The Workflow
 
-1. **Write code** — Define types and graphs in TypeScript
+1. **Define app-specific graph schemas** — Consumer app uses `@fiction-map/core`
 2. **Run `fiction-map generate`** — Structured metadata produced
 3. **Read metadata.json** — Agents understand graph structure
 4. **Validate** — Invalid connections flagged in CI
@@ -123,7 +152,7 @@ $ fiction-map generate
 
 ### The "Aha" Moment
 
-Developer thinks: *"I defined my graph in code, and Fiction Map extracted it, validated it, and an AI assistant can reason about it."*
+Developer thinks: *"My app defined its graph model, and Fiction Map extracted it, validated it, and an AI assistant can reason about it."*
 
 Like Encore's: *"I defined my backend in code, and Encore understood my infrastructure."*
 
@@ -196,10 +225,11 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 
 ## What We're NOT Building (Yet)
 
-- Browser dashboard / visual graph editor (backed up at `archive/browser-dashboard`)
+- A built-in Story Editor UI inside the Fiction Map packages
+- ShadCN components or product-specific editor shells in the package surface
 - Cloud hosting
 - Collaboration features
-- Drag-and-drop graph editing
+- Product-specific drag-and-drop graph editing
 
 ---
 
@@ -211,7 +241,7 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 
 ## How We'll Know We Succeeded
 
-1. **A story author** defines SceneNode and ChoiceEdge, runs a pre-commit hook, and CI catches a broken path before it reaches staging.
+1. **A story editor app** defines SceneNode and ChoiceEdge, runs a pre-commit hook, and CI catches a broken path before it reaches staging.
 
 2. **An AI assistant** reads `SEMANTICS.md` and correctly suggests graph edits without being told the schema.
 
@@ -229,6 +259,8 @@ Everything flows from this:
 - Runtime validates and traverses the graph
 - Traces explain graph execution
 - Agents consume metadata directly
+
+The consumer app sits on top of this engine. It should not be conflated with the engine itself.
 
 Not: "Add graphs to your app"
 But: "Your app IS a graph"
