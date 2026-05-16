@@ -13,6 +13,8 @@ Fiction Map focuses on the engine layer:
 
 - `@fiction-map/core` provides the abstractions for defining node types, edge types,
   conditions, effects, and graph shapes.
+- `@fiction-map/entities` optionally provides a generic world/entity meta-model for
+  consumer-defined concepts like species, stats, traits, items, and locations.
 - `@fiction-map/runtime` provides traversal, simulation, and runtime validation.
 - `fiction-map` CLI provides metadata and semantics generation for tooling, CI, and AI use.
 
@@ -57,6 +59,7 @@ $ fiction-map generate
 | Package | Purpose |
 |---------|---------|
 | [`@fiction-map/core`](packages/core) | Define node types, edge types, conditions, effects |
+| [`@fiction-map/entities`](packages/entities) | Define generic entity types, instances, typed references, and declarative world rules |
 | [`@fiction-map/runtime`](packages/story-runtime) | Execute graphs, manage state, validate traversals |
 | [`fiction-map`](packages/cli) | CLI — discover files, extract metadata, generate output |
 
@@ -72,7 +75,9 @@ for defining its own concrete schemas and building its own UI on top of these pa
 That means:
 
 - `@fiction-map/core` does not hardcode story-specific schemas like `SceneNode` or `ChoiceEdge`
+- `@fiction-map/entities` does not hardcode world-specific schemas like `Species`, `Stat`, or `Item`
 - the consumer app defines those schemas using the abstractions from `core`
+- the consumer app defines world concepts using the abstractions from `entities`
 - the consumer app can use any UI stack, including ShadCN, Vite, React, or another frontend
 - the runtime and CLI remain UI-agnostic
 
@@ -82,7 +87,7 @@ That means:
 
 ```bash
 # Install
-npm install @fiction-map/core @fiction-map/runtime
+npm install @fiction-map/core @fiction-map/entities @fiction-map/runtime
 
 # Define app-specific types in your consumer app
 import { defineNodeType, defineEdgeType, defineGraph } from "@fiction-map/core"
@@ -118,6 +123,9 @@ const story = defineGraph({
 - [North Star](docs/NORTH_STAR.md) — The vision and delivery plan
 - [Headless Engine Decision](docs/decisions/2026-05-16-headless-engine-direction.md) — The
   accepted boundary between Fiction Map and consumer apps
+- [Literature RPG Gap Analysis](docs/plans/2026-05-16-literature-rpg-gap-analysis.md) — What a
+  literature-RPG-style consumer app can already do, what is awkward, and what the engine still
+  needs
 - [Block Editor Research](docs/design/block-editor-research.md) — Research notes on how
   consumer apps should sit on top of a headless engine
 
@@ -137,6 +145,7 @@ Fiction Map applies [Encore's](https://encore.dev) "infrastructure from code" ap
 | Milestone | Status | Description |
 |-----------|--------|-------------|
 | **Core Types** | ✅ Complete | `@fiction-map/core` package |
+| **Entity Meta-Model** | 🚧 Initial Slice | `@fiction-map/entities` — entity types, instances, references, validation |
 | **Generator** | ✅ Complete | `fiction-map` CLI — file discovery, metadata extraction |
 | **Runtime** | ✅ Complete | `@fiction-map/runtime` — state, transitions, validation, path enumeration |
 

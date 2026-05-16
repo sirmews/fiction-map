@@ -23,6 +23,7 @@ the package contract of Fiction Map itself.
 The accepted decision record for this boundary is:
 
 - [Headless Engine Direction](decisions/2026-05-16-headless-engine-direction.md)
+- [Literature RPG Gap Analysis](plans/2026-05-16-literature-rpg-gap-analysis.md)
 
 ---
 
@@ -108,6 +109,7 @@ $ fiction-map generate
 
 **Packages:**
 - `@fiction-map/core` — defineNodeType, defineEdgeType, defineCondition, defineEffect
+- `@fiction-map/entities` — optional generic entity meta-model for consumer-defined world concepts
 - `@fiction-map/runtime` — `GraphRuntime` class, traversal, validation, path enumeration
 
 **Delivery:** npm packages

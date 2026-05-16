@@ -16,6 +16,7 @@ This document is the short decision layer on top of:
 - [North Star](../NORTH_STAR.md)
 - [Block Editor Research](../design/block-editor-research.md)
 - [Adjacent Platforms and Packages](../research/adjacent-platforms/README.md)
+- [Literature RPG Gap Analysis](../plans/2026-05-16-literature-rpg-gap-analysis.md)
 
 ## Decision
 
