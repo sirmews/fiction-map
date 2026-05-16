@@ -103,3 +103,21 @@ export {
   hasDanglingTransitions,
   hasUnreachableNodes,
 } from "./core/validation";
+
+// Adapter (generic graph JSON → runtime types)
+export {
+  parseGraph,
+  determineEndings,
+  type EdgeBlueprint,
+  type NodeBlueprint,
+  type GraphBlueprint,
+  type ParsedGraph,
+} from "./adapter";
+
+// High-level runtime wrapper
+export {
+  GraphRuntime,
+  type StepResult,
+  type PathStep,
+  type TraversalPath,
+} from "./runtime";

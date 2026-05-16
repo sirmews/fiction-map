@@ -16,8 +16,7 @@
   "scripts": {
     "build": "tsup src/cli.ts src/index.ts --format esm --dts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "dev": "bun run src/cli.ts"
+    "test": "vitest run"
   },
   "dependencies": {
     "@fiction-map/core": "workspace:*",
