@@ -352,6 +352,114 @@ describe("transition engine", () => {
     expect(getResource(result.state, "gold")).toBe(3);
     expect(entityIsUnlocked(result.state, "dark-cave")).toBe(false);
   });
+
+  it("explains failed entity-aware availability requirements", () => {
+    const state = addResource(createInitialState("scene-1"), "gold", 3);
+
+    const transition: Transition = {
+      id: "enter-cave",
+      sourceNodeId: "scene-1",
+      targetNodeId: "scene-2",
+      requirements: {
+        all: [
+          { type: "hasEntity", entityId: "lantern" },
+          { type: "resourceAtLeast", key: "gold", value: 5 },
+        ],
+      },
+    };
+
+    const availability = checkTransitionAvailability(
+      state,
+      transition,
+      builtinEvaluators
+    );
+
+    expect(availability.allowed).toBe(false);
+    expect(availability.visible).toBe(true);
+    expect(availability.reason).toBe("Requirements not met");
+    expect(availability.failedConditions).toEqual([
+      {
+        scope: "requirements",
+        group: "all",
+        condition: { type: "hasEntity", entityId: "lantern" },
+      },
+      {
+        scope: "requirements",
+        group: "all",
+        condition: { type: "resourceAtLeast", key: "gold", value: 5 },
+      },
+    ]);
+  });
+
+  it("explains hidden entity-aware transitions separately from blocked transitions", () => {
+    const state = createInitialState("scene-1");
+
+    const transition: Transition = {
+      id: "secret-door",
+      sourceNodeId: "scene-1",
+      targetNodeId: "scene-2",
+      visibility: {
+        all: [{ type: "entityUnlocked", entityId: "secret-door" }],
+      },
+      requirements: {
+        all: [{ type: "hasEntity", entityId: "silver-key" }],
+      },
+    };
+
+    const availability = checkTransitionAvailability(
+      state,
+      transition,
+      builtinEvaluators
+    );
+
+    expect(availability.allowed).toBe(false);
+    expect(availability.visible).toBe(false);
+    expect(availability.reason).toBe("Transition is not visible");
+    expect(availability.failedConditions).toEqual([
+      {
+        scope: "visibility",
+        group: "all",
+        condition: { type: "entityUnlocked", entityId: "secret-door" },
+      },
+    ]);
+  });
+
+  it("returns failed conditions on blocked transition results", () => {
+    const state = addResource(createInitialState("scene-1"), "gold", 3);
+
+    const transition: Transition = {
+      id: "enter-cave",
+      sourceNodeId: "scene-1",
+      targetNodeId: "scene-2",
+      requirements: {
+        all: [
+          { type: "hasEntity", entityId: "lantern" },
+          { type: "resourceAtLeast", key: "gold", value: 5 },
+        ],
+      },
+    };
+
+    const result = applyTransition(
+      state,
+      transition,
+      builtinEvaluators,
+      builtinHandlers
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.failedConditions).toEqual([
+      {
+        scope: "requirements",
+        group: "all",
+        condition: { type: "hasEntity", entityId: "lantern" },
+      },
+      {
+        scope: "requirements",
+        group: "all",
+        condition: { type: "resourceAtLeast", key: "gold", value: 5 },
+      },
+    ]);
+  });
   
   it("applies failed transition", () => {
     const state = createInitialState("scene-1", { gold: 10 });

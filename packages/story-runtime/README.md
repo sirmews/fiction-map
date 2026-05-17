@@ -126,6 +126,10 @@ Derivation reports effective ids, active modifiers, prerequisite status, unlocks
 references that do not exist in the supplied world. It does not apply RPG-specific formulas,
 inventory rules, equipment rules, combat, or story graph transition logic.
 
+Entity-aware transition failures are machine-readable. A blocked or hidden transition can include
+`failedConditions` entries that identify the failed condition, whether it came from `visibility`
+or `requirements`, and which condition group failed.
+
 ## Built-in Conditions
 
 | Type | Parameters | Description |

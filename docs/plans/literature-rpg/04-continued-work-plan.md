@@ -60,12 +60,11 @@ Implemented:
 - `deriveEntityState(world, state)` combines a world definition with runtime state.
 - Derived state reports owned, active, unlocked, effective, missing, active modifiers, and generic
   entity `has` prerequisite status.
+- Transition availability and transition results report machine-readable failed conditions for
+  blocked or hidden choices.
 
 Not implemented yet:
 
-- built-in entity-aware transition conditions
-- built-in entity-aware transition effects
-- story transition explanation data for failed entity-aware requirements
 - cross-validation between story graph conditions/effects and world entity ids
 - computed stat formulas, modifier math, inventory rules, shops, equipment, combat, or leveling
 - Story Editor UI
@@ -136,38 +135,19 @@ Delivered:
 
 ### Stage 4: Story Graph Bridge
 
-Status: next.
+Status: implemented.
 
-Goal:
+Delivered:
 
-Make story graph transitions use entity-aware runtime primitives in a way that is clear to tests,
-consumer apps, and future editor feedback.
-
-Expected outcome:
-
-- story choices can require entities or unlocks
-- story choices can grant, activate, deactivate, unlock, or lock entities
-- blocked and hidden choices can identify which entity-aware requirement failed
-
-Acceptance criteria:
-
-- transition availability can expose which entity-aware condition failed
-- blocked choices can distinguish hidden from visible-but-unavailable requirements
-- the bridge does not require the runtime to know concrete app concepts like species, stats,
-  items, quests, shops, equipment, combat, or leveling
+- transition availability exposes which generic condition failed
+- transition results expose which generic condition failed
+- failed condition details distinguish `visibility` failures from `requirements` failures
+- failed condition details identify the condition group: `all`, `any`, or `none`
 - focused tests cover a blocked entity-aware transition with machine-readable failure detail
-
-Out of scope:
-
-- applying modifiers into computed stat formulas
-- evaluating entity `state`, `tag`, `equals`, `gte`, or `includes` prerequisites
-- changing the CLI generator
-- building the Story Editor UI
-- persistence or collaboration
 
 ### Stage 5: Validation And Explanation Improvements
 
-Status: planned.
+Status: next.
 
 Goal:
 
@@ -180,6 +160,22 @@ Useful checks:
 - unlock target exists structurally
 - entity prerequisite target exists
 - blocked transition explanation identifies the failing entity-aware condition
+
+Acceptance criteria:
+
+- a validator can receive both a story graph and a world definition
+- entity-aware conditions that reference unknown entities are reported as validation errors
+- entity-aware effects that reference unknown entities are reported as validation errors
+- resource references stay generic and do not require a built-in RPG resource ontology
+- focused tests cover unknown entity references in conditions and effects
+
+Out of scope:
+
+- applying modifiers into computed stat formulas
+- evaluating entity `state`, `tag`, `equals`, `gte`, or `includes` prerequisites
+- changing the CLI generator
+- building the Story Editor UI
+- persistence or collaboration
 
 ### Stage 6: Example Project And End-To-End Tests
 

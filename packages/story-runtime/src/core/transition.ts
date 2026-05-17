@@ -5,16 +5,25 @@ import type {
   TransitionResult,
   TransitionTrace,
   Consequence,
+  Condition,
   ConditionEvaluator,
+  ConditionSet,
+  ConditionScope,
+  FailedCondition,
   EffectHandler,
   EvaluationContext,
   EffectContext,
 } from "../types";
-import { evaluateConditionSet } from "../conditions";
+import { evaluateCondition } from "../conditions";
 import { applyEffects } from "../effects";
 import { cloneState, navigateToNode } from "./state";
 
 type CombinedContext = EvaluationContext & EffectContext;
+
+interface ConditionEvaluation {
+  passed: boolean;
+  failedConditions: FailedCondition[];
+}
 
 /**
  * Check if a transition is available.
@@ -40,33 +49,37 @@ export function checkTransitionAvailability(
   
   const traceContext = { ...context, trace };
   
-  const visible = evaluateConditionSet(
+  const visibility = evaluateTransitionConditions(
     state,
     transition.visibility,
     evaluators,
+    "visibility",
     traceContext
   );
   
-  if (!visible) {
+  if (!visibility.passed) {
     return {
       allowed: false,
       visible: false,
       reason: "Transition is not visible",
+      failedConditions: visibility.failedConditions,
     };
   }
   
-  const allowed = evaluateConditionSet(
+  const requirements = evaluateTransitionConditions(
     state,
     transition.requirements,
     evaluators,
+    "requirements",
     traceContext
   );
   
-  if (!allowed) {
+  if (!requirements.passed) {
     return {
       allowed: false,
       visible: true,
       reason: "Requirements not met",
+      failedConditions: requirements.failedConditions,
     };
   }
   
@@ -105,31 +118,34 @@ export function applyTransition(
   
   const traceContext = { ...context, trace };
   
-  const visibility = evaluateConditionSet(
+  const visibility = evaluateTransitionConditions(
     state,
     transition.visibility,
     evaluators,
+    "visibility",
     traceContext
   );
   
-  if (!visibility) {
+  if (!visibility.passed) {
     return {
       state,
       shouldNavigate: false,
       success: false,
       failureReason: "Transition is not visible",
+      failedConditions: visibility.failedConditions,
       trace,
     };
   }
   
-  const requirementsMet = evaluateConditionSet(
+  const requirements = evaluateTransitionConditions(
     state,
     transition.requirements,
     evaluators,
+    "requirements",
     traceContext
   );
   
-  const success = requirementsMet;
+  const success = requirements.passed;
   const effects = success ? transition.effects : transition.failureEffects;
   const targetNodeId = success
     ? transition.targetNodeId
@@ -174,8 +190,131 @@ export function applyTransition(
     nextNodeId: targetNodeId,
     success,
     failureReason: success ? undefined : "Requirements not met",
+    failedConditions: success ? undefined : requirements.failedConditions,
     trace,
   };
+}
+
+function evaluateTransitionConditions(
+  state: GraphRuntimeState,
+  conditionSet: ConditionSet | undefined,
+  evaluators: Map<string, ConditionEvaluator>,
+  scope: ConditionScope,
+  context?: EvaluationContext
+): ConditionEvaluation {
+  if (!conditionSet) {
+    return { passed: true, failedConditions: [] };
+  }
+
+  const { all, any, none } = conditionSet;
+  const failedConditions: FailedCondition[] = [];
+
+  const allPassed = evaluateAllGroup(
+    state,
+    all,
+    evaluators,
+    scope,
+    failedConditions,
+    context
+  );
+  const anyPassed = evaluateAnyGroup(
+    state,
+    any,
+    evaluators,
+    scope,
+    failedConditions,
+    context
+  );
+  const nonePassed = evaluateNoneGroup(
+    state,
+    none,
+    evaluators,
+    scope,
+    failedConditions,
+    context
+  );
+
+  return {
+    passed: allPassed && anyPassed && nonePassed,
+    failedConditions,
+  };
+}
+
+function evaluateAllGroup(
+  state: GraphRuntimeState,
+  conditions: Condition[] | undefined,
+  evaluators: Map<string, ConditionEvaluator>,
+  scope: ConditionScope,
+  failedConditions: FailedCondition[],
+  context?: EvaluationContext
+): boolean {
+  if (!conditions?.length) {
+    return true;
+  }
+
+  let passed = true;
+
+  for (const condition of conditions) {
+    const result = evaluateCondition(state, condition, evaluators, context);
+    if (!result) {
+      passed = false;
+      failedConditions.push({ scope, group: "all", condition });
+    }
+  }
+
+  return passed;
+}
+
+function evaluateAnyGroup(
+  state: GraphRuntimeState,
+  conditions: Condition[] | undefined,
+  evaluators: Map<string, ConditionEvaluator>,
+  scope: ConditionScope,
+  failedConditions: FailedCondition[],
+  context?: EvaluationContext
+): boolean {
+  if (!conditions?.length) {
+    return true;
+  }
+
+  const results = conditions.map((condition) => ({
+    condition,
+    result: evaluateCondition(state, condition, evaluators, context),
+  }));
+
+  const passed = results.some(({ result }) => result);
+  if (!passed) {
+    for (const { condition } of results) {
+      failedConditions.push({ scope, group: "any", condition });
+    }
+  }
+
+  return passed;
+}
+
+function evaluateNoneGroup(
+  state: GraphRuntimeState,
+  conditions: Condition[] | undefined,
+  evaluators: Map<string, ConditionEvaluator>,
+  scope: ConditionScope,
+  failedConditions: FailedCondition[],
+  context?: EvaluationContext
+): boolean {
+  if (!conditions?.length) {
+    return true;
+  }
+
+  let passed = true;
+
+  for (const condition of conditions) {
+    const result = evaluateCondition(state, condition, evaluators, context);
+    if (result) {
+      passed = false;
+      failedConditions.push({ scope, group: "none", condition });
+    }
+  }
+
+  return passed;
 }
 
 /**

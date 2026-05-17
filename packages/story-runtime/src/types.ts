@@ -95,11 +95,21 @@ export interface TransitionAvailability {
   allowed: boolean
   visible: boolean
   reason?: string
+  failedConditions?: FailedCondition[]
 }
 
 export interface Consequence {
   type: string
   [key: string]: unknown
+}
+
+export type ConditionGroup = "all" | "any" | "none"
+export type ConditionScope = "visibility" | "requirements"
+
+export interface FailedCondition {
+  scope: ConditionScope
+  group: ConditionGroup
+  condition: Condition
 }
 
 export interface TransitionTrace {
@@ -121,6 +131,7 @@ export interface TransitionResult {
   nextNodeId?: string
   success: boolean
   failureReason?: string
+  failedConditions?: FailedCondition[]
   trace?: TransitionTrace
 }
 

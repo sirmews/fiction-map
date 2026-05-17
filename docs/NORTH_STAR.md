@@ -208,7 +208,7 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 - [x] Derived state from `@fiction-map/entities` world definitions and runtime state
 - [x] Generic entity-aware built-in conditions
 - [x] Generic entity-aware built-in effects
-- [ ] Story transition bridge for entity-aware requirements and consequences
+- [x] Story transition bridge for entity-aware requirements and consequences
 - [ ] Cross-graph validation and explanation data for editor feedback
 
 **Deliverable:** credible headless foundation for literature-RPG-style consumer apps
