@@ -80,6 +80,8 @@ The consumer app owns:
 
 ### Stage 1: Entity-aware runtime state
 
+Status: implemented.
+
 Define a small runtime-facing state shape for entity-aware play.
 
 This should probably live in `@fiction-map/runtime` unless a stronger reason emerges to create a
@@ -216,28 +218,35 @@ Good stopping points:
 
 Do not bundle all of this into one change set.
 
+Implemented in this stage:
+
+- `GraphRuntimeState.entityState`
+- owned entity ids
+- active entity ids
+- unlocked entity ids
+- numeric resources
+- immutable helper functions
+- serialization and deserialization support
+- focused runtime state tests
+
 ## Current next task
 
 The next task is:
 
-Define and implement the smallest entity-aware runtime state contract in `@fiction-map/runtime`.
-
-The implementation should start with tests and should not evaluate modifiers yet. It only needs to
-establish the state shape and safe helpers for owned, active, unlocked, and resource state.
+Define and implement the first derived-state function that combines a world definition from
+`@fiction-map/entities` with entity-aware runtime state from `@fiction-map/runtime`.
 
 Acceptance criteria:
 
-- `GraphRuntimeState` can carry entity-aware state without forcing any RPG ontology
-- helpers can grant, revoke, activate, deactivate, unlock, lock, add resource, spend resource, and
-  read resource values
-- serialization and deserialization preserve the entity-aware state
-- existing runtime state behavior remains unchanged for graph-only users
-- focused tests cover the new helpers and serialization behavior
+- derived state can report owned, active, and unlocked entity ids
+- derived state can collect modifiers from active entities
+- derived state can identify entity prerequisites that are satisfied or unsatisfied
+- derived state does not hardcode species, stats, traits, items, spells, factions, or quests
+- focused tests cover entity references, active modifiers, and prerequisite status
 
 Out of scope for this next task:
 
-- loading `@fiction-map/entities` world definitions inside runtime
-- deriving modifiers from entities
-- evaluating prerequisites
 - adding built-in story conditions or effects for entities
 - changing the CLI generator
+- evaluating story graph transitions from derived state
+- implementing RPG-specific formulas or inventory behavior

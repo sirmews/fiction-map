@@ -14,6 +14,15 @@ export interface GraphRuntimeState {
   variables: Record<string, unknown>
   flags: Record<string, boolean | string | number>
   visited: Set<string>
+  entityState?: EntityRuntimeState
+  extensions?: Record<string, unknown>
+}
+
+export interface EntityRuntimeState {
+  owned: Set<string>
+  active: Set<string>
+  unlocked: Set<string>
+  resources: Record<string, number>
   extensions?: Record<string, unknown>
 }
 
@@ -156,5 +165,14 @@ export interface SerializableState {
   variables: Record<string, unknown>
   flags: Record<string, boolean | string | number>
   visited: string[]
+  entityState?: SerializableEntityState
+  extensions?: Record<string, unknown>
+}
+
+export interface SerializableEntityState {
+  owned: string[]
+  active: string[]
+  unlocked: string[]
+  resources: Record<string, number>
   extensions?: Record<string, unknown>
 }

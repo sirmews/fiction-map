@@ -1,6 +1,8 @@
 // Core types
 export type {
+  EntityRuntimeState,
   GraphRuntimeState,
+  SerializableEntityState,
   Condition,
   ConditionSet,
   ConditionEvaluator,
@@ -36,6 +38,18 @@ export {
   setVariable,
   getVariable,
   incrementVariable,
+  grantEntity,
+  revokeEntity,
+  ownsEntity,
+  activateEntity,
+  deactivateEntity,
+  entityIsActive,
+  unlockEntity,
+  lockEntity,
+  entityIsUnlocked,
+  addResource,
+  spendResource,
+  getResource,
   serializeState,
   deserializeState,
 } from "./core/state";

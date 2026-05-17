@@ -11,6 +11,7 @@ npm install @fiction-map/runtime
 ## Features
 
 - **State Management** — Immutable state with history tracking
+- **Entity-Aware State** — Generic owned, active, unlocked, and resource state
 - **Condition Evaluation** — Pluggable condition system
 - **Effect Application** — Pluggable effect handlers
 - **Graph Traversal** — Transition engine with tracing
@@ -54,6 +55,40 @@ console.log(result.state)          // new state
 console.log(result.shouldNavigate) // true
 console.log(result.nextNodeId)     // "next-node"
 ```
+
+## Entity-Aware State
+
+Runtime state can optionally track generic entity state without hardcoding RPG concepts.
+
+```typescript
+import {
+  createInitialState,
+  grantEntity,
+  activateEntity,
+  unlockEntity,
+  addResource,
+  ownsEntity,
+  entityIsActive,
+  entityIsUnlocked,
+  getResource,
+} from "@fiction-map/runtime"
+
+let state = createInitialState("start")
+
+state = grantEntity(state, "lantern")
+state = activateEntity(state, "elf")
+state = unlockEntity(state, "dark-cave")
+state = addResource(state, "gold", 12)
+
+console.log(ownsEntity(state, "lantern"))          // true
+console.log(entityIsActive(state, "elf"))          // true
+console.log(entityIsUnlocked(state, "dark-cave"))  // true
+console.log(getResource(state, "gold"))            // 12
+```
+
+This state layer does not evaluate entity modifiers, prerequisites, or world definitions. It only
+records what a player/session owns, has active, has unlocked, and has available as numeric
+resources.
 
 ## Built-in Conditions
 

@@ -1,5 +1,7 @@
 import type {
+  EntityRuntimeState,
   GraphRuntimeState,
+  SerializableEntityState,
   SerializableState,
 } from "../types";
 
@@ -13,7 +15,8 @@ import type {
 export function createInitialState(
   startNodeId: string,
   initialVariables?: Record<string, unknown>,
-  initialExtensions?: Record<string, unknown>
+  initialExtensions?: Record<string, unknown>,
+  initialEntityState?: EntityRuntimeState
 ): GraphRuntimeState {
   return {
     currentNodeId: startNodeId,
@@ -21,6 +24,7 @@ export function createInitialState(
     variables: initialVariables ? { ...initialVariables } : {},
     flags: {},
     visited: new Set([startNodeId]),
+    entityState: initialEntityState ? cloneEntityState(initialEntityState) : undefined,
     extensions: initialExtensions ? { ...initialExtensions } : undefined,
   };
 }
@@ -38,6 +42,7 @@ export function cloneState(state: GraphRuntimeState): GraphRuntimeState {
     variables: { ...state.variables },
     flags: { ...state.flags },
     visited: new Set(state.visited),
+    entityState: state.entityState ? cloneEntityState(state.entityState) : undefined,
     extensions: state.extensions ? { ...state.extensions } : undefined,
   };
 }
@@ -72,6 +77,10 @@ export function mergeState(
   
   if (updates.visited !== undefined) {
     cloned.visited = new Set(updates.visited);
+  }
+
+  if (updates.entityState !== undefined) {
+    cloned.entityState = cloneEntityState(updates.entityState);
   }
   
   if (updates.extensions !== undefined) {
@@ -210,8 +219,170 @@ export function incrementVariable(
 }
 
 // ============================================================================
+// ENTITY-AWARE STATE
+// ============================================================================
+
+function createEmptyEntityState(): EntityRuntimeState {
+  return {
+    owned: new Set(),
+    active: new Set(),
+    unlocked: new Set(),
+    resources: {},
+  };
+}
+
+function cloneEntityState(entityState: EntityRuntimeState): EntityRuntimeState {
+  return {
+    owned: new Set(entityState.owned),
+    active: new Set(entityState.active),
+    unlocked: new Set(entityState.unlocked),
+    resources: { ...entityState.resources },
+    extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
+  };
+}
+
+function cloneStateWithEntityState(state: GraphRuntimeState): GraphRuntimeState {
+  const cloned = cloneState(state);
+  cloned.entityState = cloned.entityState ?? createEmptyEntityState();
+  return cloned;
+}
+
+export function grantEntity(
+  state: GraphRuntimeState,
+  entityId: string
+): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state);
+  cloned.entityState!.owned.add(entityId);
+  return cloned;
+}
+
+export function revokeEntity(
+  state: GraphRuntimeState,
+  entityId: string
+): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state);
+  cloned.entityState!.owned.delete(entityId);
+  return cloned;
+}
+
+export function ownsEntity(state: GraphRuntimeState, entityId: string): boolean {
+  return state.entityState?.owned.has(entityId) ?? false;
+}
+
+export function activateEntity(
+  state: GraphRuntimeState,
+  entityId: string
+): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state);
+  cloned.entityState!.active.add(entityId);
+  return cloned;
+}
+
+export function deactivateEntity(
+  state: GraphRuntimeState,
+  entityId: string
+): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state);
+  cloned.entityState!.active.delete(entityId);
+  return cloned;
+}
+
+export function entityIsActive(state: GraphRuntimeState, entityId: string): boolean {
+  return state.entityState?.active.has(entityId) ?? false;
+}
+
+export function unlockEntity(
+  state: GraphRuntimeState,
+  entityId: string
+): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state);
+  cloned.entityState!.unlocked.add(entityId);
+  return cloned;
+}
+
+export function lockEntity(
+  state: GraphRuntimeState,
+  entityId: string
+): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state);
+  cloned.entityState!.unlocked.delete(entityId);
+  return cloned;
+}
+
+export function entityIsUnlocked(state: GraphRuntimeState, entityId: string): boolean {
+  return state.entityState?.unlocked.has(entityId) ?? false;
+}
+
+export function addResource(
+  state: GraphRuntimeState,
+  key: string,
+  amount: number
+): GraphRuntimeState {
+  if (!Number.isFinite(amount)) {
+    return state;
+  }
+
+  const cloned = cloneStateWithEntityState(state);
+  const current = cloned.entityState!.resources[key] ?? 0;
+  cloned.entityState!.resources[key] = current + amount;
+  return cloned;
+}
+
+export function spendResource(
+  state: GraphRuntimeState,
+  key: string,
+  amount: number
+): GraphRuntimeState {
+  const current = getResource(state, key);
+
+  if (!Number.isFinite(amount) || amount < 0 || current < amount) {
+    return state;
+  }
+
+  const cloned = cloneStateWithEntityState(state);
+  cloned.entityState!.resources[key] = current - amount;
+  return cloned;
+}
+
+export function getResource(state: GraphRuntimeState, key: string): number {
+  return state.entityState?.resources[key] ?? 0;
+}
+
+// ============================================================================
 // SERIALIZATION
 // ============================================================================
+
+function serializeEntityState(
+  entityState: EntityRuntimeState | undefined
+): SerializableEntityState | undefined {
+  if (!entityState) {
+    return undefined;
+  }
+
+  return {
+    owned: [...entityState.owned],
+    active: [...entityState.active],
+    unlocked: [...entityState.unlocked],
+    resources: { ...entityState.resources },
+    extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
+  };
+}
+
+function deserializeEntityState(
+  entityState: SerializableEntityState | undefined
+): EntityRuntimeState | undefined {
+  if (!entityState) {
+    return undefined;
+  }
+
+  return {
+    owned: new Set(entityState.owned),
+    active: new Set(entityState.active),
+    unlocked: new Set(entityState.unlocked),
+    resources: { ...entityState.resources },
+    extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
+  };
+}
 
 /**
  * Convert state to a JSON-serializable format.
@@ -225,6 +396,7 @@ export function serializeState(state: GraphRuntimeState): SerializableState {
     variables: { ...state.variables },
     flags: { ...state.flags },
     visited: [...state.visited],
+    entityState: serializeEntityState(state.entityState),
     extensions: state.extensions ? { ...state.extensions } : undefined,
   };
 }
@@ -241,6 +413,7 @@ export function deserializeState(data: SerializableState): GraphRuntimeState {
     variables: { ...data.variables },
     flags: { ...data.flags },
     visited: new Set(data.visited),
+    entityState: deserializeEntityState(data.entityState),
     extensions: data.extensions ? { ...data.extensions } : undefined,
   };
 }

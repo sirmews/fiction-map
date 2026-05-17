@@ -12,6 +12,18 @@ import {
   getVariable,
   serializeState,
   deserializeState,
+  grantEntity,
+  revokeEntity,
+  ownsEntity,
+  activateEntity,
+  deactivateEntity,
+  entityIsActive,
+  unlockEntity,
+  lockEntity,
+  entityIsUnlocked,
+  addResource,
+  spendResource,
+  getResource,
 } from "../core/state";
 import type { GraphRuntimeState } from "../types";
 
@@ -138,6 +150,51 @@ describe("visited", () => {
   });
 });
 
+describe("entity-aware runtime state", () => {
+  it("tracks owned entities immutably", () => {
+    const original = createInitialState("scene-1");
+    const granted = grantEntity(original, "lantern");
+
+    expect(ownsEntity(original, "lantern")).toBe(false);
+    expect(ownsEntity(granted, "lantern")).toBe(true);
+
+    const revoked = revokeEntity(granted, "lantern");
+
+    expect(ownsEntity(granted, "lantern")).toBe(true);
+    expect(ownsEntity(revoked, "lantern")).toBe(false);
+  });
+
+  it("tracks active and unlocked entities", () => {
+    let state = createInitialState("scene-1");
+
+    state = activateEntity(state, "elf");
+    state = unlockEntity(state, "dark-cave");
+
+    expect(entityIsActive(state, "elf")).toBe(true);
+    expect(entityIsUnlocked(state, "dark-cave")).toBe(true);
+
+    state = deactivateEntity(state, "elf");
+    state = lockEntity(state, "dark-cave");
+
+    expect(entityIsActive(state, "elf")).toBe(false);
+    expect(entityIsUnlocked(state, "dark-cave")).toBe(false);
+  });
+
+  it("tracks resources without allowing overspend", () => {
+    let state = createInitialState("scene-1");
+
+    state = addResource(state, "gold", 10);
+    expect(getResource(state, "gold")).toBe(10);
+
+    state = spendResource(state, "gold", 4);
+    expect(getResource(state, "gold")).toBe(6);
+
+    const unchanged = spendResource(state, "gold", 99);
+    expect(unchanged).toBe(state);
+    expect(getResource(unchanged, "gold")).toBe(6);
+  });
+});
+
 describe("serialization", () => {
   it("serializes and deserializes state", () => {
     let state = createInitialState("scene-1", { gold: 100 });
@@ -155,5 +212,22 @@ describe("serialization", () => {
     expect(restored.flags["has-key"]).toBe(true);
     expect(restored.visited.has("scene-1")).toBe(true);
     expect(restored.visited.has("scene-2")).toBe(true);
+  });
+
+  it("serializes and deserializes entity-aware state", () => {
+    let state = createInitialState("scene-1");
+    state = grantEntity(state, "lantern");
+    state = activateEntity(state, "elf");
+    state = unlockEntity(state, "dark-cave");
+    state = addResource(state, "gold", 12);
+
+    const serialized = serializeState(state);
+    const json = JSON.stringify(serialized);
+    const restored = deserializeState(JSON.parse(json));
+
+    expect(ownsEntity(restored, "lantern")).toBe(true);
+    expect(entityIsActive(restored, "elf")).toBe(true);
+    expect(entityIsUnlocked(restored, "dark-cave")).toBe(true);
+    expect(getResource(restored, "gold")).toBe(12);
   });
 });
