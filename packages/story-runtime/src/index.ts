@@ -83,6 +83,10 @@ export {
   notVisitedEvaluator,
   currentNodeEvaluator,
   hasVariableEvaluator,
+  hasEntityEvaluator,
+  entityActiveEvaluator,
+  entityUnlockedEvaluator,
+  resourceAtLeastEvaluator,
   builtinEvaluators,
 } from "./conditions/builtin";
 
@@ -107,6 +111,14 @@ export {
   noOpHandler,
   setExtensionHandler,
   mergeExtensionHandler,
+  grantEntityHandler,
+  revokeEntityHandler,
+  activateEntityHandler,
+  deactivateEntityHandler,
+  unlockEntityHandler,
+  lockEntityHandler,
+  addResourceHandler,
+  spendResourceHandler,
   builtinHandlers,
 } from "./effects/builtin";
 

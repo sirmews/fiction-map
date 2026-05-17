@@ -3,12 +3,19 @@ import type {
   Condition,
   ConditionEvaluator,
 } from "../types"
+import {
+  ownsEntity,
+  entityIsActive,
+  entityIsUnlocked,
+  getResource,
+} from "../core/state"
 
 type EqualsCondition = Condition & { key: string; value: unknown }
 type NumericCondition = Condition & { key: string; value: number }
 type KeyCondition = Condition & { key: string }
 type FlagCondition = Condition & { key: string; value: boolean | string | number }
 type NodeIdCondition = Condition & { nodeId: string }
+type EntityCondition = Condition & { entityId: string }
 
 export const equalsEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -122,6 +129,38 @@ export const hasVariableEvaluator: ConditionEvaluator = (
   return key in state.variables
 }
 
+export const hasEntityEvaluator: ConditionEvaluator = (
+  state: GraphRuntimeState,
+  condition: Condition
+): boolean => {
+  const { entityId } = condition as EntityCondition
+  return typeof entityId === "string" && ownsEntity(state, entityId)
+}
+
+export const entityActiveEvaluator: ConditionEvaluator = (
+  state: GraphRuntimeState,
+  condition: Condition
+): boolean => {
+  const { entityId } = condition as EntityCondition
+  return typeof entityId === "string" && entityIsActive(state, entityId)
+}
+
+export const entityUnlockedEvaluator: ConditionEvaluator = (
+  state: GraphRuntimeState,
+  condition: Condition
+): boolean => {
+  const { entityId } = condition as EntityCondition
+  return typeof entityId === "string" && entityIsUnlocked(state, entityId)
+}
+
+export const resourceAtLeastEvaluator: ConditionEvaluator = (
+  state: GraphRuntimeState,
+  condition: Condition
+): boolean => {
+  const { key, value } = condition as NumericCondition
+  return typeof key === "string" && typeof value === "number" && getResource(state, key) >= value
+}
+
 export const builtinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["equals", equalsEvaluator],
   ["notEquals", notEqualsEvaluator],
@@ -135,4 +174,8 @@ export const builtinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["notVisited", notVisitedEvaluator],
   ["currentNode", currentNodeEvaluator],
   ["hasVariable", hasVariableEvaluator],
+  ["hasEntity", hasEntityEvaluator],
+  ["entityActive", entityActiveEvaluator],
+  ["entityUnlocked", entityUnlockedEvaluator],
+  ["resourceAtLeast", resourceAtLeastEvaluator],
 ])

@@ -206,8 +206,8 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 
 - [x] Generic runtime entity state
 - [x] Derived state from `@fiction-map/entities` world definitions and runtime state
-- [ ] Generic entity-aware built-in conditions
-- [ ] Generic entity-aware built-in effects
+- [x] Generic entity-aware built-in conditions
+- [x] Generic entity-aware built-in effects
 - [ ] Story transition bridge for entity-aware requirements and consequences
 - [ ] Cross-graph validation and explanation data for editor feedback
 

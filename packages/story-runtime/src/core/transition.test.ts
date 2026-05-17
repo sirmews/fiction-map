@@ -2,6 +2,13 @@ import { describe, it, expect } from "vitest";
 import {
   createInitialState,
   cloneState,
+  grantEntity,
+  unlockEntity,
+  addResource,
+  ownsEntity,
+  entityIsActive,
+  entityIsUnlocked,
+  getResource,
 } from "../core/state";
 import {
   evaluateConditionSet,
@@ -81,6 +88,29 @@ describe("condition evaluation", () => {
     
     expect(result).toBe(true);
   });
+
+  it("evaluates entity-aware conditions", () => {
+    let state = createInitialState("scene-1");
+    state = grantEntity(state, "lantern");
+    state = unlockEntity(state, "dark-cave");
+    state = addResource(state, "gold", 12);
+
+    const conditionSet: ConditionSet = {
+      all: [
+        { type: "hasEntity", entityId: "lantern" },
+        { type: "entityUnlocked", entityId: "dark-cave" },
+        { type: "resourceAtLeast", key: "gold", value: 10 },
+      ],
+      none: [
+        { type: "entityActive", entityId: "cursed-ring" },
+        { type: "resourceAtLeast", key: "gold", value: 20 },
+      ],
+    };
+
+    const result = evaluateConditionSet(state, conditionSet, builtinEvaluators);
+
+    expect(result).toBe(true);
+  });
   
   it("evaluates all/any/none composition", () => {
     let state = createInitialState("scene-1", { gold: 100 });
@@ -143,6 +173,64 @@ describe("effect application", () => {
     expect(newState.variables.gold).toBe(150);
     expect(newState.flags["opened-chest"]).toBe(true);
   });
+
+  it("applies entity-aware effects", () => {
+    const state = createInitialState("scene-1");
+    const effects = [
+      { type: "grantEntity", entityId: "lantern" },
+      { type: "activateEntity", entityId: "night-vision" },
+      { type: "unlockEntity", entityId: "dark-cave" },
+      { type: "addResource", key: "gold", amount: 12 },
+      { type: "spendResource", key: "gold", amount: 5 },
+    ];
+
+    const newState = applyEffects(state, effects, builtinHandlers);
+
+    expect(ownsEntity(newState, "lantern")).toBe(true);
+    expect(entityIsActive(newState, "night-vision")).toBe(true);
+    expect(entityIsUnlocked(newState, "dark-cave")).toBe(true);
+    expect(getResource(newState, "gold")).toBe(7);
+    expect(state.entityState).toBeUndefined();
+  });
+
+  it("applies entity-aware removal effects", () => {
+    let state = createInitialState("scene-1");
+    state = grantEntity(state, "lantern");
+    state = grantEntity(state, "silver-key");
+    state = unlockEntity(state, "dark-cave");
+    state = applyEffect(
+      state,
+      { type: "activateEntity", entityId: "night-vision" },
+      builtinHandlers
+    );
+
+    const newState = applyEffects(
+      state,
+      [
+        { type: "revokeEntity", entityId: "silver-key" },
+        { type: "deactivateEntity", entityId: "night-vision" },
+        { type: "lockEntity", entityId: "dark-cave" },
+      ],
+      builtinHandlers
+    );
+
+    expect(ownsEntity(newState, "lantern")).toBe(true);
+    expect(ownsEntity(newState, "silver-key")).toBe(false);
+    expect(entityIsActive(newState, "night-vision")).toBe(false);
+    expect(entityIsUnlocked(newState, "dark-cave")).toBe(false);
+  });
+
+  it("does not spend unavailable resources", () => {
+    const state = addResource(createInitialState("scene-1"), "gold", 3);
+
+    const newState = applyEffect(
+      state,
+      { type: "spendResource", key: "gold", amount: 5 },
+      builtinHandlers
+    );
+
+    expect(getResource(newState, "gold")).toBe(3);
+  });
 });
 
 describe("transition engine", () => {
@@ -197,6 +285,72 @@ describe("transition engine", () => {
     expect(result.state.variables.gold).toBe(50);
     expect(result.state.flags["has-sword"]).toBe(true);
     expect(result.state.currentNodeId).toBe("scene-2");
+  });
+
+  it("applies successful entity-aware transition", () => {
+    let state = createInitialState("scene-1");
+    state = grantEntity(state, "lantern");
+    state = addResource(state, "gold", 10);
+
+    const transition: Transition = {
+      id: "enter-cave",
+      sourceNodeId: "scene-1",
+      targetNodeId: "scene-2",
+      requirements: {
+        all: [
+          { type: "hasEntity", entityId: "lantern" },
+          { type: "resourceAtLeast", key: "gold", value: 5 },
+        ],
+      },
+      effects: [
+        { type: "spendResource", key: "gold", amount: 5 },
+        { type: "unlockEntity", entityId: "dark-cave" },
+      ],
+    };
+
+    const result = applyTransition(
+      state,
+      transition,
+      builtinEvaluators,
+      builtinHandlers
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.state.currentNodeId).toBe("scene-2");
+    expect(getResource(result.state, "gold")).toBe(5);
+    expect(entityIsUnlocked(result.state, "dark-cave")).toBe(true);
+  });
+
+  it("blocks entity-aware transition when requirements are not met", () => {
+    const state = addResource(createInitialState("scene-1"), "gold", 3);
+
+    const transition: Transition = {
+      id: "enter-cave",
+      sourceNodeId: "scene-1",
+      targetNodeId: "scene-2",
+      requirements: {
+        all: [
+          { type: "hasEntity", entityId: "lantern" },
+          { type: "resourceAtLeast", key: "gold", value: 5 },
+        ],
+      },
+      effects: [
+        { type: "spendResource", key: "gold", amount: 5 },
+        { type: "unlockEntity", entityId: "dark-cave" },
+      ],
+    };
+
+    const result = applyTransition(
+      state,
+      transition,
+      builtinEvaluators,
+      builtinHandlers
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.state.currentNodeId).toBe("scene-1");
+    expect(getResource(result.state, "gold")).toBe(3);
+    expect(entityIsUnlocked(result.state, "dark-cave")).toBe(false);
   });
   
   it("applies failed transition", () => {

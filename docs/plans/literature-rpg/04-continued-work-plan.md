@@ -122,51 +122,21 @@ Delivered:
 
 ### Stage 3: Generic Entity-Aware Conditions And Effects
 
-Status: next.
+Status: implemented.
 
-Goal:
+Delivered:
 
-Add generic runtime conditions and effects that let story transitions read and update
-entity-aware runtime state.
-
-Acceptance criteria:
-
-- conditions can check whether an entity is owned, active, or unlocked
-- conditions can check whether a numeric resource is at least a requested value
-- effects can grant, revoke, activate, deactivate, unlock, and lock entities
-- effects can add and spend resources
+- built-in `hasEntity`, `entityActive`, `entityUnlocked`, and `resourceAtLeast` conditions
+- built-in `grantEntity`, `revokeEntity`, `activateEntity`, `deactivateEntity`, `unlockEntity`,
+  and `lockEntity` effects
+- built-in `addResource` and `spendResource` effects
 - blocked resource spending is explicit and tested
-- these primitives remain generic and do not hardcode species, stats, traits, items, spells,
-  factions, quests, inventory, shops, equipment, combat, or leveling
-- focused tests cover allowed and blocked transitions using entity-aware conditions and effects
-
-Implementation files:
-
-- Modify `packages/story-runtime/src/conditions/builtin.ts`
-- Modify `packages/story-runtime/src/effects/builtin.ts`
-- Modify `packages/story-runtime/src/index.ts`
-- Test in `packages/story-runtime/src/core/transition.test.ts` or a new focused runtime test file
-
-Verification:
-
-- `bun run --filter @fiction-map/runtime test`
-- `bun run --filter @fiction-map/runtime typecheck`
-- `bun run --filter @fiction-map/runtime build`
-- `bun test`
-- `bun typecheck`
-- `bun run build`
-
-Out of scope:
-
-- applying modifiers into computed stat formulas
-- evaluating entity `state`, `tag`, `equals`, `gte`, or `includes` prerequisites
-- changing the CLI generator
-- building the Story Editor UI
-- persistence or collaboration
+- focused tests for condition evaluation, effect application, successful transitions, and blocked
+  transitions using entity-aware conditions and effects
 
 ### Stage 4: Story Graph Bridge
 
-Status: planned.
+Status: next.
 
 Goal:
 
@@ -178,6 +148,22 @@ Expected outcome:
 - story choices can require entities or unlocks
 - story choices can grant, activate, deactivate, unlock, or lock entities
 - blocked and hidden choices can identify which entity-aware requirement failed
+
+Acceptance criteria:
+
+- transition availability can expose which entity-aware condition failed
+- blocked choices can distinguish hidden from visible-but-unavailable requirements
+- the bridge does not require the runtime to know concrete app concepts like species, stats,
+  items, quests, shops, equipment, combat, or leveling
+- focused tests cover a blocked entity-aware transition with machine-readable failure detail
+
+Out of scope:
+
+- applying modifiers into computed stat formulas
+- evaluating entity `state`, `tag`, `equals`, `gte`, or `includes` prerequisites
+- changing the CLI generator
+- building the Story Editor UI
+- persistence or collaboration
 
 ### Stage 5: Validation And Explanation Improvements
 

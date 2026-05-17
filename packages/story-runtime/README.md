@@ -140,6 +140,10 @@ inventory rules, equipment rules, combat, or story graph transition logic.
 | `notVisited` | `nodeId` | `!state.visited.has(nodeId)` |
 | `currentNode` | `nodeId` | `state.currentNodeId === nodeId` |
 | `hasVariable` | `key` | `key in state.variables` |
+| `hasEntity` | `entityId` | Entity is owned in runtime entity state |
+| `entityActive` | `entityId` | Entity is active in runtime entity state |
+| `entityUnlocked` | `entityId` | Entity is unlocked in runtime entity state |
+| `resourceAtLeast` | `key`, `value` | Runtime resource is at least `value` |
 
 ## Built-in Effects
 
@@ -156,6 +160,14 @@ inventory rules, equipment rules, combat, or story graph transition logic.
 | `navigate` | `nodeId` | Navigate to node |
 | `setExtension` | `key`, `value` | Set extension data |
 | `mergeExtension` | `key`, `value` | Merge extension data |
+| `grantEntity` | `entityId` | Add an entity to owned runtime state |
+| `revokeEntity` | `entityId` | Remove an entity from owned runtime state |
+| `activateEntity` | `entityId` | Add an entity to active runtime state |
+| `deactivateEntity` | `entityId` | Remove an entity from active runtime state |
+| `unlockEntity` | `entityId` | Add an entity to unlocked runtime state |
+| `lockEntity` | `entityId` | Remove an entity from unlocked runtime state |
+| `addResource` | `key`, `amount` | Add to a numeric runtime resource |
+| `spendResource` | `key`, `amount` | Spend a numeric runtime resource if enough is available |
 
 ## Custom Conditions
 
