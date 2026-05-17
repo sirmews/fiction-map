@@ -152,6 +152,7 @@ export type GraphErrorType =
   | "missing-property"
   | "empty-graph"
   | "missing-start-node"
+  | "unknown-entity-reference"
 
 export interface GraphError {
   type: GraphErrorType
@@ -164,6 +165,21 @@ export interface ValidationResult {
   valid: boolean
   errors: GraphError[]
   reachableNodes: Set<string>
+}
+
+export interface EntityTransitionReferenceError {
+  type: "unknown-entity-reference"
+  transitionId: string
+  source: "condition" | "effect" | "failureEffect"
+  conditionType?: string
+  effectType?: string
+  entityId: string
+  message: string
+}
+
+export interface EntityTransitionReferenceValidationResult {
+  valid: boolean
+  errors: EntityTransitionReferenceError[]
 }
 
 // ============================================================================

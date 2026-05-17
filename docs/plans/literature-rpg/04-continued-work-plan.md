@@ -62,10 +62,10 @@ Implemented:
   entity `has` prerequisite status.
 - Transition availability and transition results report machine-readable failed conditions for
   blocked or hidden choices.
+- Entity-aware transition validation reports story graph references to unknown world entities.
 
 Not implemented yet:
 
-- cross-validation between story graph conditions/effects and world entity ids
 - computed stat formulas, modifier math, inventory rules, shops, equipment, combat, or leveling
 - Story Editor UI
 
@@ -147,39 +147,20 @@ Delivered:
 
 ### Stage 5: Validation And Explanation Improvements
 
-Status: next.
+Status: implemented.
 
-Goal:
+Delivered:
 
-Add validation and explanation data that spans the story graph and world entity graph.
-
-Useful checks:
-
-- story condition references an entity that does not exist
-- transition effect grants an unknown entity
-- unlock target exists structurally
-- entity prerequisite target exists
-- blocked transition explanation identifies the failing entity-aware condition
-
-Acceptance criteria:
-
-- a validator can receive both a story graph and a world definition
+- `validateEntityTransitionReferences(transitions, world)` in `@fiction-map/runtime`
+- validator accepts runtime transitions plus an `@fiction-map/entities` world definition
 - entity-aware conditions that reference unknown entities are reported as validation errors
-- entity-aware effects that reference unknown entities are reported as validation errors
+- entity-aware effects and failure effects that reference unknown entities are reported as validation errors
 - resource references stay generic and do not require a built-in RPG resource ontology
 - focused tests cover unknown entity references in conditions and effects
 
-Out of scope:
-
-- applying modifiers into computed stat formulas
-- evaluating entity `state`, `tag`, `equals`, `gte`, or `includes` prerequisites
-- changing the CLI generator
-- building the Story Editor UI
-- persistence or collaboration
-
 ### Stage 6: Example Project And End-To-End Tests
 
-Status: planned.
+Status: next.
 
 Goal:
 

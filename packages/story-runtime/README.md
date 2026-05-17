@@ -130,6 +130,10 @@ Entity-aware transition failures are machine-readable. A blocked or hidden trans
 `failedConditions` entries that identify the failed condition, whether it came from `visibility`
 or `requirements`, and which condition group failed.
 
+Use `validateEntityTransitionReferences(transitions, world)` to validate that entity-aware
+transition conditions and effects reference entities that exist in the supplied world definition.
+Resource references remain generic and are not checked against a built-in resource registry.
+
 ## Built-in Conditions
 
 | Type | Parameters | Description |

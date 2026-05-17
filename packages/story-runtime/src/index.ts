@@ -22,6 +22,8 @@ export type {
   GraphErrorType,
   GraphError,
   ValidationResult,
+  EntityTransitionReferenceError,
+  EntityTransitionReferenceValidationResult,
   SerializableState,
 } from "./types";
 
@@ -64,6 +66,11 @@ export {
   type EntityPrerequisiteResult,
   type DerivedEntityState,
 } from "./entities/derived";
+
+// Entity-aware transition validation
+export {
+  validateEntityTransitionReferences,
+} from "./entities/validation";
 
 // Condition evaluation
 export {
