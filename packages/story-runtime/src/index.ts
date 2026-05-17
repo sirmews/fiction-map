@@ -54,6 +54,14 @@ export {
   deserializeState,
 } from "./core/state";
 
+// Entity derivation
+export {
+  deriveEntityState,
+  type ActiveEntityModifier,
+  type EntityPrerequisiteResult,
+  type DerivedEntityState,
+} from "./entities/derived";
+
 // Condition evaluation
 export {
   evaluateCondition,

@@ -231,22 +231,33 @@ Implemented in this stage:
 
 ## Current next task
 
-The next task is:
+Status: Stage 2 implemented.
 
-Define and implement the first derived-state function that combines a world definition from
-`@fiction-map/entities` with entity-aware runtime state from `@fiction-map/runtime`.
+Implemented in this stage:
+
+- `deriveEntityState(world, state)` in `@fiction-map/runtime`
+- derived owned, active, unlocked, and effective entity id sets
+- unlock propagation from effective entities
+- active modifier collection from active entities
+- prerequisite status reporting for generic entity `has` prerequisites
+- missing runtime entity reference reporting
+- focused derived-state tests
+
+The next task is Stage 3: generic entity-aware conditions and effects.
 
 Acceptance criteria:
 
-- derived state can report owned, active, and unlocked entity ids
-- derived state can collect modifiers from active entities
-- derived state can identify entity prerequisites that are satisfied or unsatisfied
-- derived state does not hardcode species, stats, traits, items, spells, factions, or quests
-- focused tests cover entity references, active modifiers, and prerequisite status
+- conditions can check whether an entity is owned, active, or unlocked
+- conditions can check numeric resources
+- effects can grant, revoke, activate, deactivate, unlock, and lock entities
+- effects can add and spend resources
+- these primitives remain generic and do not hardcode species, stats, traits, items, spells, factions, or quests
+- focused tests cover allowed and blocked transitions using entity-aware conditions and effects
 
 Out of scope for this next task:
 
-- adding built-in story conditions or effects for entities
+- RPG-specific inventory or equipment semantics
+- applying modifiers into computed stat formulas
 - changing the CLI generator
-- evaluating story graph transitions from derived state
-- implementing RPG-specific formulas or inventory behavior
+- building the Story Editor UI
+- persistence or collaboration

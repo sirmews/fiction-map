@@ -49,6 +49,9 @@
     "packages/story-runtime": {
       "name": "@fiction-map/runtime",
       "version": "0.1.0",
+      "dependencies": {
+        "@fiction-map/entities": "workspace:*",
+      },
       "devDependencies": {
         "@vitest/coverage-v8": "^3.0.0",
         "tsup": "^8.0.0",

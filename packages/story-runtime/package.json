@@ -17,7 +17,9 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@fiction-map/entities": "workspace:*"
+  },
   "devDependencies": {
     "@vitest/coverage-v8": "^3.0.0",
     "tsup": "^8.0.0",

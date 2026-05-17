@@ -12,6 +12,7 @@ npm install @fiction-map/runtime
 
 - **State Management** — Immutable state with history tracking
 - **Entity-Aware State** — Generic owned, active, unlocked, and resource state
+- **Entity Derivation** — Combine world definitions with runtime entity state
 - **Condition Evaluation** — Pluggable condition system
 - **Effect Application** — Pluggable effect handlers
 - **Graph Traversal** — Transition engine with tracing
@@ -86,9 +87,44 @@ console.log(entityIsUnlocked(state, "dark-cave"))  // true
 console.log(getResource(state, "gold"))            // 12
 ```
 
-This state layer does not evaluate entity modifiers, prerequisites, or world definitions. It only
-records what a player/session owns, has active, has unlocked, and has available as numeric
-resources.
+This state layer only records what a player/session owns, has active, has unlocked, and has
+available as numeric resources.
+
+For world-aware reads, combine it with a world definition from `@fiction-map/entities`:
+
+```typescript
+import { defineEntityType, defineWorld } from "@fiction-map/entities"
+import {
+  createInitialState,
+  deriveEntityState,
+  grantEntity,
+} from "@fiction-map/runtime"
+
+defineEntityType({ id: "item" })
+defineEntityType({ id: "location" })
+
+const world = defineWorld({
+  id: "example-world",
+  entities: [
+    { id: "lantern", type: "item", unlocks: ["dark-cave"] },
+    {
+      id: "dark-cave",
+      type: "location",
+      prerequisites: [{ kind: "entity", target: "lantern", operator: "has" }],
+    },
+  ],
+})
+
+const state = grantEntity(createInitialState("start"), "lantern")
+const derived = deriveEntityState(world, state)
+
+console.log(derived.effectiveEntityIds.has("dark-cave")) // true
+console.log(derived.prerequisites[0]?.satisfied)         // true
+```
+
+Derivation reports effective ids, active modifiers, prerequisite status, unlocks, and runtime
+references that do not exist in the supplied world. It does not apply RPG-specific formulas,
+inventory rules, equipment rules, combat, or story graph transition logic.
 
 ## Built-in Conditions
 
