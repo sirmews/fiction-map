@@ -301,55 +301,45 @@ The current first implementation slice in this repo covers:
 
 It does not yet evaluate these rules in runtime.
 
-## What should happen next
+## Package decision
 
-The next step should not be implementation yet.
+The package decision has been made.
 
-The next step should be a design decision on package shape:
-
-### Option A: fold entity meta-model into `@fiction-map/core`
-
-Pros:
-
-- fewer packages
-- easier integration with existing definitions and validation
-
-Cons:
-
-- risks overloading `core`
-- makes boundaries less explicit
-
-### Option B: add a new package for the generic world/entity meta-model
-
-Possible name:
+Fiction Map now has a separate optional package:
 
 - `@fiction-map/entities`
 
-Pros:
+This package is the home for the generic entity meta-model.
 
-- keeps the world/entity abstraction separate from graph structure
-- makes scope easier to control
-- easier to keep optional for non-RPG consumers
+The current implementation includes:
 
-Cons:
+- entity type definitions
+- entity instances grouped into worlds
+- typed references
+- declarative modifiers
+- declarative prerequisites and unlocks
+- validation for entity structure and reference integrity
 
-- more package surface
-- one more integration boundary to manage
+It does not yet include runtime evaluation.
 
 ## Recommendation
 
-My recommendation is:
+The continuing recommendation is:
 
 - adopt the minimal entity meta-model concept
 - do **not** adopt a built-in RPG ontology
-- seriously consider a separate package boundary for the entity layer if literature RPG support
-  is a real goal
+- keep `@fiction-map/entities` separate from `@fiction-map/core`
+- connect it to runtime through explicit state and derivation contracts
 
 The reason is simple:
 
 - no entity meta-model is too little
 - built-in RPG concepts are too much
 - a small generic meta-model is the credible middle
+
+The next active plan is:
+
+- [Continued Work Plan](04-continued-work-plan.md)
 
 ## Bottom line
 

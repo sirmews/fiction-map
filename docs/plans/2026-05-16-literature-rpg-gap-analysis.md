@@ -90,17 +90,26 @@ This document explains, in detail:
 - where it belongs in relation to the story graph and runtime state
 - what the next implementation decision should be
 
+### 4. Continued work plan
+
+- [04-continued-work-plan.md](literature-rpg/04-continued-work-plan.md)
+
+This document explains, in detail:
+
+- the current completed stage
+- the ideal target state
+- the ordered work needed to connect `@fiction-map/entities` to runtime and story traversal
+- what should remain out of scope while the engine contract stabilizes
+
 ## Short conclusion
 
 Fiction Map already has enough flexibility to represent literature-RPG-style logic in principle.
 
 What it lacks is not a UI platform. What it lacks is a tighter engine contract around:
 
-- validation of condition and effect payloads
-- consistent world-state conventions
-- richer authored transition semantics
-- safer extension registration
-- clearer runtime explanations for blocked, hidden, and failed choices
-- a minimal generic entity/meta-model layer
+- entity-aware runtime state
+- derived state from world definitions and player state
+- graph/runtime integration over derived state
+- stronger validation and explanations for entity-aware choices
 
 That is the core of the current gap.
