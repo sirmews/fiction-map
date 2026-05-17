@@ -7,6 +7,11 @@ Date: 2026-05-16
 This is the entry document for a self-contained analysis of whether Fiction Map can support a
 consumer app for a literature RPG.
 
+This is **not** the active implementation plan. The single source of truth for current and next
+work is:
+
+- [Literature RPG Continued Work Plan](literature-rpg/04-continued-work-plan.md)
+
 This document assumes no prior context. It starts from first principles:
 
 - what Fiction Map is
@@ -23,6 +28,7 @@ It is not the Story Editor product itself.
 That means:
 
 - `@fiction-map/core` provides abstractions for defining graph structures
+- `@fiction-map/entities` provides generic world/entity definitions
 - `@fiction-map/runtime` provides traversal and execution behavior
 - consumer apps define their own concrete story schemas and own their own UI
 
@@ -44,15 +50,17 @@ Representative examples:
 - a choice is visible but currently unavailable
 - failure applies penalties or redirects the story elsewhere
 
-## Why there are multiple documents
+## Document roles
 
-The gap question has two different layers:
+The literature-RPG docs have one active plan and several background snapshots.
 
-1. What the current engine can and cannot do right now
-2. What missing capabilities matter enough that the engine contract should change
+The active plan is:
 
-Those are separated below so future readers can distinguish present capability from recommended
-next work.
+- [04-continued-work-plan.md](literature-rpg/04-continued-work-plan.md)
+
+The other documents are reference material. They explain earlier analysis, requirements, and
+design rationale. They must not be treated as competing task order, current status, or a second
+roadmap.
 
 ## Documents
 
@@ -60,7 +68,7 @@ next work.
 
 - [01-engine-capability-audit.md](literature-rpg/01-engine-capability-audit.md)
 
-This document explains, in detail:
+Reference snapshot. This document explains, in detail:
 
 - the current package boundary
 - the relevant `core` and `runtime` contracts
@@ -71,7 +79,7 @@ This document explains, in detail:
 
 - [02-gap-catalog.md](literature-rpg/02-gap-catalog.md)
 
-This document explains, in detail:
+Reference snapshot. This document explains, in detail:
 
 - each important missing engine capability
 - why it matters
@@ -83,7 +91,7 @@ This document explains, in detail:
 
 - [03-minimal-entity-meta-model.md](literature-rpg/03-minimal-entity-meta-model.md)
 
-This document explains, in detail:
+Reference snapshot. This document explains, in detail:
 
 - what a generic entity/meta-model layer would need to include
 - what it should explicitly exclude
@@ -94,7 +102,7 @@ This document explains, in detail:
 
 - [04-continued-work-plan.md](literature-rpg/04-continued-work-plan.md)
 
-This document explains, in detail:
+Active plan. This document explains, in detail:
 
 - the current completed stage
 - the ideal target state
@@ -103,13 +111,14 @@ This document explains, in detail:
 
 ## Short conclusion
 
-Fiction Map already has enough flexibility to represent literature-RPG-style logic in principle.
+Fiction Map already has enough flexibility to represent literature-RPG-style logic in principle,
+and now has first slices of generic entity definitions, runtime entity state, and derived entity
+state.
 
-What it lacks is not a UI platform. What it lacks is a tighter engine contract around:
+What it lacks is not a UI platform. What it still lacks is a tighter engine contract around:
 
-- entity-aware runtime state
-- derived state from world definitions and player state
-- graph/runtime integration over derived state
+- built-in entity-aware runtime conditions and effects
+- graph/runtime integration over entity-aware state
 - stronger validation and explanations for entity-aware choices
 
 That is the core of the current gap.

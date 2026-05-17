@@ -2,63 +2,35 @@
 
 Date: 2026-05-17
 
+## Source Of Truth
+
+This document is the single source of truth for current literature-RPG engine work in Fiction Map.
+
+Other literature-RPG documents are background analysis:
+
+- [01-engine-capability-audit.md](01-engine-capability-audit.md)
+- [02-gap-catalog.md](02-gap-catalog.md)
+- [03-minimal-entity-meta-model.md](03-minimal-entity-meta-model.md)
+
+Do not treat those files as competing task order, current status, or a second roadmap.
+
 ## Purpose
 
-This document is the current forward plan for getting Fiction Map from the first
-`@fiction-map/entities` slice to a credible literature-RPG engine foundation.
+This plan gets Fiction Map from generic graph packages to a credible headless foundation for a
+literature-RPG-style consumer app.
 
-It assumes no prior context.
+The target consumer app may define concepts such as species, stats, traits, items, spells,
+locations, quests, or resources. Fiction Map must not hardcode those concepts. It should provide
+the generic contracts that let the app define, validate, derive, and execute them.
 
-## Current completed stage
+## Current Package Boundary
 
-Fiction Map now has four relevant package surfaces:
+Fiction Map currently has four relevant package surfaces:
 
-- `@fiction-map/core`
-- `@fiction-map/entities`
-- `@fiction-map/runtime`
-- `fiction-map` CLI
-
-The entity package exists as a separate optional package. Its current scope is deliberately small.
-
-It supports:
-
-- entity type definitions
-- entity instances grouped into worlds
-- typed references between entities
-- declarative modifiers
-- declarative prerequisites and unlocks
-- validation for entity structure and references
-
-It does not yet support:
-
-- runtime state for owned, active, or unlocked entities
-- derived state computation
-- runtime evaluation of modifiers
-- runtime evaluation of prerequisites and unlocks
-- graph transition conditions that read entity-derived state
-
-## Ideal target
-
-The ideal target is not one giant universal graph.
-
-The target is a set of related graph-shaped layers:
-
-- **story graph**: scenes, choices, transitions, traversal
-- **world entity graph**: entities, references, modifiers, prerequisites, unlocks
-- **runtime state**: what a player currently owns, has active, has unlocked, or has spent
-- **derived state**: what follows from combining authored world definitions with runtime state
-
-The runtime should eventually answer:
-
-- is this story choice visible?
-- is this story choice allowed?
-- what entity or state requirement failed?
-- what entities, resources, or unlocks changed after this transition?
-
-It should answer those questions without hardcoding concepts like species, stats, traits, items,
-spells, factions, quests, combat, or inventory.
-
-## Guiding boundary
+- `@fiction-map/core`: graph schema definitions and graph validation
+- `@fiction-map/entities`: generic world/entity definitions and validation
+- `@fiction-map/runtime`: traversal, runtime state, derived entity state, and transition execution
+- `fiction-map` CLI: metadata and semantics generation
 
 The framework owns:
 
@@ -70,91 +42,150 @@ The framework owns:
 The consumer app owns:
 
 - concrete world concepts
+- concrete story schemas
 - editor UI
-- product workflows
-- persistence
-- RPG-specific semantics
-- game-specific formulas
+- persistence, auth, autosave, and collaboration
+- RPG-specific formulas and product workflows
 
-## Work sequence
+## Current Capability Checkpoint
 
-### Stage 1: Entity-aware runtime state
+Implemented:
+
+- `@fiction-map/entities` defines entity types, entity instances, typed references, modifiers,
+  prerequisites, unlocks, and structural validation.
+- `GraphRuntimeState.entityState` records owned, active, unlocked, and numeric resource state.
+- Runtime state helpers can grant, revoke, activate, deactivate, unlock, lock, add resources, and
+  spend resources.
+- Runtime serialization and deserialization preserve entity-aware state.
+- `deriveEntityState(world, state)` combines a world definition with runtime state.
+- Derived state reports owned, active, unlocked, effective, missing, active modifiers, and generic
+  entity `has` prerequisite status.
+
+Not implemented yet:
+
+- built-in entity-aware transition conditions
+- built-in entity-aware transition effects
+- story transition explanation data for failed entity-aware requirements
+- cross-validation between story graph conditions/effects and world entity ids
+- computed stat formulas, modifier math, inventory rules, shops, equipment, combat, or leveling
+- Story Editor UI
+
+## Target Shape
+
+The ideal target is a set of related graph-shaped layers, not one universal graph:
+
+- **Story graph**: scenes, choices, transitions, traversal
+- **World entity graph**: entities, references, modifiers, prerequisites, unlocks
+- **Runtime state**: what a player currently owns, has active, has unlocked, or has spent
+- **Derived state**: what follows from combining authored world definitions with runtime state
+
+The runtime should eventually answer:
+
+- is this story choice visible?
+- is this story choice allowed?
+- what entity or state requirement failed?
+- what entities, resources, or unlocks changed after this transition?
+
+It should answer those questions without hardcoding concepts like species, stats, traits, items,
+spells, factions, quests, combat, or inventory.
+
+## Ordered Work
+
+### Stage 1: Entity-Aware Runtime State
 
 Status: implemented.
 
-Define a small runtime-facing state shape for entity-aware play.
+Delivered:
 
-This should probably live in `@fiction-map/runtime` unless a stronger reason emerges to create a
-shared state package.
-
-Minimum state concepts:
-
+- `GraphRuntimeState.entityState`
 - owned entity ids
 - active entity ids
 - unlocked entity ids
-- resources
-- app extension data
+- numeric resources
+- immutable helper functions
+- serialization and deserialization support
+- focused runtime state tests
 
-The goal is not to model inventory rules. The goal is to provide a stable place for runtime state
-to record which authored entities matter to the current player/session.
+### Stage 2: Derived State Computation
 
-### Stage 2: Derived state computation
+Status: implemented.
 
-Add a derivation layer that combines:
+Delivered:
 
-- a world definition from `@fiction-map/entities`
-- entity-aware runtime state
+- `deriveEntityState(world, state)` in `@fiction-map/runtime`
+- derived owned, active, unlocked, and effective entity id sets
+- unlock propagation from effective entities
+- active modifier collection from active entities
+- prerequisite status reporting for generic entity `has` prerequisites
+- missing runtime entity reference reporting
+- focused derived-state tests
 
-and produces derived information such as:
+### Stage 3: Generic Entity-Aware Conditions And Effects
 
-- effective entity ids
-- active modifiers
-- satisfied prerequisites
-- unlocked entities
-- unresolved or invalid runtime references
+Status: next.
 
-This layer should remain generic. It should not interpret species, stats, items, or spells as
-special concepts.
+Goal:
 
-### Stage 3: Generic entity-aware conditions and effects
+Add generic runtime conditions and effects that let story transitions read and update
+entity-aware runtime state.
 
-Add runtime conditions and effects that operate on the derived state.
+Acceptance criteria:
 
-Likely first conditions:
+- conditions can check whether an entity is owned, active, or unlocked
+- conditions can check whether a numeric resource is at least a requested value
+- effects can grant, revoke, activate, deactivate, unlock, and lock entities
+- effects can add and spend resources
+- blocked resource spending is explicit and tested
+- these primitives remain generic and do not hardcode species, stats, traits, items, spells,
+  factions, quests, inventory, shops, equipment, combat, or leveling
+- focused tests cover allowed and blocked transitions using entity-aware conditions and effects
 
-- has entity
-- entity is active
-- entity is unlocked
-- resource at least
-- derived value at least
+Implementation files:
 
-Likely first effects:
+- Modify `packages/story-runtime/src/conditions/builtin.ts`
+- Modify `packages/story-runtime/src/effects/builtin.ts`
+- Modify `packages/story-runtime/src/index.ts`
+- Test in `packages/story-runtime/src/core/transition.test.ts` or a new focused runtime test file
 
-- grant entity
-- activate entity
-- deactivate entity
-- unlock entity
-- spend resource
-- add resource
+Verification:
 
-These should be generic runtime primitives. Consumer apps can still register custom evaluators and
-handlers for domain-specific behavior.
+- `bun run --filter @fiction-map/runtime test`
+- `bun run --filter @fiction-map/runtime typecheck`
+- `bun run --filter @fiction-map/runtime build`
+- `bun test`
+- `bun typecheck`
+- `bun run build`
 
-### Stage 4: Story graph bridge
+Out of scope:
 
-Connect story graph transitions to the entity-aware runtime layer.
+- applying modifiers into computed stat formulas
+- evaluating entity `state`, `tag`, `equals`, `gte`, or `includes` prerequisites
+- changing the CLI generator
+- building the Story Editor UI
+- persistence or collaboration
 
-The practical target:
+### Stage 4: Story Graph Bridge
+
+Status: planned.
+
+Goal:
+
+Make story graph transitions use entity-aware runtime primitives in a way that is clear to tests,
+consumer apps, and future editor feedback.
+
+Expected outcome:
 
 - story choices can require entities or unlocks
-- story choices can grant, activate, or unlock entities
-- blocked/hidden choices can explain which entity-aware requirement failed
+- story choices can grant, activate, deactivate, unlock, or lock entities
+- blocked and hidden choices can identify which entity-aware requirement failed
 
-This should preserve the distinction between story graph traversal and world entity modeling.
+### Stage 5: Validation And Explanation Improvements
 
-### Stage 5: Validation and explanation improvements
+Status: planned.
 
-Add validation that spans the story graph and world entity graph.
+Goal:
+
+Add validation and explanation data that spans the story graph and world entity graph.
 
 Useful checks:
 
@@ -164,11 +195,14 @@ Useful checks:
 - entity prerequisite target exists
 - blocked transition explanation identifies the failing entity-aware condition
 
-This is where the engine starts becoming useful for editor feedback and automated tests.
+### Stage 6: Example Project And End-To-End Tests
 
-### Stage 6: Example project and end-to-end tests
+Status: planned.
 
-Add a literature-RPG-style example that proves the model.
+Goal:
+
+Add a literature-RPG-style example that proves the package boundary works for a consumer-defined
+world without adding a built-in RPG ontology.
 
 The example should include:
 
@@ -183,10 +217,10 @@ The tests should prove:
 
 - entity validation works
 - derived state works
-- runtime transition availability reads derived state
+- runtime transition availability reads entity-aware state
 - transition effects update entity-aware runtime state
 
-## Explicit non-goals
+## Explicit Non-Goals
 
 Do not add these while completing the plan above:
 
@@ -203,7 +237,7 @@ Do not add these while completing the plan above:
 
 These may belong in a consumer app, but they do not belong in the framework contract yet.
 
-## Clean stopping points
+## Clean Stopping Points
 
 Each stage should be independently committable.
 
@@ -217,47 +251,3 @@ Good stopping points:
 - example project plus end-to-end tests
 
 Do not bundle all of this into one change set.
-
-Implemented in this stage:
-
-- `GraphRuntimeState.entityState`
-- owned entity ids
-- active entity ids
-- unlocked entity ids
-- numeric resources
-- immutable helper functions
-- serialization and deserialization support
-- focused runtime state tests
-
-## Current next task
-
-Status: Stage 2 implemented.
-
-Implemented in this stage:
-
-- `deriveEntityState(world, state)` in `@fiction-map/runtime`
-- derived owned, active, unlocked, and effective entity id sets
-- unlock propagation from effective entities
-- active modifier collection from active entities
-- prerequisite status reporting for generic entity `has` prerequisites
-- missing runtime entity reference reporting
-- focused derived-state tests
-
-The next task is Stage 3: generic entity-aware conditions and effects.
-
-Acceptance criteria:
-
-- conditions can check whether an entity is owned, active, or unlocked
-- conditions can check numeric resources
-- effects can grant, revoke, activate, deactivate, unlock, and lock entities
-- effects can add and spend resources
-- these primitives remain generic and do not hardcode species, stats, traits, items, spells, factions, or quests
-- focused tests cover allowed and blocked transitions using entity-aware conditions and effects
-
-Out of scope for this next task:
-
-- RPG-specific inventory or equipment semantics
-- applying modifiers into computed stat formulas
-- changing the CLI generator
-- building the Story Editor UI
-- persistence or collaboration

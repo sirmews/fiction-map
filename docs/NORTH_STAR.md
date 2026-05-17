@@ -23,7 +23,8 @@ the package contract of Fiction Map itself.
 The accepted decision record for this boundary is:
 
 - [Headless Engine Direction](decisions/2026-05-16-headless-engine-direction.md)
-- [Literature RPG Gap Analysis](plans/2026-05-16-literature-rpg-gap-analysis.md)
+- [Literature RPG Active Plan](plans/literature-rpg/04-continued-work-plan.md)
+- [Literature RPG Gap Analysis](plans/2026-05-16-literature-rpg-gap-analysis.md) as background
 
 ---
 
@@ -186,7 +187,7 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 
 ---
 
-### Milestone 3: Runtime ✅ COMPLETE
+### Milestone 3: Runtime Foundation ✅ COMPLETE
 
 - [x] State management
 - [x] Condition evaluation
@@ -198,6 +199,23 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 - [x] Adapter for loading graphs from plain JSON
 
 **Deliverable:** `@fiction-map/runtime` package
+
+---
+
+### Milestone 3.5: Entity-Aware Runtime 🚧 IN PROGRESS
+
+- [x] Generic runtime entity state
+- [x] Derived state from `@fiction-map/entities` world definitions and runtime state
+- [ ] Generic entity-aware built-in conditions
+- [ ] Generic entity-aware built-in effects
+- [ ] Story transition bridge for entity-aware requirements and consequences
+- [ ] Cross-graph validation and explanation data for editor feedback
+
+**Deliverable:** credible headless foundation for literature-RPG-style consumer apps
+
+The source of truth for the active work sequence is:
+
+- [Literature RPG Continued Work Plan](plans/literature-rpg/04-continued-work-plan.md)
 
 ---
 

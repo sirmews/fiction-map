@@ -2,16 +2,22 @@
 
 Date: 2026-05-16
 
+> Reference snapshot, not the active implementation plan.
+>
+> Use [04-continued-work-plan.md](04-continued-work-plan.md) as the single source of truth for
+> current status, next tasks, and implementation order. This audit records the reasoning that led
+> to the plan and may lag behind newer package work.
+
 ## Purpose
 
 This document answers a precise question without assuming any prior context:
 
-Given the current Fiction Map packages, what can a consumer app for a literature RPG already do,
-what is awkward, and what is not yet supported cleanly enough?
+Given the Fiction Map packages at the time of the original audit, what could a consumer app for a
+literature RPG already do, what was awkward, and what was not yet supported cleanly enough?
 
 ## Starting context
 
-Fiction Map currently has two relevant package surfaces for this question:
+At the time of this audit, Fiction Map had two relevant package surfaces for this question:
 
 ### `@fiction-map/core`
 

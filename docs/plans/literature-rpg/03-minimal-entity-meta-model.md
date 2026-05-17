@@ -2,6 +2,12 @@
 
 Date: 2026-05-16
 
+> Reference snapshot, not the active implementation plan.
+>
+> Use [04-continued-work-plan.md](04-continued-work-plan.md) as the single source of truth for
+> current status, next tasks, and implementation order. This document records the entity
+> meta-model rationale that led to `@fiction-map/entities`.
+
 ## Purpose
 
 This document defines the smallest plausible generic entity/meta-model layer that Fiction Map
@@ -290,7 +296,7 @@ If this were reduced to the smallest serious framework addition, it would includ
 
 Nothing more should be assumed at first.
 
-The current first implementation slice in this repo covers:
+The first implementation slice in this repo covered:
 
 - entity type definitions
 - entity instances
@@ -299,7 +305,8 @@ The current first implementation slice in this repo covers:
 - declarative prerequisites and unlocks
 - validation only
 
-It does not yet evaluate these rules in runtime.
+Later work added runtime entity state and the first derived-state function. Use
+[04-continued-work-plan.md](04-continued-work-plan.md) for the current status.
 
 ## Package decision
 
@@ -311,7 +318,7 @@ Fiction Map now has a separate optional package:
 
 This package is the home for the generic entity meta-model.
 
-The current implementation includes:
+The `@fiction-map/entities` implementation includes:
 
 - entity type definitions
 - entity instances grouped into worlds
@@ -320,7 +327,9 @@ The current implementation includes:
 - declarative prerequisites and unlocks
 - validation for entity structure and reference integrity
 
-It does not yet include runtime evaluation.
+Runtime entity state and first-pass derived state now live in `@fiction-map/runtime`. It still
+does not include built-in entity-aware transition conditions/effects or RPG-specific evaluation
+semantics.
 
 ## Recommendation
 
@@ -337,7 +346,7 @@ The reason is simple:
 - built-in RPG concepts are too much
 - a small generic meta-model is the credible middle
 
-The next active plan is:
+The active source of truth for continued work is:
 
 - [Continued Work Plan](04-continued-work-plan.md)
 

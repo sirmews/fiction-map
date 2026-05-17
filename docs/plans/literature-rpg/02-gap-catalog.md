@@ -2,6 +2,12 @@
 
 Date: 2026-05-16
 
+> Reference snapshot, not the active implementation plan.
+>
+> Use [04-continued-work-plan.md](04-continued-work-plan.md) as the single source of truth for
+> current status, next tasks, and implementation order. This catalog records requirements and
+> rationale, not the current task sequence.
+
 ## Purpose
 
 This document records the detailed engine gaps that matter for a literature-RPG-style consumer
@@ -390,7 +396,7 @@ It should validate declared contracts, not enforce a specific narrative philosop
 
 ## Gap prioritization
 
-If these gaps were prioritized strictly for engine value, the order should be:
+At the time of the original gap analysis, these gaps were prioritized strictly for engine value as:
 
 1. condition and effect instance validation
 2. world-state convention
@@ -400,8 +406,8 @@ If these gaps were prioritized strictly for engine value, the order should be:
 6. clearer entity-reference methodology
 7. broader semantic validation
 
-That ordering keeps the work small and practical while strengthening the core contract in the
-places that consumer apps will hit first.
+That ordering is background analysis. It is not the active implementation sequence. Use
+[04-continued-work-plan.md](04-continued-work-plan.md) for the current order of work.
 
 ## Non-goals
 

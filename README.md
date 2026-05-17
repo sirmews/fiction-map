@@ -123,9 +123,10 @@ const story = defineGraph({
 - [North Star](docs/NORTH_STAR.md) — The vision and delivery plan
 - [Headless Engine Decision](docs/decisions/2026-05-16-headless-engine-direction.md) — The
   accepted boundary between Fiction Map and consumer apps
-- [Literature RPG Gap Analysis](docs/plans/2026-05-16-literature-rpg-gap-analysis.md) — What a
-  literature-RPG-style consumer app can already do, what is awkward, and what the engine still
-  needs
+- [Literature RPG Active Plan](docs/plans/literature-rpg/04-continued-work-plan.md) — The
+  single source of truth for current literature-RPG engine work
+- [Literature RPG Gap Analysis](docs/plans/2026-05-16-literature-rpg-gap-analysis.md) —
+  Background analysis and links to reference snapshots
 - [Block Editor Research](docs/design/block-editor-research.md) — Research notes on how
   consumer apps should sit on top of a headless engine
 
@@ -147,7 +148,8 @@ Fiction Map applies [Encore's](https://encore.dev) "infrastructure from code" ap
 | **Core Types** | ✅ Complete | `@fiction-map/core` package |
 | **Entity Meta-Model** | 🚧 Initial Slice | `@fiction-map/entities` — entity types, instances, references, validation |
 | **Generator** | ✅ Complete | `fiction-map` CLI — file discovery, metadata extraction |
-| **Runtime** | ✅ Complete | `@fiction-map/runtime` — state, entity derivation, transitions, validation, path enumeration |
+| **Runtime Foundation** | ✅ Complete | `@fiction-map/runtime` — base state, transitions, validation, path enumeration |
+| **Entity-Aware Runtime** | 🚧 In Progress | runtime entity state and derivation exist; built-in entity-aware conditions/effects are next |
 
 ---
 
