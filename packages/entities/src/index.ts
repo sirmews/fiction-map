@@ -5,16 +5,7 @@
  */
 
 export * from "./types"
-export {
-  defineEntityType,
-  getEntityTypes,
-  getEntityType,
-  clearEntityTypes,
-} from "./entity-type"
-export {
-  defineWorld,
-  getWorlds,
-  getWorld,
-  clearWorlds,
-  generateEntityMetadata,
-} from "./world"
+export { EntityRegistry } from "./registry"
+export { defineEntityType } from "./entity-type"
+export { defineWorld } from "./world"
+

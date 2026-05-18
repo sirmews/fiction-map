@@ -4,7 +4,7 @@ import type {
   ValidationError,
   ValidationWarning,
 } from "@fiction-map/core"
-import { getEntityType, getEntityTypes } from "./entity-type"
+import type { EntityRegistry } from "./registry"
 import type {
   EntityInstance,
   EntityMetadata,
@@ -15,8 +15,6 @@ import type {
   WorldConfig,
   WorldDefinition,
 } from "./types"
-
-const worldRegistry = new Map<string, WorldDefinition>()
 
 function getCallSite(): SourceLocation {
   const stack = new Error().stack?.split("\n") || []
@@ -88,6 +86,7 @@ function validatePrerequisite(prerequisite: EntityPrerequisite): boolean {
 }
 
 function validateWorld(
+  registry: EntityRegistry,
   entities: EntityInstance[]
 ): { errors: ValidationError[]; warnings: ValidationWarning[] } {
   const errors: ValidationError[] = []
@@ -105,7 +104,7 @@ function validateWorld(
   }
 
   for (const entity of entities) {
-    const entityType = getEntityType(entity.type)
+    const entityType = registry.entityTypes.get(entity.type)
     if (!entityType) {
       errors.push({
         code: "UNKNOWN_ENTITY_TYPE",
@@ -220,16 +219,16 @@ function validateWorld(
   return { errors, warnings }
 }
 
-export function defineWorld(config: WorldConfig): WorldDefinition {
+export function defineWorld(registry: EntityRegistry, config: WorldConfig): WorldDefinition {
   if (!config.id) {
     throw new Error("World must have an id")
   }
 
-  if (worldRegistry.has(config.id)) {
-    throw new Error(`World "${config.id}" is already defined`)
+  if (registry.worlds.has(config.id)) {
+    throw new Error(`World "${config.id}" is already defined in this registry`)
   }
 
-  const { errors, warnings } = validateWorld(config.entities)
+  const { errors, warnings } = validateWorld(registry, config.entities)
   const entityTypesUsed = [...new Set(config.entities.map((entity) => entity.type))].sort()
 
   const definition: WorldDefinition = {
@@ -243,34 +242,8 @@ export function defineWorld(config: WorldConfig): WorldDefinition {
     warnings,
   }
 
-  worldRegistry.set(config.id, definition)
+  registry.worlds.set(config.id, definition)
 
   return definition
 }
 
-export function getWorlds(): Map<string, WorldDefinition> {
-  return new Map(worldRegistry)
-}
-
-export function getWorld(id: string): WorldDefinition | undefined {
-  return worldRegistry.get(id)
-}
-
-export function clearWorlds(): void {
-  worldRegistry.clear()
-}
-
-export function generateEntityMetadata(): EntityMetadata {
-  const worlds = [...worldRegistry.values()]
-  const errors = worlds.flatMap((world) => world.errors)
-  const warnings = worlds.flatMap((world) => world.warnings)
-
-  return {
-    entityTypes: [...getEntityTypes().values()],
-    worlds,
-    validation: {
-      errors,
-      warnings,
-    },
-  }
-}

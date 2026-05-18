@@ -1,128 +1,122 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
-  clearEntityTypes,
-  clearWorlds,
+  EntityRegistry,
   defineEntityType,
   defineWorld,
 } from "@fiction-map/entities";
 import {
-  activateEntity,
   createInitialState,
-  deriveEntityState,
   grantEntity,
   unlockEntity,
-} from "../index";
+  activateEntity,
+} from "../core/state";
+import { deriveEntityState } from "./derived";
 
 describe("deriveEntityState", () => {
+  let registry: EntityRegistry;
+
   beforeEach(() => {
-    clearEntityTypes();
-    clearWorlds();
+    registry = new EntityRegistry();
   });
 
   it("reports owned, active, unlocked, and effective entity ids", () => {
-    defineEntityType({ id: "item" });
-    defineEntityType({ id: "trait" });
-    defineEntityType({ id: "location" });
+    defineEntityType(registry, { id: "stat" });
+    defineEntityType(registry, {
+      id: "item",
+      references: { requiredStats: { to: ["stat"], multiple: true } },
+    });
 
-    const world = defineWorld({
-      id: "test-world",
+    const world = defineWorld(registry, {
+      id: "world",
       entities: [
-        { id: "lantern", type: "item", unlocks: ["dark-cave"] },
-        { id: "night-vision", type: "trait" },
-        { id: "dark-cave", type: "location" },
-        { id: "old-road", type: "location" },
+        { id: "dexterity", type: "stat" },
+        { id: "sword", type: "item", unlocks: ["cave"] },
+        { id: "cave", type: "item" }, // unlock target
       ],
     });
 
     let state = createInitialState("start");
-    state = grantEntity(state, "lantern");
-    state = activateEntity(state, "night-vision");
-    state = unlockEntity(state, "old-road");
+    state = unlockEntity(state, "dexterity"); // explicit unlock
+    state = grantEntity(state, "sword"); // explicit grant
+    state = activateEntity(state, "sword"); // explicit active
 
     const derived = deriveEntityState(world, state);
 
-    expect(derived.ownedEntityIds).toEqual(new Set(["lantern"]));
-    expect(derived.activeEntityIds).toEqual(new Set(["night-vision"]));
-    expect(derived.unlockedEntityIds).toEqual(new Set(["old-road", "dark-cave"]));
+    // explicit state mapping
+    expect(derived.ownedEntityIds).toEqual(new Set(["sword"]));
+    expect(derived.activeEntityIds).toEqual(new Set(["sword"]));
+    expect(derived.unlockedEntityIds).toEqual(new Set(["dexterity", "cave"]));
+
+    // explicit state + cascaded unlocks
     expect(derived.effectiveEntityIds).toEqual(
-      new Set(["lantern", "night-vision", "old-road", "dark-cave"])
+      new Set(["sword", "dexterity", "cave"])
     );
   });
 
   it("collects modifiers from active entities", () => {
-    defineEntityType({ id: "trait" });
+    defineEntityType(registry, { id: "trait" });
 
-    const world = defineWorld({
-      id: "test-world",
+    const world = defineWorld(registry, {
+      id: "world",
       entities: [
         {
-          id: "night-vision",
+          id: "strong",
           type: "trait",
           modifiers: [
-            { target: "senses.darkness", operation: "add", value: 2 },
-          ],
-        },
-        {
-          id: "unused-trait",
-          type: "trait",
-          modifiers: [
-            { target: "senses.noise", operation: "add", value: 1 },
+            { target: "stats.strength", operation: "add", value: 5 },
           ],
         },
       ],
     });
 
     let state = createInitialState("start");
-    state = activateEntity(state, "night-vision");
+    state = grantEntity(state, "strong");
 
-    const derived = deriveEntityState(world, state);
+    const beforeActivate = deriveEntityState(world, state);
+    expect(beforeActivate.activeModifiers).toHaveLength(0); // must be active
 
-    expect(derived.activeModifiers).toEqual([
-      {
-        sourceEntityId: "night-vision",
-        modifier: { target: "senses.darkness", operation: "add", value: 2 },
-      },
-    ]);
+    state = activateEntity(state, "strong");
+    const afterActivate = deriveEntityState(world, state);
+    expect(afterActivate.activeModifiers).toContainEqual({
+      sourceEntityId: "strong",
+      modifier: { target: "stats.strength", operation: "add", value: 5 },
+    });
   });
 
   it("identifies satisfied and unsatisfied entity prerequisites", () => {
-    defineEntityType({ id: "item" });
-    defineEntityType({ id: "location" });
+    defineEntityType(registry, { id: "location" });
+    defineEntityType(registry, { id: "item" });
 
-    const world = defineWorld({
-      id: "test-world",
+    const world = defineWorld(registry, {
+      id: "world",
       entities: [
-        { id: "lantern", type: "item" },
-        { id: "silver-key", type: "item" },
+        { id: "key", type: "item" },
         {
-          id: "dark-cave",
+          id: "locked-door",
           type: "location",
           prerequisites: [
-            { kind: "entity", target: "lantern", operator: "has" },
-          ],
-        },
-        {
-          id: "silver-gate",
-          type: "location",
-          prerequisites: [
-            { kind: "entity", target: "silver-key", operator: "has" },
+            { kind: "entity", target: "key", operator: "has" },
           ],
         },
       ],
     });
 
-    const state = grantEntity(createInitialState("start"), "lantern");
-    const derived = deriveEntityState(world, state);
+    let state = createInitialState("start");
 
-    expect(derived.prerequisites).toContainEqual({
-      entityId: "dark-cave",
-      prerequisite: { kind: "entity", target: "lantern", operator: "has" },
-      satisfied: true,
+    const derivedBefore = deriveEntityState(world, state);
+    expect(derivedBefore.prerequisites).toContainEqual({
+      entityId: "locked-door",
+      prerequisite: { kind: "entity", target: "key", operator: "has" },
+      satisfied: false, // does not have key yet
     });
-    expect(derived.prerequisites).toContainEqual({
-      entityId: "silver-gate",
-      prerequisite: { kind: "entity", target: "silver-key", operator: "has" },
-      satisfied: false,
+
+    state = grantEntity(state, "key");
+    const derivedAfter = deriveEntityState(world, state);
+    expect(derivedAfter.prerequisites).toContainEqual({
+      entityId: "locked-door",
+      prerequisite: { kind: "entity", target: "key", operator: "has" },
+      satisfied: true, // now has key
     });
   });
 });
+

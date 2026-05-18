@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
-  clearEntityTypes,
-  clearWorlds,
+  EntityRegistry,
   defineEntityType,
   defineWorld,
 } from "@fiction-map/entities";
@@ -23,25 +22,26 @@ import {
 } from "../index";
 
 describe("literature RPG example", () => {
+  let registry: EntityRegistry;
+
   beforeEach(() => {
-    clearEntityTypes();
-    clearWorlds();
+    registry = new EntityRegistry();
   });
 
   it("proves a consumer-defined world can gate and update story traversal", () => {
-    defineEntityType({
+    defineEntityType(registry, {
       id: "stat",
       properties: {
         label: { type: "string", required: true },
       },
     });
-    defineEntityType({
+    defineEntityType(registry, {
       id: "trait",
       properties: {
         label: { type: "string", required: true },
       },
     });
-    defineEntityType({
+    defineEntityType(registry, {
       id: "species",
       properties: {
         label: { type: "string", required: true },
@@ -51,7 +51,7 @@ describe("literature RPG example", () => {
         grants: { to: ["trait"], multiple: true },
       },
     });
-    defineEntityType({
+    defineEntityType(registry, {
       id: "item",
       properties: {
         label: { type: "string", required: true },
@@ -60,14 +60,14 @@ describe("literature RPG example", () => {
         grants: { to: ["trait"], multiple: true },
       },
     });
-    defineEntityType({
+    defineEntityType(registry, {
       id: "location",
       properties: {
         label: { type: "string", required: true },
       },
     });
 
-    const world = defineWorld({
+    const world = defineWorld(registry, {
       id: "moonlit-forest",
       entities: [
         { id: "dexterity", type: "stat", label: "Dexterity" },
@@ -210,3 +210,5 @@ describe("literature RPG example", () => {
     );
   });
 });
+
+

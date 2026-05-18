@@ -1,24 +1,22 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
-  clearEntityTypes,
-  clearWorlds,
+  EntityRegistry,
   defineEntityType,
   defineWorld,
 } from "@fiction-map/entities";
-import {
-  validateEntityTransitionReferences,
-  type Transition,
-} from "../index";
+import type { Transition } from "../types";
+import { validateEntityTransitionReferences } from "./validation";
 
 describe("validateEntityTransitionReferences", () => {
+  let registry: EntityRegistry;
+
   beforeEach(() => {
-    clearEntityTypes();
-    clearWorlds();
+    registry = new EntityRegistry();
   });
 
   it("reports entity-aware conditions that reference unknown entities", () => {
-    defineEntityType({ id: "item" });
-    const world = defineWorld({
+    defineEntityType(registry, { id: "item" });
+    const world = defineWorld(registry, {
       id: "test-world",
       entities: [{ id: "lantern", type: "item" }],
     });
@@ -54,8 +52,8 @@ describe("validateEntityTransitionReferences", () => {
   });
 
   it("reports entity-aware effects that reference unknown entities", () => {
-    defineEntityType({ id: "item" });
-    const world = defineWorld({
+    defineEntityType(registry, { id: "item" });
+    const world = defineWorld(registry, {
       id: "test-world",
       entities: [{ id: "lantern", type: "item" }],
     });
@@ -99,9 +97,9 @@ describe("validateEntityTransitionReferences", () => {
   });
 
   it("passes when entity-aware references exist and resources are unconstrained", () => {
-    defineEntityType({ id: "item" });
-    defineEntityType({ id: "location" });
-    const world = defineWorld({
+    defineEntityType(registry, { id: "item" });
+    defineEntityType(registry, { id: "location" });
+    const world = defineWorld(registry, {
       id: "test-world",
       entities: [
         { id: "lantern", type: "item" },
@@ -135,3 +133,4 @@ describe("validateEntityTransitionReferences", () => {
     expect(result).toEqual({ valid: true, errors: [] });
   });
 });
+

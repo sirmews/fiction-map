@@ -1,7 +1,6 @@
 import type { SourceLocation } from "@fiction-map/core"
 import type { EntityTypeConfig, EntityTypeDefinition } from "./types"
-
-const entityTypeRegistry = new Map<string, EntityTypeDefinition>()
+import type { EntityRegistry } from "./registry"
 
 function getCallSite(): SourceLocation {
   const stack = new Error().stack?.split("\n") || []
@@ -19,13 +18,13 @@ function getCallSite(): SourceLocation {
   return { file: "unknown", line: 0, column: 0 }
 }
 
-export function defineEntityType(config: EntityTypeConfig): EntityTypeDefinition {
+export function defineEntityType(registry: EntityRegistry, config: EntityTypeConfig): EntityTypeDefinition {
   if (!config.id) {
     throw new Error("Entity type must have an id")
   }
 
-  if (entityTypeRegistry.has(config.id)) {
-    throw new Error(`Entity type "${config.id}" is already defined`)
+  if (registry.entityTypes.has(config.id)) {
+    throw new Error(`Entity type "${config.id}" is already defined in this registry`)
   }
 
   const definition: EntityTypeDefinition = {
@@ -36,19 +35,8 @@ export function defineEntityType(config: EntityTypeConfig): EntityTypeDefinition
     references: config.references || {},
   }
 
-  entityTypeRegistry.set(config.id, definition)
+  registry.entityTypes.set(config.id, definition)
 
   return definition
 }
 
-export function getEntityTypes(): Map<string, EntityTypeDefinition> {
-  return new Map(entityTypeRegistry)
-}
-
-export function getEntityType(id: string): EntityTypeDefinition | undefined {
-  return entityTypeRegistry.get(id)
-}
-
-export function clearEntityTypes(): void {
-  entityTypeRegistry.clear()
-}

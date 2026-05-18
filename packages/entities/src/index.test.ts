@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it } from "vitest"
 import {
-  clearEntityTypes,
-  clearWorlds,
+  EntityRegistry,
   defineEntityType,
   defineWorld,
 } from "../src"
 
 describe("@fiction-map/entities", () => {
+  let registry: EntityRegistry
+
   beforeEach(() => {
-    clearEntityTypes()
-    clearWorlds()
+    registry = new EntityRegistry()
   })
 
   describe("defineEntityType", () => {
     it("should define an entity type with typed references", () => {
-      const species = defineEntityType({
+      const species = defineEntityType(registry, {
         id: "species",
         properties: {
           label: { type: "string", required: true },
@@ -29,32 +29,33 @@ describe("@fiction-map/entities", () => {
       expect(species.name).toBe("speciesEntityType")
       expect(species.references.baseStats.to).toEqual(["stat"])
       expect(species.references.baseStats.multiple).toBe(true)
+      expect(registry.entityTypes.get("species")).toBeDefined()
     })
 
     it("should not allow duplicate entity type ids", () => {
-      defineEntityType({ id: "species" })
+      defineEntityType(registry, { id: "species" })
 
       expect(() => {
-        defineEntityType({ id: "species" })
+        defineEntityType(registry, { id: "species" })
       }).toThrow("already defined")
     })
   })
 
   describe("defineWorld", () => {
     it("should define a valid world with typed entity references", () => {
-      defineEntityType({
+      defineEntityType(registry, {
         id: "stat",
         properties: {
           label: { type: "string", required: true },
         },
       })
-      defineEntityType({
+      defineEntityType(registry, {
         id: "trait",
         properties: {
           label: { type: "string", required: true },
         },
       })
-      defineEntityType({
+      defineEntityType(registry, {
         id: "species",
         properties: {
           label: { type: "string", required: true },
@@ -65,7 +66,7 @@ describe("@fiction-map/entities", () => {
         },
       })
 
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "forest-world",
         entities: [
           { id: "strength", type: "stat", label: "Strength" },
@@ -103,7 +104,7 @@ describe("@fiction-map/entities", () => {
     })
 
     it("should detect unknown entity types", () => {
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "test-world",
         entities: [{ id: "elf", type: "species" }],
       })
@@ -114,14 +115,14 @@ describe("@fiction-map/entities", () => {
     })
 
     it("should detect missing required properties", () => {
-      defineEntityType({
+      defineEntityType(registry, {
         id: "species",
         properties: {
           label: { type: "string", required: true },
         },
       })
 
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "test-world",
         entities: [{ id: "elf", type: "species" }],
       })
@@ -132,15 +133,15 @@ describe("@fiction-map/entities", () => {
     })
 
     it("should detect references to unknown entities", () => {
-      defineEntityType({ id: "stat" })
-      defineEntityType({
+      defineEntityType(registry, { id: "stat" })
+      defineEntityType(registry, {
         id: "species",
         references: {
           baseStats: { to: ["stat"], multiple: true, required: true },
         },
       })
 
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "test-world",
         entities: [
           {
@@ -159,16 +160,16 @@ describe("@fiction-map/entities", () => {
     })
 
     it("should detect references to entities of the wrong type", () => {
-      defineEntityType({ id: "stat" })
-      defineEntityType({ id: "trait" })
-      defineEntityType({
+      defineEntityType(registry, { id: "stat" })
+      defineEntityType(registry, { id: "trait" })
+      defineEntityType(registry, {
         id: "species",
         references: {
           baseStats: { to: ["stat"], multiple: true, required: true },
         },
       })
 
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "test-world",
         entities: [
           { id: "night-vision", type: "trait" },
@@ -188,9 +189,9 @@ describe("@fiction-map/entities", () => {
     })
 
     it("should detect malformed modifiers", () => {
-      defineEntityType({ id: "trait" })
+      defineEntityType(registry, { id: "trait" })
 
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "test-world",
         entities: [
           {
@@ -213,9 +214,9 @@ describe("@fiction-map/entities", () => {
     })
 
     it("should detect unknown entity prerequisite targets", () => {
-      defineEntityType({ id: "trait" })
+      defineEntityType(registry, { id: "trait" })
 
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "test-world",
         entities: [
           {
@@ -238,9 +239,9 @@ describe("@fiction-map/entities", () => {
     })
 
     it("should detect unknown unlock targets", () => {
-      defineEntityType({ id: "trait" })
+      defineEntityType(registry, { id: "trait" })
 
-      const world = defineWorld({
+      const world = defineWorld(registry, {
         id: "test-world",
         entities: [
           {
