@@ -4,9 +4,9 @@ Date: 2026-05-16
 
 > Reference snapshot, not the active implementation plan.
 >
-> Use [04-continued-work-plan.md](04-continued-work-plan.md) as the single source of truth for
-> current status, next tasks, and implementation order. This document records the entity
-> meta-model rationale that led to `@fiction-map/entities`.
+> Use [05-consumer-app-readiness-plan.md](05-consumer-app-readiness-plan.md) as the single source
+> of truth for current next-phase tasks. This document records the entity meta-model rationale
+> that led to `@fiction-map/entities`.
 
 ## Purpose
 
@@ -305,8 +305,9 @@ The first implementation slice in this repo covered:
 - declarative prerequisites and unlocks
 - validation only
 
-Later work added runtime entity state and the first derived-state function. Use
-[04-continued-work-plan.md](04-continued-work-plan.md) for the current status.
+Later work added runtime entity state, derived state, entity-aware transition primitives,
+failure details, cross-validation, and an executable literature-RPG example. Use
+[05-consumer-app-readiness-plan.md](05-consumer-app-readiness-plan.md) for current next-phase work.
 
 ## Package decision
 
@@ -327,9 +328,9 @@ The `@fiction-map/entities` implementation includes:
 - declarative prerequisites and unlocks
 - validation for entity structure and reference integrity
 
-Runtime entity state and first-pass derived state now live in `@fiction-map/runtime`. It still
-does not include built-in entity-aware transition conditions/effects or RPG-specific evaluation
-semantics.
+Runtime entity state, derived state, built-in entity-aware transition conditions/effects, failure
+details, and cross-validation now live in `@fiction-map/runtime`. It still does not include
+RPG-specific evaluation semantics.
 
 ## Recommendation
 
@@ -348,7 +349,7 @@ The reason is simple:
 
 The active source of truth for continued work is:
 
-- [Continued Work Plan](04-continued-work-plan.md)
+- [Consumer-App Readiness Plan](05-consumer-app-readiness-plan.md)
 
 ## Bottom line
 

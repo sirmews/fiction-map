@@ -32,13 +32,16 @@ The package provides:
 - declarative prerequisites and unlocks
 - minimal validation for properties, references, and entity rules
 
-It does not provide:
+This package itself does not provide:
 
 - built-in RPG ontology
 - runtime evaluation of modifiers
-- runtime evaluation of prerequisites and unlocks
+- runtime transition conditions or effects
 - inventory semantics
 - editor UI
+
+Runtime state, derived state, entity-aware transition primitives, and story/world reference
+validation live in `@fiction-map/runtime`.
 
 ## Quick Start
 

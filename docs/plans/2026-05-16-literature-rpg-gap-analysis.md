@@ -7,10 +7,10 @@ Date: 2026-05-16
 This is the entry document for a self-contained analysis of whether Fiction Map can support a
 consumer app for a literature RPG.
 
-This is **not** the active implementation plan. The single source of truth for current and next
+This is **not** the active implementation plan. The single source of truth for current next-phase
 work is:
 
-- [Literature RPG Continued Work Plan](literature-rpg/04-continued-work-plan.md)
+- [Literature RPG Consumer-App Readiness Plan](literature-rpg/05-consumer-app-readiness-plan.md)
 
 This document assumes no prior context. It starts from first principles:
 
@@ -54,9 +54,9 @@ Representative examples:
 
 The literature-RPG docs have one active plan and several background snapshots.
 
-The active plan is:
+The active next-phase plan is:
 
-- [04-continued-work-plan.md](literature-rpg/04-continued-work-plan.md)
+- [05-consumer-app-readiness-plan.md](literature-rpg/05-consumer-app-readiness-plan.md)
 
 The other documents are reference material. They explain earlier analysis, requirements, and
 design rationale. They must not be treated as competing task order, current status, or a second
@@ -98,27 +98,39 @@ Reference snapshot. This document explains, in detail:
 - where it belongs in relation to the story graph and runtime state
 - what the next implementation decision should be
 
-### 4. Continued work plan
+### 4. Completed foundation plan
 
 - [04-continued-work-plan.md](literature-rpg/04-continued-work-plan.md)
 
-Active plan. This document explains, in detail:
+Completed foundation record. This document explains, in detail:
 
 - the current completed stage
 - the ideal target state
 - the ordered work needed to connect `@fiction-map/entities` to runtime and story traversal
 - what should remain out of scope while the engine contract stabilizes
 
+### 5. Active consumer-app readiness plan
+
+- [05-consumer-app-readiness-plan.md](literature-rpg/05-consumer-app-readiness-plan.md)
+
+Active plan. This document explains, in detail:
+
+- the current headless foundation
+- the next ordered tasks before consumer app work
+- the documentation, examples, and API-readiness work still needed
+
 ## Short conclusion
 
-Fiction Map already has enough flexibility to represent literature-RPG-style logic in principle,
-and now has first slices of generic entity definitions, runtime entity state, and derived entity
-state.
+Fiction Map now has a credible headless foundation for literature-RPG-style logic: generic entity
+definitions, runtime entity state, derived entity state, entity-aware transition primitives,
+failure details, cross-validation, and an executable example.
 
-What it lacks is not a UI platform. What it still lacks is a tighter engine contract around:
+What it lacks is not a UI platform. What it still needs next is consumer-app readiness work:
 
-- built-in entity-aware runtime conditions and effects
-- graph/runtime integration over entity-aware state
-- stronger validation and explanations for entity-aware choices
+- public API audit
+- consumer usage guide
+- example placement decision
+- derived unlock semantics decision
+- runtime explanation ergonomics review
 
 That is the core of the current gap.

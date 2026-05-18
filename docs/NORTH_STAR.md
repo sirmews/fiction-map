@@ -23,7 +23,7 @@ the package contract of Fiction Map itself.
 The accepted decision record for this boundary is:
 
 - [Headless Engine Direction](decisions/2026-05-16-headless-engine-direction.md)
-- [Literature RPG Active Plan](plans/literature-rpg/04-continued-work-plan.md)
+- [Literature RPG Active Plan](plans/literature-rpg/05-consumer-app-readiness-plan.md)
 - [Literature RPG Gap Analysis](plans/2026-05-16-literature-rpg-gap-analysis.md) as background
 
 ---
@@ -214,9 +214,9 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 
 **Deliverable:** credible headless foundation for literature-RPG-style consumer apps
 
-The source of truth for the active work sequence is:
+The source of truth for the active next-phase work is:
 
-- [Literature RPG Continued Work Plan](plans/literature-rpg/04-continued-work-plan.md)
+- [Literature RPG Consumer-App Readiness Plan](plans/literature-rpg/05-consumer-app-readiness-plan.md)
 
 ---
 

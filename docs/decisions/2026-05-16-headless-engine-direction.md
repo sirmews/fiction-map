@@ -176,13 +176,19 @@ than pushing product responsibilities back down into the packages.
 
 ## Immediate consequences
 
-This decision means the next work in Fiction Map should focus on the smallest engine contract a
-consumer app needs:
+The first entity-aware engine foundation has now been implemented. The current active next-phase
+plan is:
 
-1. a stable serializable graph/document contract
-2. stronger structured validation outputs
-3. a runtime that consumes that contract cleanly
-4. optional metadata/tooling around that contract
+- [Literature RPG Consumer-App Readiness Plan](../plans/literature-rpg/05-consumer-app-readiness-plan.md)
+
+This means the next work in Fiction Map should focus on making the package contract consumable by a
+separate Story Editor app:
+
+1. public API audit
+2. consumer usage guide
+3. documented example placement
+4. derived unlock semantics decision
+5. runtime explanation ergonomics review
 
 It does **not** mean building:
 
@@ -193,11 +199,11 @@ It does **not** mean building:
 
 ## Open questions
 
-These are still unresolved and should drive the next implementation tasks:
+These are the remaining boundary questions that should drive the next-phase plan:
 
 1. What is the smallest serializable graph/document contract the consumer app should read/write?
-2. Should the runtime be primarily stateful, host-driven, or hybrid?
-3. How should conditions and effects cross the boundary between runtime and host app?
+2. Should the literature-RPG example remain a test, become a fixture, or become a separate example package?
+3. Should derived unlocks remain read-only, or should runtime expose an explicit materialization helper?
 4. Is there an explicit compile/export step between authored data and runtime-ready data?
 
 ## Bottom line

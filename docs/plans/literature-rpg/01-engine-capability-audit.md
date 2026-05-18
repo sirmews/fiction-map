@@ -4,9 +4,9 @@ Date: 2026-05-16
 
 > Reference snapshot, not the active implementation plan.
 >
-> Use [04-continued-work-plan.md](04-continued-work-plan.md) as the single source of truth for
-> current status, next tasks, and implementation order. This audit records the reasoning that led
-> to the plan and may lag behind newer package work.
+> Use [05-consumer-app-readiness-plan.md](05-consumer-app-readiness-plan.md) as the single source
+> of truth for current next-phase tasks. This audit records the earlier reasoning that led to the
+> completed foundation plan and may lag behind newer package work.
 
 ## Purpose
 

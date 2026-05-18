@@ -2,9 +2,13 @@
 
 Date: 2026-05-17
 
-## Source Of Truth
+## Status
 
-This document is the single source of truth for current literature-RPG engine work in Fiction Map.
+This document is the completed foundation record for the literature-RPG engine work.
+
+The active next-phase plan is:
+
+- [05-consumer-app-readiness-plan.md](05-consumer-app-readiness-plan.md)
 
 Other literature-RPG documents are background analysis:
 

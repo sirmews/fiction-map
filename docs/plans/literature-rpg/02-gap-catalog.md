@@ -4,9 +4,9 @@ Date: 2026-05-16
 
 > Reference snapshot, not the active implementation plan.
 >
-> Use [04-continued-work-plan.md](04-continued-work-plan.md) as the single source of truth for
-> current status, next tasks, and implementation order. This catalog records requirements and
-> rationale, not the current task sequence.
+> Use [05-consumer-app-readiness-plan.md](05-consumer-app-readiness-plan.md) as the single source
+> of truth for current next-phase tasks. This catalog records earlier requirements and rationale,
+> not the current task sequence.
 
 ## Purpose
 
@@ -407,7 +407,8 @@ At the time of the original gap analysis, these gaps were prioritized strictly f
 7. broader semantic validation
 
 That ordering is background analysis. It is not the active implementation sequence. Use
-[04-continued-work-plan.md](04-continued-work-plan.md) for the current order of work.
+[05-consumer-app-readiness-plan.md](05-consumer-app-readiness-plan.md) for the current order of
+work.
 
 ## Non-goals
 

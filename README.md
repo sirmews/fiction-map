@@ -123,7 +123,7 @@ const story = defineGraph({
 - [North Star](docs/NORTH_STAR.md) — The vision and delivery plan
 - [Headless Engine Decision](docs/decisions/2026-05-16-headless-engine-direction.md) — The
   accepted boundary between Fiction Map and consumer apps
-- [Literature RPG Active Plan](docs/plans/literature-rpg/04-continued-work-plan.md) — The
+- [Literature RPG Active Plan](docs/plans/literature-rpg/05-consumer-app-readiness-plan.md) — The
   single source of truth for current literature-RPG engine work
 - [Literature RPG Gap Analysis](docs/plans/2026-05-16-literature-rpg-gap-analysis.md) —
   Background analysis and links to reference snapshots
