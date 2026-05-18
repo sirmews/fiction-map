@@ -1,0 +1,57 @@
+[**fiction-map**](../../../README.md)
+
+***
+
+[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / getTransitionsByAvailability
+
+# Function: getTransitionsByAvailability()
+
+> **getTransitionsByAvailability**(`state`, `transitions`, `evaluators`, `context?`): `object`
+
+Defined in: [story-runtime/src/core/transition.ts:363](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/transition.ts#L363)
+
+Get transitions grouped by availability status.
+
+## Parameters
+
+### state
+
+[`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
+
+Current runtime state
+
+### transitions
+
+[`Transition`](../interfaces/Transition.md)[]
+
+All transitions in the graph
+
+### evaluators
+
+`Map`\<`string`, [`ConditionEvaluator`](../type-aliases/ConditionEvaluator.md)\>
+
+Map of condition type → evaluator function
+
+### context?
+
+`CombinedContext`
+
+Optional evaluation context
+
+## Returns
+
+`object`
+
+Object with available, blocked, and hidden transitions
+
+### available
+
+> **available**: [`Transition`](../interfaces/Transition.md)[]
+
+### blocked
+
+> **blocked**: [`Transition`](../interfaces/Transition.md)[]
+
+### hidden
+
+> **hidden**: [`Transition`](../interfaces/Transition.md)[]

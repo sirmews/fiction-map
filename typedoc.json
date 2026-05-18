@@ -1,0 +1,15 @@
+{
+  "entryPoints": [
+    "packages/core/src/index.ts",
+    "packages/entities/src/index.ts",
+    "packages/story-runtime/src/index.ts"
+  ],
+  "out": "docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "readme": "none",
+  "excludeInternal": true,
+  "compilerOptions": {
+    "target": "ES2022",
+    "moduleResolution": "bundler"
+  }
+}
