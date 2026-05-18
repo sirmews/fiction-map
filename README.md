@@ -149,7 +149,7 @@ Fiction Map applies [Encore's](https://encore.dev) "infrastructure from code" ap
 | **Entity Meta-Model** | 🚧 Initial Slice | `@fiction-map/entities` — entity types, instances, references, validation |
 | **Generator** | ✅ Complete | `fiction-map` CLI — file discovery, metadata extraction |
 | **Runtime Foundation** | ✅ Complete | `@fiction-map/runtime` — base state, transitions, validation, path enumeration |
-| **Entity-Aware Runtime** | 🚧 In Progress | runtime entity state, derivation, built-in entity-aware primitives, failure details, and cross-validation exist; example coverage is next |
+| **Entity-Aware Runtime** | ✅ Foundation Complete | runtime entity state, derivation, built-in entity-aware primitives, failure details, cross-validation, and example coverage |
 
 ---
 

@@ -63,6 +63,8 @@ Implemented:
 - Transition availability and transition results report machine-readable failed conditions for
   blocked or hidden choices.
 - Entity-aware transition validation reports story graph references to unknown world entities.
+- A literature-RPG-style example proves consumer-defined entities, derived state, transition
+  gating, effects, failure details, and cross-validation work together.
 
 Not implemented yet:
 
@@ -160,28 +162,18 @@ Delivered:
 
 ### Stage 6: Example Project And End-To-End Tests
 
-Status: next.
+Status: implemented.
 
-Goal:
+Delivered:
 
-Add a literature-RPG-style example that proves the package boundary works for a consumer-defined
-world without adding a built-in RPG ontology.
-
-The example should include:
-
-- a consumer-defined `species` entity type
-- a consumer-defined `stat` entity type
-- a consumer-defined `trait` or `item` entity type
-- an unlock chain
-- a story graph transition gated by entity-aware state
-- a transition effect that grants or unlocks an entity
-
-The tests should prove:
-
-- entity validation works
-- derived state works
-- runtime transition availability reads entity-aware state
-- transition effects update entity-aware runtime state
+- a literature-RPG-style package-level example test
+- consumer-defined `species`, `stat`, `trait`, `item`, and `location` entity types
+- a valid world definition with typed references, modifiers, prerequisites, and unlocks
+- an authored unlock chain proven through derived state
+- a story transition gated by entity-aware runtime state
+- transition effects that spend resources and grant entities
+- failed visibility details before runtime unlock state is recorded
+- cross-validation that catches invalid story/world entity references
 
 ## Explicit Non-Goals
 

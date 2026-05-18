@@ -210,7 +210,7 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 - [x] Generic entity-aware built-in effects
 - [x] Story transition bridge for entity-aware requirements and consequences
 - [x] Cross-graph validation and explanation data for editor feedback
-- [ ] Literature-RPG-style example and end-to-end tests
+- [x] Literature-RPG-style example and end-to-end tests
 
 **Deliverable:** credible headless foundation for literature-RPG-style consumer apps
 
