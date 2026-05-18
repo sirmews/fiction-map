@@ -154,40 +154,39 @@ describe("literature RPG example", () => {
     });
 
     expect(
-      checkTransitionAvailability(state, transitions[0], builtinEvaluators)
+      checkTransitionAvailability(state, transitions[0], builtinEvaluators, { derivedState: derivedBefore })
         .failedConditions
-    ).toEqual([
-      {
-        scope: "visibility",
-        group: "all",
-        condition: { type: "entityUnlocked", entityId: "dark-cave" },
-      },
-    ]);
+    ).toBeUndefined();
 
-    state = unlockEntity(state, "dark-cave");
-
+    // Now the transition should be fully allowed WITHOUT calling unlockEntity manually
     const availability = checkTransitionAvailability(
       state,
       transitions[0],
-      builtinEvaluators
+      builtinEvaluators,
+      { derivedState: derivedBefore }
     );
 
     expect(availability).toEqual({ allowed: true, visible: true });
 
+    // Ensure we can apply it
     const result = applyTransition(
       state,
       transitions[0],
       builtinEvaluators,
-      builtinHandlers
+      builtinHandlers,
+      { derivedState: derivedBefore }
     );
 
     expect(result.success).toBe(true);
     expect(result.state.currentNodeId).toBe("dark-cave");
     expect(getResource(result.state, "stamina")).toBe(2);
     expect(ownsEntity(result.state, "night-vision")).toBe(true);
-    expect(entityIsUnlocked(result.state, "dark-cave")).toBe(true);
+    
+    // Notice dark-cave isn't in runtime explicit state, it's just allowed because of derivation
+    expect(entityIsUnlocked(result.state, "dark-cave")).toBe(false);
 
     const invalidTransitions: Transition[] = [
+
       {
         id: "bad-reference",
         sourceNodeId: "forest-edge",

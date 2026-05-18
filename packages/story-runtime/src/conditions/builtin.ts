@@ -130,27 +130,45 @@ export const hasVariableEvaluator: ConditionEvaluator = (
 }
 
 export const hasEntityEvaluator: ConditionEvaluator = (
-  state: GraphRuntimeState,
-  condition: Condition
+  state,
+  condition,
+  context
 ): boolean => {
   const { entityId } = condition as EntityCondition
-  return typeof entityId === "string" && ownsEntity(state, entityId)
+  if (typeof entityId !== "string") return false
+  
+  if (context?.derivedState?.ownedEntityIds?.has(entityId)) {
+    return true
+  }
+  return ownsEntity(state, entityId)
 }
 
 export const entityActiveEvaluator: ConditionEvaluator = (
-  state: GraphRuntimeState,
-  condition: Condition
+  state,
+  condition,
+  context
 ): boolean => {
   const { entityId } = condition as EntityCondition
-  return typeof entityId === "string" && entityIsActive(state, entityId)
+  if (typeof entityId !== "string") return false
+
+  if (context?.derivedState?.activeEntityIds?.has(entityId)) {
+    return true
+  }
+  return entityIsActive(state, entityId)
 }
 
 export const entityUnlockedEvaluator: ConditionEvaluator = (
-  state: GraphRuntimeState,
-  condition: Condition
+  state,
+  condition,
+  context
 ): boolean => {
   const { entityId } = condition as EntityCondition
-  return typeof entityId === "string" && entityIsUnlocked(state, entityId)
+  if (typeof entityId !== "string") return false
+
+  if (context?.derivedState?.effectiveEntityIds?.has(entityId)) {
+    return true
+  }
+  return entityIsUnlocked(state, entityId)
 }
 
 export const resourceAtLeastEvaluator: ConditionEvaluator = (
@@ -179,3 +197,4 @@ export const builtinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["entityUnlocked", entityUnlockedEvaluator],
   ["resourceAtLeast", resourceAtLeastEvaluator],
 ])
+

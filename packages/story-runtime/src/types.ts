@@ -4,6 +4,8 @@
  * A schema-driven runtime engine for graph-based narratives, workflows, and decision trees.
  */
 
+import type { DerivedEntityState } from "./entities/derived"
+
 // ============================================================================
 // STATE
 // ============================================================================
@@ -44,6 +46,7 @@ export interface ConditionSet {
 export interface EvaluationContext {
   registry?: unknown
   scope?: string
+  derivedState?: DerivedEntityState
   [key: string]: unknown
 }
 
@@ -203,3 +206,4 @@ export interface SerializableEntityState {
   resources: Record<string, number>
   extensions?: Record<string, unknown>
 }
+
