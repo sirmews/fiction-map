@@ -140,53 +140,53 @@ Verification:
 - `bun test`
 - `bun typecheck`
 
-### Task 5: Runtime Explanation Ergonomics Review
+### Task 5: Fix Global Singletons (Registry Context)
 
 Purpose:
 
-Check whether `failedConditions` is sufficient for a Story Editor to show useful author-facing
-feedback.
+Remove global mutable state (`defineEntityType`, `defineCondition`, etc.) from `@fiction-map/core` and `@fiction-map/entities` so multiple projects/worlds can be loaded simultaneously without collision or memory leaks.
 
 Actions:
 
-- Review the current `FailedCondition` structure.
-- Compare it against the literature-RPG example and validation errors.
-- Decide whether additional fields are needed now or should wait for the consumer app.
+- Introduce a `Registry` or `ProjectContext` class to hold node types, edge types, entity types, conditions, and effects.
+- Update all definition functions to require or bind to a registry instance.
+- Ensure the runtime evaluators and handlers can access this registry context.
 
-Acceptance criteria:
-
-- The review states whether the current structure is enough.
-- Any proposed additions are generic and not RPG-specific.
-- No UI language or rendering assumptions are added to runtime.
-
-Verification:
-
-- `bun run --filter @fiction-map/runtime test`
-- `bun run --filter @fiction-map/runtime typecheck`
-
-### Task 6: Next Implementation Decision
+### Task 6: Solve the Unlock Trap (Seamless Evaluation)
 
 Purpose:
 
-Choose the next coding slice only after the consumer contract is documented.
+Ensure that `derivedState.effectiveEntityIds` (cascading unlocks via schemas) are respected by runtime transition evaluation without forcing the consumer app to write tedious boilerplate to sync derived state back into `EntityRuntimeState`.
 
-Likely options:
+Actions:
 
-- add a small derived-unlock materialization helper
-- add richer validation payload locations
-- start a separate Story Editor consumer app scaffold
-- stop engine work and use the packages from a consumer app
+- Create an ergonomic solution for `checkTransitionAvailability` to optionally or inherently respect derived state.
+- Ensure this solution does not violate pure evaluation performance or silently mutate the serializable explicit state.
+- Write tests proving that an entity like "Lantern" unlocking "Dark Cave" allows a player to traverse to "Dark Cave" effortlessly.
 
-Acceptance criteria:
+### Task 7: Clean Up Noisy Public API
 
-- The next slice is selected in writing.
-- It has explicit scope and non-goals.
-- It is independently committable.
+Purpose:
 
-Verification:
+Ensure `@fiction-map/runtime`, `@fiction-map/core`, and `@fiction-map/entities` export only what a consumer app actually needs, hiding internal execution loops and adapters.
 
-- The active plan is updated before implementation starts.
+Actions:
+
+- Obscure/unexport `parseGraph`, `GraphBlueprint`, and other internal parsing layers.
+- Provide a clear, unified `GraphRuntime` or engine entry point.
+- Consolidate built-in evaluators and handlers behind a simple initialization pattern (e.g., `registerBuiltins(registry)`).
+
+### Task 8: Implement Self-Documentation Mechanism
+
+Purpose:
+
+Replace the reliance on `*.test.ts` files for consumer education by building a mechanism that surfaces documentation, usage patterns, or generated schemas automatically, making the framework self-documenting for the consuming engineer.
+
+Actions:
+
+- Determine the right format (e.g., JSDoc generation, interactive CLI scaffold generator, or automated Markdown docs).
+- Implement the documentation generator so the API boundaries and usage examples are natively accessible without digging into the framework's test folder.
 
 ## Current Next Task
 
-Start with **Task 1: Public API Audit**.
+Start with **Task 5: Fix Global Singletons (Registry Context)**.
