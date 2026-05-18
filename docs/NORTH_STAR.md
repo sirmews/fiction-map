@@ -202,7 +202,7 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 
 ---
 
-### Milestone 3.5: Entity-Aware Runtime 🚧 IN PROGRESS
+### Milestone 3.5: Entity-Aware Runtime ✅ FOUNDATION COMPLETE
 
 - [x] Generic runtime entity state
 - [x] Derived state from `@fiction-map/entities` world definitions and runtime state
