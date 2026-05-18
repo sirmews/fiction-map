@@ -3,9 +3,7 @@
  */
 
 import { NodeTypeDefinition, NodeTypeConfig, PropertyDefinition, SourceLocation } from "./types"
-
-// Global registry for node types
-const nodeTypeRegistry = new Map<string, NodeTypeDefinition>()
+import type { ProjectRegistry } from "./registry"
 
 /**
  * Get the current call site for source location
@@ -35,7 +33,7 @@ function getCallSite(): SourceLocation {
  * 
  * @example
  * ```typescript
- * export const SceneNode = defineNodeType({
+ * export const SceneNode = defineNodeType(registry, {
  *   id: "scene",
  *   properties: {
  *     title: { type: "string", required: true },
@@ -46,13 +44,13 @@ function getCallSite(): SourceLocation {
  * })
  * ```
  */
-export function defineNodeType(config: NodeTypeConfig): NodeTypeDefinition {
+export function defineNodeType(registry: ProjectRegistry, config: NodeTypeConfig): NodeTypeDefinition {
   if (!config.id) {
     throw new Error("Node type must have an id")
   }
   
-  if (nodeTypeRegistry.has(config.id)) {
-    throw new Error(`Node type "${config.id}" is already defined`)
+  if (registry.nodeTypes.has(config.id)) {
+    throw new Error(`Node type "${config.id}" is already defined in this registry`)
   }
   
   const definition: NodeTypeDefinition = {
@@ -64,28 +62,8 @@ export function defineNodeType(config: NodeTypeConfig): NodeTypeDefinition {
     incomingEdges: config.incomingEdges || [],
   }
   
-  nodeTypeRegistry.set(config.id, definition)
+  registry.nodeTypes.set(config.id, definition)
   
   return definition
 }
 
-/**
- * Get all registered node types
- */
-export function getNodeTypes(): Map<string, NodeTypeDefinition> {
-  return new Map(nodeTypeRegistry)
-}
-
-/**
- * Get a specific node type
- */
-export function getNodeType(id: string): NodeTypeDefinition | undefined {
-  return nodeTypeRegistry.get(id)
-}
-
-/**
- * Clear the registry (useful for testing)
- */
-export function clearNodeTypes(): void {
-  nodeTypeRegistry.clear()
-}

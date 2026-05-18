@@ -3,9 +3,7 @@
  */
 
 import { EdgeTypeDefinition, EdgeTypeConfig, SourceLocation } from "./types"
-
-// Global registry for edge types
-const edgeTypeRegistry = new Map<string, EdgeTypeDefinition>()
+import type { ProjectRegistry } from "./registry"
 
 /**
  * Get the current call site for source location
@@ -32,7 +30,7 @@ function getCallSite(): SourceLocation {
  * 
  * @example
  * ```typescript
- * export const ChoiceEdge = defineEdgeType({
+ * export const ChoiceEdge = defineEdgeType(registry, {
  *   id: "choice",
  *   properties: {
  *     text: { type: "string", required: true },
@@ -44,13 +42,13 @@ function getCallSite(): SourceLocation {
  * })
  * ```
  */
-export function defineEdgeType(config: EdgeTypeConfig): EdgeTypeDefinition {
+export function defineEdgeType(registry: ProjectRegistry, config: EdgeTypeConfig): EdgeTypeDefinition {
   if (!config.id) {
     throw new Error("Edge type must have an id")
   }
   
-  if (edgeTypeRegistry.has(config.id)) {
-    throw new Error(`Edge type "${config.id}" is already defined`)
+  if (registry.edgeTypes.has(config.id)) {
+    throw new Error(`Edge type "${config.id}" is already defined in this registry`)
   }
   
   const definition: EdgeTypeDefinition = {
@@ -62,28 +60,8 @@ export function defineEdgeType(config: EdgeTypeConfig): EdgeTypeDefinition {
     targetTypes: config.targetTypes,
   }
   
-  edgeTypeRegistry.set(config.id, definition)
+  registry.edgeTypes.set(config.id, definition)
   
   return definition
 }
 
-/**
- * Get all registered edge types
- */
-export function getEdgeTypes(): Map<string, EdgeTypeDefinition> {
-  return new Map(edgeTypeRegistry)
-}
-
-/**
- * Get a specific edge type
- */
-export function getEdgeType(id: string): EdgeTypeDefinition | undefined {
-  return edgeTypeRegistry.get(id)
-}
-
-/**
- * Clear the registry (useful for testing)
- */
-export function clearEdgeTypes(): void {
-  edgeTypeRegistry.clear()
-}

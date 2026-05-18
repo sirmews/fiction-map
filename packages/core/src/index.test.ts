@@ -1,30 +1,23 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import {
+  ProjectRegistry,
   defineNodeType,
   defineEdgeType,
   defineCondition,
   defineEffect,
   defineGraph,
-  generateMetadata,
-  clearNodeTypes,
-  clearEdgeTypes,
-  clearConditions,
-  clearEffects,
-  clearGraphs,
 } from "../src"
 
 describe("@fiction-map/core", () => {
+  let registry: ProjectRegistry
+  
   beforeEach(() => {
-    clearNodeTypes()
-    clearEdgeTypes()
-    clearConditions()
-    clearEffects()
-    clearGraphs()
+    registry = new ProjectRegistry()
   })
   
   describe("defineNodeType", () => {
     it("should define a node type", () => {
-      const sceneNode = defineNodeType({
+      const sceneNode = defineNodeType(registry, {
         id: "scene",
         properties: {
           title: { type: "string", required: true },
@@ -36,20 +29,21 @@ describe("@fiction-map/core", () => {
       expect(sceneNode.id).toBe("scene")
       expect(sceneNode.name).toBe("sceneNode")
       expect(sceneNode.properties.title.type).toBe("string")
+      expect(registry.nodeTypes.get("scene")).toBeDefined()
     })
     
     it("should not allow duplicate node type ids", () => {
-      defineNodeType({ id: "scene" })
+      defineNodeType(registry, { id: "scene" })
       
       expect(() => {
-        defineNodeType({ id: "scene" })
+        defineNodeType(registry, { id: "scene" })
       }).toThrow("already defined")
     })
   })
   
   describe("defineEdgeType", () => {
     it("should define an edge type", () => {
-      const choiceEdge = defineEdgeType({
+      const choiceEdge = defineEdgeType(registry, {
         id: "choice",
         properties: {
           text: { type: "string", required: true },
@@ -61,12 +55,13 @@ describe("@fiction-map/core", () => {
       expect(choiceEdge.id).toBe("choice")
       expect(choiceEdge.name).toBe("choiceEdge")
       expect(choiceEdge.sourceTypes).toContain("scene")
+      expect(registry.edgeTypes.get("choice")).toBeDefined()
     })
   })
   
   describe("defineCondition", () => {
     it("should define a condition", () => {
-      const hasItem = defineCondition({
+      const hasItem = defineCondition(registry, {
         id: "has-item",
         parameters: {
           itemId: { type: "string", required: true },
@@ -75,12 +70,13 @@ describe("@fiction-map/core", () => {
       
       expect(hasItem.id).toBe("has-item")
       expect(hasItem.name).toBe("hasItemCondition")
+      expect(registry.conditions.get("has-item")).toBeDefined()
     })
   })
   
   describe("defineEffect", () => {
     it("should define an effect", () => {
-      const giveItem = defineEffect({
+      const giveItem = defineEffect(registry, {
         id: "give-item",
         parameters: {
           itemId: { type: "string", required: true },
@@ -89,15 +85,16 @@ describe("@fiction-map/core", () => {
       
       expect(giveItem.id).toBe("give-item")
       expect(giveItem.name).toBe("giveItemEffect")
+      expect(registry.effects.get("give-item")).toBeDefined()
     })
   })
   
   describe("defineGraph", () => {
     it("should define a valid graph", () => {
-      defineNodeType({ id: "scene", outgoingEdges: ["choice"], incomingEdges: ["choice"] })
-      defineEdgeType({ id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
+      defineNodeType(registry, { id: "scene", outgoingEdges: ["choice"], incomingEdges: ["choice"] })
+      defineEdgeType(registry, { id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
       
-      const graph = defineGraph({
+      const graph = defineGraph(registry, {
         id: "test-story",
         nodes: [
           { id: "start", type: "scene", title: "Beginning" },
@@ -115,7 +112,7 @@ describe("@fiction-map/core", () => {
     })
     
     it("should detect unknown node types", () => {
-      const graph = defineGraph({
+      const graph = defineGraph(registry, {
         id: "test-story",
         nodes: [
           { id: "start", type: "unknown-type" },
@@ -129,11 +126,11 @@ describe("@fiction-map/core", () => {
     })
     
     it("should detect invalid edge type connections", () => {
-      defineNodeType({ id: "scene", outgoingEdges: ["choice"], incomingEdges: ["choice"] })
-      defineNodeType({ id: "task", outgoingEdges: ["flow"], incomingEdges: ["flow"] })
-      defineEdgeType({ id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
+      defineNodeType(registry, { id: "scene", outgoingEdges: ["choice"], incomingEdges: ["choice"] })
+      defineNodeType(registry, { id: "task", outgoingEdges: ["flow"], incomingEdges: ["flow"] })
+      defineEdgeType(registry, { id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
       
-      const graph = defineGraph({
+      const graph = defineGraph(registry, {
         id: "test-story",
         nodes: [
           { id: "start", type: "scene" },
@@ -150,10 +147,10 @@ describe("@fiction-map/core", () => {
     })
     
     it("should find endings", () => {
-      defineNodeType({ id: "scene" })
-      defineEdgeType({ id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
+      defineNodeType(registry, { id: "scene" })
+      defineEdgeType(registry, { id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
       
-      const graph = defineGraph({
+      const graph = defineGraph(registry, {
         id: "test-story",
         nodes: [
           { id: "start", type: "scene" },
@@ -165,28 +162,6 @@ describe("@fiction-map/core", () => {
       })
       
       expect(graph.endings).toContain("end")
-    })
-  })
-  
-  describe("generateMetadata", () => {
-    it("should generate complete metadata", () => {
-      defineNodeType({ id: "scene" })
-      defineEdgeType({ id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
-      defineCondition({ id: "has-item" })
-      defineEffect({ id: "give-item" })
-      defineGraph({
-        id: "test",
-        nodes: [{ id: "start", type: "scene" }],
-        edges: [],
-      })
-      
-      const metadata = generateMetadata()
-      
-      expect(metadata.nodeTypes).toHaveLength(1)
-      expect(metadata.edgeTypes).toHaveLength(1)
-      expect(metadata.conditions).toHaveLength(1)
-      expect(metadata.effects).toHaveLength(1)
-      expect(metadata.graphs).toHaveLength(1)
     })
   })
 })

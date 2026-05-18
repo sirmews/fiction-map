@@ -12,13 +12,7 @@ import {
   ValidationWarning,
   SourceLocation,
 } from "./types"
-import { getNodeTypes, getNodeType } from "./node-type"
-import { getEdgeTypes, getEdgeType } from "./edge-type"
-import { getConditions, getCondition } from "./condition"
-import { getEffects, getEffect } from "./effect"
-
-// Global registry for graphs
-const graphRegistry = new Map<string, GraphDefinition>()
+import type { ProjectRegistry } from "./registry"
 
 /**
  * Get the current call site for source location
@@ -44,6 +38,7 @@ function getCallSite(): SourceLocation {
  * Validate a graph
  */
 function validateGraph(
+  registry: ProjectRegistry,
   nodes: NodeInstance[],
   edges: EdgeInstance[]
 ): { errors: ValidationError[]; warnings: ValidationWarning[] } {
@@ -66,7 +61,7 @@ function validateGraph(
   // Validate nodes
   for (const node of nodes) {
     // Check type exists
-    const nodeType = getNodeType(node.type)
+    const nodeType = registry.nodeTypes.get(node.type)
     if (!nodeType) {
       errors.push({
         code: "UNKNOWN_NODE_TYPE",
@@ -97,7 +92,7 @@ function validateGraph(
     }
     
     // Check edge type exists
-    const edgeType = getEdgeType(edge.type)
+    const edgeType = registry.edgeTypes.get(edge.type)
     if (!edgeType) {
       errors.push({
         code: "UNKNOWN_EDGE_TYPE",
@@ -136,7 +131,7 @@ function validateGraph(
     // Validate conditions
     if (edge.conditions) {
       for (const condition of edge.conditions) {
-        const conditionDef = getCondition(condition.type)
+        const conditionDef = registry.conditions.get(condition.type)
         if (!conditionDef) {
           errors.push({
             code: "UNKNOWN_CONDITION",
@@ -150,7 +145,7 @@ function validateGraph(
     // Validate effects
     if (edge.effects) {
       for (const effect of edge.effects) {
-        const effectDef = getEffect(effect.type)
+        const effectDef = registry.effects.get(effect.type)
         if (!effectDef) {
           errors.push({
             code: "UNKNOWN_EFFECT",
@@ -303,7 +298,7 @@ function findEndings(nodes: NodeInstance[], edges: EdgeInstance[]): string[] {
  * 
  * @example
  * ```typescript
- * export const myStory = defineGraph({
+ * export const myStory = defineGraph(registry, {
  *   id: "my-story",
  *   nodes: [
  *     { id: "start", type: "scene", title: "Beginning" },
@@ -315,16 +310,16 @@ function findEndings(nodes: NodeInstance[], edges: EdgeInstance[]): string[] {
  * })
  * ```
  */
-export function defineGraph(config: GraphConfig): GraphDefinition {
+export function defineGraph(registry: ProjectRegistry, config: GraphConfig): GraphDefinition {
   if (!config.id) {
     throw new Error("Graph must have an id")
   }
   
-  if (graphRegistry.has(config.id)) {
-    throw new Error(`Graph "${config.id}" is already defined`)
+  if (registry.graphs.has(config.id)) {
+    throw new Error(`Graph "${config.id}" is already defined in this registry`)
   }
   
-  const { errors, warnings } = validateGraph(config.nodes, config.edges)
+  const { errors, warnings } = validateGraph(registry, config.nodes, config.edges)
   const usage = collectTypeUsage(config.nodes, config.edges)
   
   const definition: GraphDefinition = {
@@ -342,56 +337,8 @@ export function defineGraph(config: GraphConfig): GraphDefinition {
     warnings,
   }
   
-  graphRegistry.set(config.id, definition)
+  registry.graphs.set(config.id, definition)
   
   return definition
 }
 
-/**
- * Get all registered graphs
- */
-export function getGraphs(): Map<string, GraphDefinition> {
-  return new Map(graphRegistry)
-}
-
-/**
- * Get a specific graph
- */
-export function getGraph(id: string): GraphDefinition | undefined {
-  return graphRegistry.get(id)
-}
-
-/**
- * Clear the registry (useful for testing)
- */
-export function clearGraphs(): void {
-  graphRegistry.clear()
-}
-
-/**
- * Generate metadata for all registered types
- */
-export function generateMetadata(): GraphMetadata {
-  const nodeTypes = Array.from(getNodeTypes().values())
-  const edgeTypes = Array.from(getEdgeTypes().values())
-  const conditions = Array.from(getConditions().values())
-  const effects = Array.from(getEffects().values())
-  const graphs = Array.from(getGraphs().values())
-  
-  const errors: ValidationError[] = []
-  const warnings: ValidationWarning[] = []
-  
-  for (const graph of graphs) {
-    errors.push(...graph.errors)
-    warnings.push(...graph.warnings)
-  }
-  
-  return {
-    nodeTypes,
-    edgeTypes,
-    conditions,
-    effects,
-    graphs,
-    validation: { errors, warnings },
-  }
-}

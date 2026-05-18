@@ -3,9 +3,7 @@
  */
 
 import { EffectDefinition, EffectConfig, SourceLocation } from "./types"
-
-// Global registry for effects
-const effectRegistry = new Map<string, EffectDefinition>()
+import type { ProjectRegistry } from "./registry"
 
 /**
  * Get the current call site for source location
@@ -32,7 +30,7 @@ function getCallSite(): SourceLocation {
  * 
  * @example
  * ```typescript
- * export const GiveItemEffect = defineEffect({
+ * export const GiveItemEffect = defineEffect(registry, {
  *   id: "give-item",
  *   parameters: {
  *     itemId: { type: "string", required: true },
@@ -41,13 +39,13 @@ function getCallSite(): SourceLocation {
  * })
  * ```
  */
-export function defineEffect(config: EffectConfig): EffectDefinition {
+export function defineEffect(registry: ProjectRegistry, config: EffectConfig): EffectDefinition {
   if (!config.id) {
     throw new Error("Effect must have an id")
   }
   
-  if (effectRegistry.has(config.id)) {
-    throw new Error(`Effect "${config.id}" is already defined`)
+  if (registry.effects.has(config.id)) {
+    throw new Error(`Effect "${config.id}" is already defined in this registry`)
   }
   
   const definition: EffectDefinition = {
@@ -57,28 +55,8 @@ export function defineEffect(config: EffectConfig): EffectDefinition {
     parameters: config.parameters || {},
   }
   
-  effectRegistry.set(config.id, definition)
+  registry.effects.set(config.id, definition)
   
   return definition
 }
 
-/**
- * Get all registered effects
- */
-export function getEffects(): Map<string, EffectDefinition> {
-  return new Map(effectRegistry)
-}
-
-/**
- * Get a specific effect
- */
-export function getEffect(id: string): EffectDefinition | undefined {
-  return effectRegistry.get(id)
-}
-
-/**
- * Clear the registry (useful for testing)
- */
-export function clearEffects(): void {
-  effectRegistry.clear()
-}

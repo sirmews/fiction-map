@@ -3,9 +3,7 @@
  */
 
 import { ConditionDefinition, ConditionConfig, SourceLocation } from "./types"
-
-// Global registry for conditions
-const conditionRegistry = new Map<string, ConditionDefinition>()
+import type { ProjectRegistry } from "./registry"
 
 /**
  * Get the current call site for source location
@@ -32,7 +30,7 @@ function getCallSite(): SourceLocation {
  * 
  * @example
  * ```typescript
- * export const HasItemCondition = defineCondition({
+ * export const HasItemCondition = defineCondition(registry, {
  *   id: "has-item",
  *   parameters: {
  *     itemId: { type: "string", required: true },
@@ -40,13 +38,13 @@ function getCallSite(): SourceLocation {
  * })
  * ```
  */
-export function defineCondition(config: ConditionConfig): ConditionDefinition {
+export function defineCondition(registry: ProjectRegistry, config: ConditionConfig): ConditionDefinition {
   if (!config.id) {
     throw new Error("Condition must have an id")
   }
   
-  if (conditionRegistry.has(config.id)) {
-    throw new Error(`Condition "${config.id}" is already defined`)
+  if (registry.conditions.has(config.id)) {
+    throw new Error(`Condition "${config.id}" is already defined in this registry`)
   }
   
   const definition: ConditionDefinition = {
@@ -56,28 +54,8 @@ export function defineCondition(config: ConditionConfig): ConditionDefinition {
     parameters: config.parameters || {},
   }
   
-  conditionRegistry.set(config.id, definition)
+  registry.conditions.set(config.id, definition)
   
   return definition
 }
 
-/**
- * Get all registered conditions
- */
-export function getConditions(): Map<string, ConditionDefinition> {
-  return new Map(conditionRegistry)
-}
-
-/**
- * Get a specific condition
- */
-export function getCondition(id: string): ConditionDefinition | undefined {
-  return conditionRegistry.get(id)
-}
-
-/**
- * Clear the registry (useful for testing)
- */
-export function clearConditions(): void {
-  conditionRegistry.clear()
-}
