@@ -148,16 +148,6 @@ export {
   hasUnreachableNodes,
 } from "./core/validation";
 
-// Adapter (generic graph JSON → runtime types)
-export {
-  parseGraph,
-  determineEndings,
-  type EdgeBlueprint,
-  type NodeBlueprint,
-  type GraphBlueprint,
-  type ParsedGraph,
-} from "./adapter";
-
 // High-level runtime wrapper
 export {
   GraphRuntime,
@@ -165,3 +155,4 @@ export {
   type PathStep,
   type TraversalPath,
 } from "./runtime";
+
