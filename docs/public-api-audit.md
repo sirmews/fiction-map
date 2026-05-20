@@ -1,75 +1,91 @@
 # Public API Audit
 
-**Date:** 2026-05-18
-**Context:** This document analyzes the current exports of `@fiction-map/core`, `@fiction-map/entities`, and `@fiction-map/runtime` to identify stable consumer-facing APIs versus implementation details, based on the headless engine boundary established in `docs/plans/literature-rpg/05-consumer-app-readiness-plan.md`.
+**Date:** 2026-05-19 (post-ergonomics refactor)
+**Context:** Snapshot of the current public surfaces of `@fiction-map/core`, `@fiction-map/entities`, and `@fiction-map/runtime` after Tasks 5–7 of the [engine-ergonomics plan](superpowers/plans/2026-05-18-engine-ergonomics.md) landed (commits `fe53a65`, `c932a16`, `438d95e`, `b370981`). Use this document to judge what is safe for a consumer Story Editor to depend on.
+
+The boundary this audit is measured against is documented in [docs/decisions/2026-05-16-headless-engine-direction.md](decisions/2026-05-16-headless-engine-direction.md).
 
 ---
 
 ## 1. `@fiction-map/core`
 
-This package defines the generic graph abstractions, metadata schemas, and authoring primitives.
+Source: [`packages/core/src/index.ts`](../packages/core/src/index.ts).
 
 ### Stable Consumer-Facing API
-*   **Schema Definition Builders:** `defineNodeType`, `defineEdgeType`, `defineCondition`, `defineEffect`, `defineGraph`
-    *   *Role:* Used by the consumer app to define their specific node types, edge types, and graph topology.
-*   **Types:** `PropertyType`, `PropertySchema`, `PropertyDefinition`, `NodeTypeDefinition`, `EdgeTypeDefinition`, `ConditionDefinition`, `EffectDefinition`, `GraphDefinition`
-    *   *Role:* Core building blocks for the editor's schema validation and typing.
 
-### Questionable / Implementation Details
-*   **Global Registry Methods:** `getNodeTypes`, `getNodeType`, `clearNodeTypes`, `getEdgeTypes`, `getEdgeType`, `clearEdgeTypes`, `getConditions`, `getCondition`, `clearConditions`, `getEffects`, `getEffect`, `clearEffects`, `getGraphs`, `getGraph`, `clearGraphs`
-    *   *Issue:* Relying on global mutable singleton state makes it harder for a Story Editor to manage multiple projects, namespaces, or hot-reloading reliably. An explicit `Registry` class or context might be better.
-*   **Split-Brain Runtime Types:** `GraphState`, `TraversalResult`, `TraceEvent`
-    *   *Issue:* These exist in the `core` package but overlap conceptually with the much richer `GraphRuntimeState` and `TransitionResult` defined in `@fiction-map/runtime`. They should likely be unified or moved entirely to `runtime`.
-*   **Internal Helpers:** `generateMetadata`
-    *   *Issue:* While useful, it feels like an internal generation step that could be named better or encapsulated in the Graph validation pipeline.
+- **Registry:** `ProjectRegistry`
+  - *Role:* Per-project container for node types, edge types, conditions, effects, and graphs. Replaces the previous module-level singletons.
+- **Schema Definition Builders (all take `registry` as the first argument):**
+  `defineNodeType`, `defineEdgeType`, `defineCondition`, `defineEffect`, `defineGraph`
+- **Types (re-exported via `export * from "./types"`):**
+  `PropertyType`, `PropertySchema`, `PropertyDefinition`, `NodeTypeDefinition`, `EdgeTypeDefinition`, `ConditionDefinition`, `EffectDefinition`, `GraphDefinition`, `NodeInstance`, `EdgeInstance`, `ValidationError`, `ValidationWarning`, `SourceLocation`.
+
+### Known Smell — Split-Brain Runtime Types
+
+`packages/core/src/types.ts` still defines and re-exports the legacy `GraphState`, `TraversalResult`, and `TraceEvent` shapes ([types.ts#L255-L290](../packages/core/src/types.ts#L255)). They overlap conceptually with the richer `GraphRuntimeState` / `TransitionResult` / `TransitionTrace` shapes in `@fiction-map/runtime`. They are reachable through `export * from "./types"` but are not used anywhere downstream.
+
+*Recommendation:* mark them `@deprecated` and plan a follow-up to remove them in the next minor.
+
+### What is no longer exported
+
+The previous global helpers `getNodeTypes`, `clearNodeTypes`, `getEdgeTypes`, `clearEdgeTypes`, `getConditions`, `clearConditions`, `getEffects`, `clearEffects`, `getGraphs`, `clearGraphs`, and the standalone `generateMetadata` are gone. Consumers iterate `registry.nodeTypes` / `registry.edgeTypes` / etc. directly, or use the `fiction-map` CLI for metadata generation.
 
 ---
 
 ## 2. `@fiction-map/entities`
 
-This package defines the consumer-owned world/entity abstractions.
+Source: [`packages/entities/src/index.ts`](../packages/entities/src/index.ts).
 
 ### Stable Consumer-Facing API
-*   **Schema Definition Builders:** `defineEntityType`, `defineWorld`
-    *   *Role:* Used to specify what entities exist (e.g., characters, items) and instantiate the world.
-*   **Types:** `EntityTypeDefinition`, `WorldDefinition`, `EntityReferenceDefinition`, `EntityModifier`, `EntityPrerequisite`, `EntityInstance`
 
-### Questionable / Implementation Details
-*   **Global Registry Methods:** `getEntityTypes`, `getEntityType`, `clearEntityTypes`, `getWorlds`, `getWorld`, `clearWorlds`
-    *   *Issue:* Same as core. Global singletons are an anti-pattern for a consumer editor app that might need to isolate different world instances or manage memory tightly.
-*   **Internal Helpers:** `generateEntityMetadata`
-    *   *Issue:* Likely an internal detail of world definition compilation.
+- **Registry:** `EntityRegistry` (extends `ProjectRegistry` from core)
+- **Schema Definition Builders (take `registry` first):** `defineEntityType`, `defineWorld`
+- **Types:** `EntityTypeDefinition`, `WorldDefinition`, `EntityReferenceDefinition`, `EntityModifier`, `EntityPrerequisite`, `EntityInstance`, plus supporting types from `./types`.
+
+### What is no longer exported
+
+`getEntityTypes`, `clearEntityTypes`, `getWorlds`, `clearWorlds`, and the standalone `generateEntityMetadata` helper. The same pattern as core: iterate `registry.entityTypes` / `registry.worlds`, or drive generation through the CLI.
 
 ---
 
 ## 3. `@fiction-map/runtime`
 
-This package is responsible for state transition, condition evaluation, effect application, and runtime graph traversal.
+Source: [`packages/story-runtime/src/index.ts`](../packages/story-runtime/src/index.ts).
 
-### Stable Consumer-Facing API
-*   **High-Level Engine:** `GraphRuntime`
-    *   *Role:* The primary entry point for the consumer app to run a graph.
-*   **Core Types:** `GraphRuntimeState`, `EntityRuntimeState`, `Transition`, `TransitionResult`, `TransitionAvailability`, `SerializableState`, `SerializableEntityState`
-    *   *Role:* Fundamental runtime contracts for reading state, rendering availability, and persisting saves.
-*   **Entity Runtime Features:** `deriveEntityState`, `validateEntityTransitionReferences`
-    *   *Role:* Allows the consumer app to merge authored worlds with runtime state and validate references statically.
-*   **Extensibility Interfaces:** `ConditionEvaluator`, `EffectHandler`, `EvaluationContext`, `EffectContext`
-    *   *Role:* Necessary for a consumer app to define its own logic (e.g., specific RPG mechanics).
+### Stable Consumer-Facing API (high level)
 
-### Consumer-Facing (For Extension Authors)
-*   **State Mutation / Read Helpers:** `setVariable`, `getVariable`, `grantEntity`, `revokeEntity`, `hasFlag`, `navigateToNode`, etc.
-    *   *Role:* These shouldn't be called directly by the app to mutate state outside the engine's loop, but they *are* required by consumer apps when writing custom `EffectHandler` or `ConditionEvaluator` implementations.
+- **High-Level Engine:** `GraphRuntime` and its companion types `StepResult`, `PathStep`, `TraversalPath`.
+- **State Lifecycle:** `createInitialState`, `serializeState`, `deserializeState`, `cloneState`, `mergeState`.
+- **Entity Derivation:** `deriveEntityState`, `ActiveEntityModifier`, `EntityPrerequisiteResult`, `DerivedEntityState`.
+- **Entity-Aware Validation:** `validateEntityTransitionReferences`, `EntityTransitionReferenceError`, `EntityTransitionReferenceValidationResult`.
+- **Core Runtime Types:** `GraphRuntimeState`, `EntityRuntimeState`, `Transition`, `TransitionAvailability`, `TransitionResult`, `TransitionTrace`, `Condition`, `ConditionSet`, `ConditionGroup`, `ConditionScope`, `FailedCondition`, `Consequence`, `NodeDefinition`, `GraphErrorType`, `GraphError`, `ValidationResult`, `SerializableState`, `SerializableEntityState`.
+- **Extensibility Interfaces:** `ConditionEvaluator`, `EffectHandler`, `EvaluationContext` (now carries `derivedState`), `EffectContext`.
 
-### Questionable / Implementation Details
-*   **Adapter & Parsing:** `parseGraph`, `determineEndings`, `EdgeBlueprint`, `NodeBlueprint`, `GraphBlueprint`, `ParsedGraph`
-    *   *Issue:* These feel like internal translation layers converting the static `GraphDefinition` into a shape the engine uses internally. They probably shouldn't be public.
-*   **Low-Level Execution Steps:** `checkTransitionAvailability`, `applyTransition`, `getAvailableTransitions`, `getTransitionsByAvailability`, `evaluateCondition`, `evaluateConditionSet`, `applyEffect`, `applyEffects`
-    *   *Issue:* Exposing these directly leaks the internal engine loop. Consumers should rely on `GraphRuntime.step()` or `GraphRuntime.evaluateTransitions()` instead of manually piecing the loop together.
-*   **Built-in Concrete Implementations:** `equalsEvaluator`, `setVariableHandler`, `builtinEvaluators`, `builtinHandlers`, etc.
-    *   *Issue:* While helpful, exporting every single built-in evaluator and handler crowds the API. Providing an explicit registry initialization like `registerBuiltinExtensions(registry)` would be cleaner.
+### Stable for Extension Authors
+
+State read/write helpers used when implementing custom evaluators or handlers:
+`setVariable`, `getVariable`, `incrementVariable`, `setFlag`, `clearFlag`, `hasFlag`, `getFlag`, `hasVisited`, `visitCount`, `navigateToNode`, `backtrack`, `grantEntity`, `revokeEntity`, `ownsEntity`, `activateEntity`, `deactivateEntity`, `entityIsActive`, `unlockEntity`, `lockEntity`, `entityIsUnlocked`, `addResource`, `spendResource`, `getResource`.
+
+### Still Exported — Candidates For Future Pruning
+
+These remain in `index.ts` and continue to power the literature-RPG example test. They are useful but leak the internal evaluation loop and crowd the public surface; a consumer app should generally prefer `GraphRuntime`:
+
+- Low-level execution helpers: `checkTransitionAvailability`, `applyTransition`, `getAvailableTransitions`, `getTransitionsByAvailability`.
+- Effect/condition primitives: `evaluateCondition`, `evaluateConditionSet`, `createComposedEvaluator`, `applyEffect`, `applyEffects`, `combineHandlers`.
+- Graph validation primitives: `validateGraph`, `findReachableNodes`, `hasDanglingTransitions`, `hasUnreachableNodes`.
+- Individual built-in evaluators and handlers (`equalsEvaluator`, `setVariableHandler`, etc.) alongside the aggregated `builtinEvaluators` / `builtinHandlers` maps.
+
+*Recommendation:* keep them exported until `GraphRuntime` covers all current example flows, then move the individual primitives behind a `registerBuiltins(registry)` style entrypoint in a follow-up.
+
+### What Has Been Pruned
+
+The adapter layer is no longer in the public surface: `parseGraph`, `determineEndings`, `EdgeBlueprint`, `NodeBlueprint`, `GraphBlueprint`, `ParsedGraph`. They still exist in `packages/story-runtime/src/adapter.ts` for internal use by `GraphRuntime` but are not re-exported from `index.ts`.
 
 ---
 
-## Missing Exports or Functionality
-*   **Registry/Context Abstraction:** A way to instantiate a project or workspace context without relying on `core`/`entities` global module state.
-*   **Explicit Initializer:** A method to initialize the default engine (e.g., with all built-in conditions/effects pre-registered) rather than having the consumer wire `builtinEvaluators` manually.
+## Gaps / Open Questions
+
+1. **Legacy core runtime types** (`GraphState`, `TraversalResult`, `TraceEvent`) should be deprecated and removed; nothing in the current packages reads them.
+2. **No `registerBuiltins(registry)` helper yet.** Consumers still wire `builtinEvaluators` / `builtinHandlers` manually, which is the lone friction point flagged by the Task 7 commit message but not fully addressed.
+3. **`GraphRuntime` parity.** Before lower-level helpers like `checkTransitionAvailability` are removed, `GraphRuntime` needs to demonstrate every current example flow (notably the `{ derivedState }` evaluation path used in [`literature-rpg.test.ts`](../packages/story-runtime/src/examples/literature-rpg.test.ts)).
+4. **TypeDoc output.** API reference now lives under [`docs/api/`](api/) (generated via `bun run docs:api`). It is currently committed; decide whether to keep it in git or generate on demand.

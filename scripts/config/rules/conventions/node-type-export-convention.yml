@@ -1,8 +1,0 @@
-id: node-type-export-convention
-severity: error
-message: "Node type files must export a constant matching the file name: {id}NodeType"
-files:
-  - "**/node-types/*.node-type.ts"
-language: TypeScript
-rule:
-  regex: "export const \\w+NodeType"

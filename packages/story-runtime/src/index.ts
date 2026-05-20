@@ -100,6 +100,8 @@ export {
   builtinEvaluators,
 } from "./conditions/builtin";
 
+export { registerBuiltins } from "./builtins";
+
 // Effect application
 export {
   applyEffect,

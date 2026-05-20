@@ -6,6 +6,8 @@ import type {
   EffectHandler,
   NodeDefinition,
   ValidationResult,
+  EvaluationContext,
+  EffectContext,
 } from "./types"
 import {
   createInitialState,
@@ -93,45 +95,52 @@ export class GraphRuntime {
   }
 
   getAvailable(
-    state: GraphRuntimeState
+    state: GraphRuntimeState,
+    context?: EvaluationContext
   ): Transition[] {
     return getAvailableTransitions(
       state,
       this.parsed.transitions,
-      this.evaluators
+      this.evaluators,
+      context
     )
   }
 
   getByAvailability(
-    state: GraphRuntimeState
+    state: GraphRuntimeState,
+    context?: EvaluationContext
   ): { available: Transition[]; blocked: Transition[]; hidden: Transition[] } {
     return getTransitionsByAvailability(
       state,
       this.parsed.transitions,
-      this.evaluators
+      this.evaluators,
+      context
     )
   }
 
   step(
     state: GraphRuntimeState,
-    transition: Transition
+    transition: Transition,
+    context?: EvaluationContext & EffectContext
   ): TransitionResult {
     return applyTransition(
       state,
       transition,
       this.evaluators,
-      this.handlers
+      this.handlers,
+      context
     )
   }
 
   walk(
     state: GraphRuntimeState,
-    maxSteps: number = 100
+    maxSteps: number = 100,
+    context?: EvaluationContext & EffectContext
   ): StepResult[] {
     const steps: StepResult[] = []
 
     for (let i = 0; i < maxSteps; i++) {
-      const available = this.getAvailable(state)
+      const available = this.getAvailable(state, context)
 
       if (available.length === 0) {
         steps.push({
@@ -143,7 +152,7 @@ export class GraphRuntime {
         break
       }
 
-      const result = this.step(state, available[0])
+      const result = this.step(state, available[0], context)
       steps.push({
         state: cloneState(result.state),
         nodeId: result.state.currentNodeId,
@@ -159,7 +168,8 @@ export class GraphRuntime {
 
   enumeratePaths(
     maxDepth: number = 50,
-    maxPaths: number = 100
+    maxPaths: number = 100,
+    context?: EvaluationContext & EffectContext
   ): TraversalPath[] {
     const paths: TraversalPath[] = []
     const startState = this.createState()
@@ -194,7 +204,7 @@ export class GraphRuntime {
         continue
       }
 
-      const available = this.getAvailable(state)
+      const available = this.getAvailable(state, context)
 
       if (available.length === 0) {
         paths.push({
@@ -208,7 +218,7 @@ export class GraphRuntime {
 
       const reversed = [...available].reverse()
       for (const transition of reversed) {
-        const result = this.step(state, transition)
+        const result = this.step(state, transition, context)
         stack.push({
           state: result.state,
           steps: [

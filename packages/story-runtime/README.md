@@ -46,9 +46,10 @@ const transition = {
 
 // Apply transition
 const result = applyTransition(
-  state, 
-  transition, 
-  { evaluators: builtinEvaluators, handlers: builtinHandlers }
+  state,
+  transition,
+  builtinEvaluators,
+  builtinHandlers
 )
 
 console.log(result.success)        // true/false
@@ -93,17 +94,19 @@ available as numeric resources.
 For world-aware reads, combine it with a world definition from `@fiction-map/entities`:
 
 ```typescript
-import { defineEntityType, defineWorld } from "@fiction-map/entities"
+import { EntityRegistry, defineEntityType, defineWorld } from "@fiction-map/entities"
 import {
   createInitialState,
   deriveEntityState,
   grantEntity,
 } from "@fiction-map/runtime"
 
-defineEntityType({ id: "item" })
-defineEntityType({ id: "location" })
+const registry = new EntityRegistry()
 
-const world = defineWorld({
+defineEntityType(registry, { id: "item" })
+defineEntityType(registry, { id: "location" })
+
+const world = defineWorld(registry, {
   id: "example-world",
   entities: [
     { id: "lantern", type: "item", unlocks: ["dark-cave"] },
@@ -125,6 +128,38 @@ console.log(derived.prerequisites[0]?.satisfied)         // true
 Derivation reports effective ids, active modifiers, prerequisite status, unlocks, and runtime
 references that do not exist in the supplied world. It does not apply RPG-specific formulas,
 inventory rules, equipment rules, combat, or story graph transition logic.
+
+### Seamless derived-state evaluation
+
+Pass `{ derivedState }` to `checkTransitionAvailability` / `applyTransition` so cascading
+unlocks computed in derived state are respected automatically — the consumer app does not need
+to mirror them back into runtime state by hand:
+
+```typescript
+import {
+  checkTransitionAvailability,
+  applyTransition,
+  builtinEvaluators,
+  builtinHandlers,
+} from "@fiction-map/runtime"
+
+const availability = checkTransitionAvailability(
+  state,
+  transition,
+  builtinEvaluators,
+  { derivedState: derived }
+)
+
+const result = applyTransition(
+  state,
+  transition,
+  builtinEvaluators,
+  builtinHandlers,
+  { derivedState: derived }
+)
+```
+
+If you omit `{ derivedState }`, entity-aware evaluators fall back to explicit runtime state only.
 
 Entity-aware transition failures are machine-readable. A blocked or hidden transition can include
 `failedConditions` entries that identify the failed condition, whether it came from `visibility`
@@ -180,11 +215,13 @@ Resource references remain generic and are not checked against a built-in resour
 ## Custom Conditions
 
 ```typescript
-import { defineCondition } from "@fiction-map/core"
+import { ProjectRegistry, defineCondition } from "@fiction-map/core"
 import type { ConditionEvaluator } from "@fiction-map/runtime"
 
+const registry = new ProjectRegistry()
+
 // Define condition type
-const HasItemCondition = defineCondition({
+const HasItemCondition = defineCondition(registry, {
   id: "has-item",
   parameters: {
     itemId: { type: "string", required: true }
@@ -206,8 +243,9 @@ import { defineEffect } from "@fiction-map/core"
 import type { EffectHandler } from "@fiction-map/runtime"
 import { cloneState } from "@fiction-map/runtime"
 
+// Reuse the same registry instance from your project
 // Define effect type
-const GiveItemEffect = defineEffect({
+const GiveItemEffect = defineEffect(registry, {
   id: "give-item",
   parameters: {
     itemId: { type: "string", required: true }

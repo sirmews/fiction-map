@@ -22,7 +22,7 @@ import { defineNodeType } from "@fiction-map/core"
  * @description A test node type
  * @ai-rule Test nodes must have a name
  */
-export const TestNode = defineNodeType({
+export const TestNode = defineNodeType(registry, {
   id: "test",
   properties: {
     name: { type: "string", required: true },
@@ -38,7 +38,7 @@ export const TestNode = defineNodeType({
     `
 import { defineEdgeType } from "@fiction-map/core"
 
-export const LinkEdge = defineEdgeType({
+export const LinkEdge = defineEdgeType(registry, {
   id: "link",
   sourceTypes: ["test"],
   targetTypes: ["test"],
@@ -51,7 +51,7 @@ export const LinkEdge = defineEdgeType({
     `
 import { defineCondition } from "@fiction-map/core"
 
-export const HasValueCondition = defineCondition({
+export const HasValueCondition = defineCondition(registry, {
   id: "has-value",
   parameters: {
     key: { type: "string", required: true },
@@ -65,7 +65,7 @@ export const HasValueCondition = defineCondition({
     `
 import { defineEffect } from "@fiction-map/core"
 
-export const SetValueEffect = defineEffect({
+export const SetValueEffect = defineEffect(registry, {
   id: "set-value",
   parameters: {
     key: { type: "string", required: true },
@@ -113,8 +113,9 @@ describe("generator orchestration", () => {
       expect(result.metadata).toEqual(writtenMetadata)
       expect(result.metadataPath).toBe(join(outputDir, ".fiction-map", "metadata.json"))
       expect(result.semanticsPath).toBe(join(outputDir, "SEMANTICS.md"))
-      expect(writtenSemantics).toContain('<node_type id="test">')
-      expect(writtenSemantics).toContain('<edge_type id="link">')
+      expect(writtenSemantics).toContain("### `test`")
+      expect(writtenSemantics).toContain("### `link`")
+      expect(writtenSemantics).toContain("defineNodeType(registry, {")
     })
 
     it("restores previous metadata when semantics writing fails", async () => {
@@ -150,7 +151,7 @@ describe("generator orchestration", () => {
       const semantics = await readFile(join(outputDir, "SEMANTICS.md"), "utf8")
 
       expect(metadata.nodeTypes).toHaveLength(1)
-      expect(semantics).toContain("# Graph Semantics")
+      expect(semantics).toContain("# Fiction Map — Generated Semantics")
       expect(generateProjectSpy).toHaveBeenCalledOnce()
       expect(exitSpy).not.toHaveBeenCalled()
       expect(errorSpy).not.toHaveBeenCalled()

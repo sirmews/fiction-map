@@ -221,18 +221,6 @@ export interface ValidationWarning {
 }
 
 // ============================================================================
-// Registry
-// ============================================================================
-
-export interface Registry {
-  nodeTypes: Map<string, NodeTypeDefinition>
-  edgeTypes: Map<string, EdgeTypeDefinition>
-  conditions: Map<string, ConditionDefinition>
-  effects: Map<string, EffectDefinition>
-  graphs: Map<string, GraphDefinition>
-}
-
-// ============================================================================
 // Metadata (Generated)
 // ============================================================================
 
@@ -246,31 +234,4 @@ export interface GraphMetadata {
     errors: ValidationError[]
     warnings: ValidationWarning[]
   }
-}
-
-// ============================================================================
-// Runtime Types
-// ============================================================================
-
-export interface GraphState {
-  currentNodeId: string
-  history: string[]
-  visited: Set<string>
-  variables: Record<string, unknown>
-  [key: string]: unknown
-}
-
-export interface TraversalResult {
-  success: boolean
-  state: GraphState
-  edgeId?: string
-  targetNodeId?: string
-  error?: string
-  trace: TraceEvent[]
-}
-
-export interface TraceEvent {
-  type: "condition-eval" | "effect-apply" | "traverse" | "arrive"
-  timestamp: number
-  data: Record<string, unknown>
 }

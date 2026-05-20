@@ -5,6 +5,7 @@ export interface EdgeBlueprint {
   source: string
   target?: string
   conditions?: Condition[]
+  visibility?: Condition[]
   effects?: Effect[]
   failureEffects?: Effect[]
   failureTarget?: string
@@ -37,6 +38,7 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
     targetNodeId: e.target,
     label: e.label,
     requirements: e.conditions?.length ? { all: e.conditions } : undefined,
+    visibility: e.visibility?.length ? { all: e.visibility } : undefined,
     effects: e.effects?.length ? e.effects : undefined,
     failureEffects: e.failureEffects?.length ? e.failureEffects : undefined,
     failureTargetNodeId: e.failureTarget,

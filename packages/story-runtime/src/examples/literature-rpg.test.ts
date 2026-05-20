@@ -6,19 +6,15 @@ import {
 } from "@fiction-map/entities";
 import {
   addResource,
-  applyTransition,
-  builtinEvaluators,
-  builtinHandlers,
-  checkTransitionAvailability,
   createInitialState,
   deriveEntityState,
   entityIsUnlocked,
   getResource,
   grantEntity,
   ownsEntity,
-  unlockEntity,
   validateEntityTransitionReferences,
-  type Transition,
+  registerBuiltins,
+  GraphRuntime,
 } from "../index";
 
 describe("literature RPG example", () => {
@@ -26,6 +22,7 @@ describe("literature RPG example", () => {
 
   beforeEach(() => {
     registry = new EntityRegistry();
+    registerBuiltins(registry);
   });
 
   it("proves a consumer-defined world can gate and update story traversal", () => {
@@ -109,29 +106,32 @@ describe("literature RPG example", () => {
       ],
     });
 
-    const transitions: Transition[] = [
-      {
-        id: "enter-dark-cave",
-        sourceNodeId: "forest-edge",
-        targetNodeId: "dark-cave",
-        visibility: {
-          all: [{ type: "entityUnlocked", entityId: "dark-cave" }],
-        },
-        requirements: {
-          all: [
+    const runtime = new GraphRuntime({
+      startNode: "forest-edge",
+      nodes: [
+        { id: "forest-edge", type: "location" },
+        { id: "dark-cave", type: "location" },
+      ],
+      edges: [
+        {
+          id: "enter-dark-cave",
+          source: "forest-edge",
+          target: "dark-cave",
+          visibility: [{ type: "entityUnlocked", entityId: "dark-cave" }],
+          conditions: [
             { type: "hasEntity", entityId: "lantern" },
             { type: "resourceAtLeast", key: "stamina", value: 3 },
           ],
+          effects: [
+            { type: "spendResource", key: "stamina", amount: 3 },
+            { type: "grantEntity", entityId: "night-vision" },
+          ],
         },
-        effects: [
-          { type: "spendResource", key: "stamina", amount: 3 },
-          { type: "grantEntity", entityId: "night-vision" },
-        ],
-      },
-    ];
+      ],
+    });
 
     expect(world.errors).toHaveLength(0);
-    expect(validateEntityTransitionReferences(transitions, world)).toEqual({
+    expect(validateEntityTransitionReferences(runtime.transitions, world)).toEqual({
       valid: true,
       errors: [],
     });
@@ -153,29 +153,14 @@ describe("literature RPG example", () => {
       satisfied: true,
     });
 
-    expect(
-      checkTransitionAvailability(state, transitions[0], builtinEvaluators, { derivedState: derivedBefore })
-        .failedConditions
-    ).toBeUndefined();
-
     // Now the transition should be fully allowed WITHOUT calling unlockEntity manually
-    const availability = checkTransitionAvailability(
-      state,
-      transitions[0],
-      builtinEvaluators,
-      { derivedState: derivedBefore }
-    );
+    const { available } = runtime.getByAvailability(state, { derivedState: derivedBefore });
 
-    expect(availability).toEqual({ allowed: true, visible: true });
+    expect(available).toHaveLength(1);
+    expect(available[0].id).toBe("enter-dark-cave");
 
     // Ensure we can apply it
-    const result = applyTransition(
-      state,
-      transitions[0],
-      builtinEvaluators,
-      builtinHandlers,
-      { derivedState: derivedBefore }
-    );
+    const result = runtime.step(state, available[0], { derivedState: derivedBefore });
 
     expect(result.success).toBe(true);
     expect(result.state.currentNodeId).toBe("dark-cave");
@@ -185,20 +170,20 @@ describe("literature RPG example", () => {
     // Notice dark-cave isn't in runtime explicit state, it's just allowed because of derivation
     expect(entityIsUnlocked(result.state, "dark-cave")).toBe(false);
 
-    const invalidTransitions: Transition[] = [
-
-      {
-        id: "bad-reference",
-        sourceNodeId: "forest-edge",
-        targetNodeId: "dark-cave",
-        requirements: {
-          all: [{ type: "hasEntity", entityId: "missing-relic" }],
+    const invalidRuntime = new GraphRuntime({
+      nodes: [{ id: "forest-edge" }, { id: "dark-cave" }],
+      edges: [
+        {
+          id: "bad-reference",
+          source: "forest-edge",
+          target: "dark-cave",
+          conditions: [{ type: "hasEntity", entityId: "missing-relic" }],
         },
-      },
-    ];
+      ],
+    });
 
     expect(
-      validateEntityTransitionReferences(invalidTransitions, world).errors
+      validateEntityTransitionReferences(invalidRuntime.transitions, world).errors
     ).toContainEqual(
       expect.objectContaining({
         type: "unknown-entity-reference",

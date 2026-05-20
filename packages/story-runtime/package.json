@@ -18,6 +18,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@fiction-map/core": "workspace:*",
     "@fiction-map/entities": "workspace:*"
   },
   "devDependencies": {

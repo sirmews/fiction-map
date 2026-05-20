@@ -1,8 +1,0 @@
-id: edge-type-export-convention
-severity: error
-message: "Edge type files must export a constant matching the file name: {id}EdgeType"
-files:
-  - "**/edge-types/*.edge-type.ts"
-language: TypeScript
-rule:
-  regex: "export const \\w+EdgeType"

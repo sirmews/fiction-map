@@ -23,5 +23,5 @@ export { defineCondition } from "./condition"
 export { defineEffect } from "./effect"
 
 // Graph
-export { defineGraph } from "./graph"
+export { defineGraph, validateGraph } from "./graph"
 

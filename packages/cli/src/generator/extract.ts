@@ -165,7 +165,7 @@ function extractConfigProperty(
 ): PropertyDefinition {
   const properties: PropertyDefinition = {}
   
-  const arg = callExpr.arguments[0]
+  const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return properties
   
   for (const prop of arg.properties) {
@@ -187,7 +187,7 @@ function extractConfigProperty(
 function extractStringArray(callExpr: ts.CallExpression, propName: string, sourceFile: ts.SourceFile): string[] {
   const result: string[] = []
   
-  const arg = callExpr.arguments[0]
+  const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return result
   
   for (const prop of arg.properties) {
@@ -211,7 +211,7 @@ function extractStringArray(callExpr: ts.CallExpression, propName: string, sourc
  * Extract id from call expression
  */
 function extractId(callExpr: ts.CallExpression, sourceFile: ts.SourceFile): string | null {
-  const arg = callExpr.arguments[0]
+  const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return null
   
   for (const prop of arg.properties) {
@@ -538,7 +538,7 @@ function extractEdgesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFil
  * Extract array property from object literal
  */
 function extractArrayProperty(callExpr: ts.CallExpression, propName: string, sourceFile: ts.SourceFile): ts.ArrayLiteralExpression | null {
-  const arg = callExpr.arguments[0]
+  const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return null
   
   for (const prop of arg.properties) {

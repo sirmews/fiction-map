@@ -37,7 +37,7 @@ function getCallSite(): SourceLocation {
 /**
  * Validate a graph
  */
-function validateGraph(
+export function validateGraph(
   registry: ProjectRegistry,
   nodes: NodeInstance[],
   edges: EdgeInstance[]

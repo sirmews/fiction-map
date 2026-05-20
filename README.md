@@ -26,18 +26,23 @@ Consumer apps own their own schemas and UI:
 
 ```typescript
 // You write this:
-export const SceneNode = defineNodeType({
+import { ProjectRegistry, defineNodeType, defineEdgeType, defineGraph } from "@fiction-map/core"
+
+const registry = new ProjectRegistry()
+
+export const SceneNode = defineNodeType(registry, {
   id: "scene",
-  properties: { title: "string", content: "richtext" },
+  properties: { title: { type: "string", required: true } },
 })
 
-export const ChoiceEdge = defineEdgeType({
+export const ChoiceEdge = defineEdgeType(registry, {
   id: "choice",
   sourceTypes: ["scene"],
   targetTypes: ["scene"],
 })
 
-export const story = defineGraph({
+export const story = defineGraph(registry, {
+  id: "my-story",
   nodes: [...],
   edges: [...],
 })
@@ -90,21 +95,23 @@ That means:
 npm install @fiction-map/core @fiction-map/entities @fiction-map/runtime
 
 # Define app-specific types in your consumer app
-import { defineNodeType, defineEdgeType, defineGraph } from "@fiction-map/core"
+import { ProjectRegistry, defineNodeType, defineEdgeType, defineGraph } from "@fiction-map/core"
 
-const SceneNode = defineNodeType({
+const registry = new ProjectRegistry()
+
+const SceneNode = defineNodeType(registry, {
   id: "scene",
   properties: { title: { type: "string", required: true } },
   outgoingEdges: ["choice"],
 })
 
-const ChoiceEdge = defineEdgeType({
+const ChoiceEdge = defineEdgeType(registry, {
   id: "choice",
   sourceTypes: ["scene"],
   targetTypes: ["scene"],
 })
 
-const story = defineGraph({
+const story = defineGraph(registry, {
   id: "my-story",
   nodes: [
     { id: "start", type: "scene", title: "Beginning" },
@@ -146,10 +153,11 @@ Fiction Map applies [Encore's](https://encore.dev) "infrastructure from code" ap
 | Milestone | Status | Description |
 |-----------|--------|-------------|
 | **Core Types** | ✅ Complete | `@fiction-map/core` package |
-| **Entity Meta-Model** | 🚧 Initial Slice | `@fiction-map/entities` — entity types, instances, references, validation |
+| **Entity Meta-Model** | ✅ Complete | `@fiction-map/entities` — entity types, instances, references, validation, registry |
 | **Generator** | ✅ Complete | `fiction-map` CLI — file discovery, metadata extraction |
 | **Runtime Foundation** | ✅ Complete | `@fiction-map/runtime` — base state, transitions, validation, path enumeration |
 | **Entity-Aware Runtime** | ✅ Foundation Complete | runtime entity state, derivation, built-in entity-aware primitives, failure details, cross-validation, and example coverage |
+| **Consumer-App Readiness** | ✅ Complete | project/entity registries, seamless derived-state evaluation, pruned public exports, TypeDoc generation |
 
 ---
 

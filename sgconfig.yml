@@ -1,6 +1,0 @@
-ruleDirs:
-  - scripts/config/rules
-languageGlobs:
-  TypeScript:
-    - "*.ts"
-    - "*.tsx"

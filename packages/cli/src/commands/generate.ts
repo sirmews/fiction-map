@@ -1,26 +1,34 @@
 /**
  * Generate command
- * 
- * Usage: fiction-map generate [options]
+ *
+ * Usage:
+ *   fiction-map generate [options]
+ *   fiction-map generate --check
  */
 
-import { resolve, relative } from "path"
-import { generateProject } from "../generator"
+import { relative, resolve } from "path"
+import { checkProject, generateProject } from "../generator"
 
 export interface GenerateOptions {
   rootDir?: string
   outputDir?: string
+  check?: boolean
 }
 
 export async function generate(options: GenerateOptions = {}): Promise<void> {
   const rootDir = resolve(options.rootDir || process.cwd())
   const outputDir = options.outputDir ? resolve(options.outputDir) : rootDir
-  
+
+  if (options.check) {
+    await runCheck({ rootDir, outputDir })
+    return
+  }
+
   console.log(`\n📦 Fiction Map Generator`)
   console.log(`   Root: ${rootDir}`)
   console.log(`   Output: ${outputDir}`)
   console.log("")
-  
+
   try {
     console.log(`🔍 Scanning ${rootDir}...`)
 
@@ -34,11 +42,39 @@ export async function generate(options: GenerateOptions = {}): Promise<void> {
 
     console.log(`\n✅ Generated metadata at ${relative(rootDir, metadataPath)}`)
     console.log(`✅ Generated SEMANTICS.md`)
-    
+
     console.log("\n✨ Done!\n")
   } catch (error) {
     console.error("\n❌ Generation failed:")
     console.error(error)
     process.exit(1)
   }
+}
+
+async function runCheck(options: { rootDir: string; outputDir: string }): Promise<void> {
+  console.log(`\n📦 Fiction Map Generator — check mode`)
+  console.log(`   Root: ${options.rootDir}`)
+  console.log("")
+
+  let result
+  try {
+    result = await checkProject(options)
+  } catch (error) {
+    console.error("\n❌ Check failed:")
+    console.error(error)
+    process.exit(1)
+  }
+
+  if (result.ok) {
+    console.log("✅ Generated artifacts are up to date.\n")
+    return
+  }
+
+  console.error("❌ Generated artifacts are out of date. Run `fiction-map generate`.")
+  for (const mismatch of result.mismatches) {
+    const rel = relative(options.rootDir, mismatch.path)
+    console.error(`   - ${rel} (${mismatch.reason})`)
+  }
+  console.error("")
+  process.exit(1)
 }

@@ -46,23 +46,40 @@ be the app itself.
 ### What the Consumer App Writes
 
 ```typescript
+// project.ts
+import { ProjectRegistry } from "@fiction-map/core"
+export const registry = new ProjectRegistry()
+
 // nodes/scene.node.ts
-export const SceneNode = defineNodeType({
+import { defineNodeType } from "@fiction-map/core"
+import { registry } from "../project"
+
+export const SceneNode = defineNodeType(registry, {
   id: "scene",
-  properties: { title: "string", content: "richtext" },
+  properties: {
+    title: { type: "string", required: true },
+    content: { type: "richtext" },
+  },
   outgoingEdges: ["choice"],
 })
 
 // edges/choice.edge.ts
-export const ChoiceEdge = defineEdgeType({
+import { defineEdgeType } from "@fiction-map/core"
+import { registry } from "../project"
+
+export const ChoiceEdge = defineEdgeType(registry, {
   id: "choice",
-  properties: { text: "string" },
+  properties: { text: { type: "string", required: true } },
   sourceTypes: ["scene"],
   targetTypes: ["scene"],
 })
 
 // graphs/story.graph.ts
-export const story = defineGraph({
+import { defineGraph } from "@fiction-map/core"
+import { registry } from "../project"
+
+export const story = defineGraph(registry, {
+  id: "my-story",
   nodes: [
     { id: "start", type: "scene", title: "Beginning" },
     { id: "end", type: "scene", title: "Ending" },
@@ -214,7 +231,22 @@ Like Encore's: *"I defined my backend in code, and Encore understood my infrastr
 
 **Deliverable:** credible headless foundation for literature-RPG-style consumer apps
 
-The source of truth for the active next-phase work is:
+---
+
+### Milestone 3.6: Consumer-App Readiness ✅ COMPLETE
+
+- [x] Public API audit ([docs/public-api-audit.md](public-api-audit.md))
+- [x] Consumer usage guide ([docs/consumer-usage-guide.md](consumer-usage-guide.md))
+- [x] Example placement decision ([docs/decisions/2026-05-18-example-placement-policy.md](decisions/2026-05-18-example-placement-policy.md))
+- [x] Derived unlock semantics decision ([docs/decisions/2026-05-18-derived-unlock-semantics.md](decisions/2026-05-18-derived-unlock-semantics.md))
+- [x] Replace global singletons with `ProjectRegistry` and `EntityRegistry`
+- [x] Seamless derived-state evaluation via `{ derivedState }` evaluation context
+- [x] Prune internal adapter exports from the public surface
+- [x] Self-documentation via TypeDoc generation ([docs/api/](api/))
+
+**Deliverable:** stable, documented package contract a separate Story Editor can consume
+
+The completed plan is:
 
 - [Literature RPG Consumer-App Readiness Plan](plans/literature-rpg/05-consumer-app-readiness-plan.md)
 

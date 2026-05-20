@@ -31,6 +31,7 @@ The package provides:
 - declarative modifiers
 - declarative prerequisites and unlocks
 - minimal validation for properties, references, and entity rules
+- an `EntityRegistry` that extends `ProjectRegistry` so a single registry holds both graph and world schemas
 
 This package itself does not provide:
 
@@ -46,16 +47,18 @@ validation live in `@fiction-map/runtime`.
 ## Quick Start
 
 ```typescript
-import { defineEntityType, defineWorld } from "@fiction-map/entities"
+import { EntityRegistry, defineEntityType, defineWorld } from "@fiction-map/entities"
 
-defineEntityType({
+const registry = new EntityRegistry()
+
+defineEntityType(registry, {
   id: "stat",
   properties: {
     label: { type: "string", required: true },
   },
 })
 
-defineEntityType({
+defineEntityType(registry, {
   id: "species",
   properties: {
     label: { type: "string", required: true },
@@ -65,7 +68,7 @@ defineEntityType({
   },
 })
 
-const world = defineWorld({
+const world = defineWorld(registry, {
   id: "forest-world",
   entities: [
     { id: "strength", type: "stat", label: "Strength" },
@@ -91,12 +94,21 @@ console.log(world.errors)
 
 ## API
 
-### `defineEntityType(config)`
+### `new EntityRegistry()`
+
+Holds entity types and worlds for a single project/workspace. Extends `ProjectRegistry` from `@fiction-map/core`, so it can also store node types, edge types, conditions, effects, and graphs.
+
+```typescript
+const registry = new EntityRegistry()
+registry.clear() // resets entity types, worlds, and the inherited project state
+```
+
+### `defineEntityType(registry, config)`
 
 Define a reusable entity type.
 
 ```typescript
-defineEntityType({
+defineEntityType(registry, {
   id: string
   properties?: { ... }
   references?: {
@@ -109,25 +121,18 @@ defineEntityType({
 })
 ```
 
-### `defineWorld(config)`
+### `defineWorld(registry, config)`
 
-Define a world containing entity instances.
+Define a world containing entity instances. Validation runs against the entity types already registered on the same registry.
 
 ```typescript
-defineWorld({
+defineWorld(registry, {
   id: string
   entities: EntityInstance[]
 })
 ```
 
-### `generateEntityMetadata()`
-
-Generate metadata for all registered entity types and worlds.
-
-```typescript
-const metadata = generateEntityMetadata()
-// { entityTypes, worlds, validation }
-```
+Metadata is held on the registry instance. Iterate `registry.entityTypes` / `registry.worlds` directly, or drive generation through the `fiction-map` CLI. There is no longer a top-level `generateEntityMetadata` export.
 
 ## Validation
 
