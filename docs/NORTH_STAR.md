@@ -252,15 +252,51 @@ The completed plan is:
 
 ---
 
-### Milestone 4: Agent & CI Integration
+### Milestone 3.7: Real Consumer Proof + API Hardening 🚧 REQUIRED BEFORE ANY FURTHER WORK
 
-- [ ] Git hooks (pre-commit metadata generation)
-- [ ] CI validation action
-- [ ] Better SEMANTICS.md format for LLM consumption
-- [ ] `fiction-map validate` standalone command
-- [ ] MCP server (optional, for assisted coding)
+**This milestone is a hard gate. No work on Milestone 4 or 5 begins until every box below is checked.** The framework has 105 passing tests but no real consumer. Every architectural claim past this point is speculative until a separate app exercises the public API. Two independent reviews (Gemini CLI + opencode, see [docs/2026-05-20-progress-vs-canonical-docs.md](2026-05-20-progress-vs-canonical-docs.md)) converged on the same gaps; they are listed here as the entry criteria for the rest of the roadmap.
 
-**Deliverable:** production-grade metadata pipeline
+**3.7.a Reference consumer app exists outside the framework's own tests**
+
+- [x] Create a sibling consumer app at [apps/literature-rpg/](../apps/literature-rpg/) using only the published package surface
+- [x] Layout follows the "What the Consumer App Writes" snippet at the top of this document: `project.ts`, `nodes/*.node.ts`, `edges/*.edge.ts`, `graphs/*.graph.ts`
+- [x] One runnable graph + `fiction-map generate` + runtime traversal via the public `GraphRuntime` API (no UI)
+- [x] Friction captured in [apps/literature-rpg/NOTES.md](../apps/literature-rpg/NOTES.md) as Milestone 5 polish items
+
+**3.7.b Close the three coupling/leak issues both reviewers caught**
+
+- [x] `GraphRuntime` constructor no longer leaks `GraphBlueprint` from the adapter — `GraphBlueprint`, `NodeBlueprint`, `EdgeBlueprint` re-exported from `@fiction-map/runtime`'s public surface
+- [x] `packages/story-runtime/src/conditions/builtin.ts` and `effects/builtin.ts` no longer import from `../core/state`; entity-aware evaluators/handlers moved to `entities/condition-evaluators.ts` and `entities/effect-handlers.ts`; default-bindings composition lives in [packages/story-runtime/src/default-bindings.ts](../packages/story-runtime/src/default-bindings.ts)
+- [x] Legacy `GraphState` / `TraversalResult` already removed from [packages/core/src/types.ts](../packages/core/src/types.ts) (the public-api-audit reference was stale; verified via repo-wide search returning zero matches)
+
+**3.7.c Persistence contract decided and documented**
+
+- [x] `SerializableState` / `SerializableEntityState` shape pinned with new `schemaVersion: 1` field; emitted by `serializeState`; rejected with a descriptive error by `deserializeState` on unknown versions
+- [x] State-migration story documented as consumer-owned (framework provides version constant + types + recipe). See [docs/decisions/2026-05-20-persistence-contract.md](decisions/2026-05-20-persistence-contract.md)
+- [x] `SERIALIZATION_SCHEMA_VERSION` exported from `@fiction-map/runtime` for consumer use
+
+**3.7.d Documentation reflects reality**
+
+- [x] Milestone 4 status updated below — `validate.ts` and `hooks.ts` boxes checked; remaining items honestly listed
+- [x] Every milestone status reverified against `packages/` (M1–M3.6 confirmed complete; M4 is ~50%; M5 is 0%)
+- [x] 2026-05-20 progress doc findings reconciled: leaky `GraphRuntime`, `builtin.ts` coupling, legacy types, and persistence contract resolved in 3.7.a–3.7.c; registry minimalism, performance, and tooling-monoculture concerns explicitly deferred (see "What We're NOT Building (Yet)")
+
+**Deliverable:** the framework's public API has been pulled on by a real consumer, the known leaks are closed, and the docs no longer lie about the source tree. Only then does Milestone 4 begin.
+
+---
+
+### Milestone 4: Agent & CI Integration ✅ COMPLETE
+
+Status verified against source tree on 2026-05-26.
+
+- [x] Git hooks (pre-commit metadata generation) — [packages/cli/src/commands/hooks.ts](../packages/cli/src/commands/hooks.ts)
+- [x] `fiction-map validate` standalone command — [packages/cli/src/commands/validate.ts](../packages/cli/src/commands/validate.ts)
+- [x] CI validation action / template — [.github/workflows/fiction-map-validate.yml](../.github/workflows/fiction-map-validate.yml)
+- [x] Read-oriented query subcommands (`fiction-map query nodes|edges|paths`, `fiction-map graph show`, `fiction-map explain`) over `metadata.json` — [packages/cli/src/commands/query.ts](../packages/cli/src/commands/query.ts)
+- [x] Predefined `using-fiction-map` agent skill shipped with the CLI, pointing agents at the query commands and SEMANTICS.md — [packages/cli/skills/using-fiction-map/SKILL.md](../packages/cli/skills/using-fiction-map/SKILL.md)
+- [x] Better SEMANTICS.md format for LLM consumption — graph topology now includes readable condition/effect summaries, and the evaluation pass is recorded in [docs/tasks/2026-05-26-semantics-llm-eval.md](tasks/2026-05-26-semantics-llm-eval.md)
+
+**Deliverable:** production-grade metadata pipeline. No MCP server — see [docs/decisions/2026-05-20-no-mcp-server.md](decisions/2026-05-20-no-mcp-server.md).
 
 ---
 
@@ -283,6 +319,10 @@ The completed plan is:
 - Cloud hosting
 - Collaboration features
 - Product-specific drag-and-drop graph editing
+- MCP server — superseded by CLI query subcommands + a predefined `using-fiction-map` agent skill. Revisit only if a real consumer hits a wall the CLI cannot solve. See [docs/decisions/2026-05-20-no-mcp-server.md](decisions/2026-05-20-no-mcp-server.md).
+- Registry duplicate detection and lifecycle events — current `ProjectRegistry` / `EntityRegistry` are intentionally minimal `Map` wrappers. Revisit only if a real consumer collides on type IDs in practice.
+- Performance work on `enumeratePaths` and `walk` — current implementations are correct but not cycle-pruned. Revisit when a consumer demonstrates a graph the runtime cannot handle.
+- Tooling alternatives (non-Bun, non-Vitest) — all framework tooling assumes Bun + tsup + Vitest. Consumers may use whatever they like; the framework will not document Webpack/Jest/plain Node paths until a real consumer needs them.
 
 ---
 

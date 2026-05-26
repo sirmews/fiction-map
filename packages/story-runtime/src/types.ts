@@ -189,7 +189,20 @@ export interface EntityTransitionReferenceValidationResult {
 // SERIALIZATION
 // ============================================================================
 
+/**
+ * Current serialization schema version.
+ *
+ * Increment when `SerializableState` or `SerializableEntityState` change
+ * in a backward-incompatible way (rename, type narrowing, removal,
+ * semantic change). Do not increment when a new optional field is added.
+ *
+ * See `docs/decisions/2026-05-20-persistence-contract.md`.
+ */
+export const SERIALIZATION_SCHEMA_VERSION = 1 as const
+
 export interface SerializableState {
+  /** Schema version. Always equals `SERIALIZATION_SCHEMA_VERSION` on write. */
+  schemaVersion: typeof SERIALIZATION_SCHEMA_VERSION
   currentNodeId: string
   history: string[]
   variables: Record<string, unknown>

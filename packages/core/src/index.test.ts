@@ -123,6 +123,8 @@ describe("@fiction-map/core", () => {
       expect(graph.errors).toContainEqual(
         expect.objectContaining({ code: "UNKNOWN_NODE_TYPE" })
       )
+      expect(graph.errors[0].message).toContain('Unknown node type "unknown-type" on node "start".')
+      expect(graph.errors[0].message).toContain("No node types are currently registered.")
     })
     
     it("should detect invalid edge type connections", () => {
@@ -144,6 +146,8 @@ describe("@fiction-map/core", () => {
       expect(graph.errors).toContainEqual(
         expect.objectContaining({ code: "INVALID_TARGET_TYPE" })
       )
+      const targetTypeError = graph.errors.find((error) => error.code === "INVALID_TARGET_TYPE")
+      expect(targetTypeError?.message).toContain('Allowed target types: "scene".')
     })
     
     it("should find endings", () => {

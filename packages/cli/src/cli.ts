@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Fiction Map CLI
  */
@@ -6,6 +8,7 @@ import { parseArgs } from "util"
 import { generate } from "./commands/generate"
 import { validate } from "./commands/validate"
 import { installHooks } from "./commands/hooks"
+import { explain, query, showGraph } from "./commands/query"
 
 const VERSION = "0.1.0"
 
@@ -20,6 +23,9 @@ Commands:
   generate    Generate metadata.json and SEMANTICS.md from graph definitions
   validate    Validate the current metadata.json against the graph schemas
   hooks       Manage git hooks (e.g. \`fiction-map hooks install\`)
+  query       Read nodes, edges, or static paths from metadata.json
+  graph       Show graph-level metadata and topology
+  explain     Explain a graph, node, or edge by id
 
 Options:
   --help, -h        Show this help
@@ -36,12 +42,24 @@ Validate Options:
   --output-dir      Output directory containing .fiction-map/metadata.json
   --strict          Treat warnings as errors
 
+Query Options:
+  --graph           Limit results to one graph id
+  --type            Filter nodes or edges by type
+  --from            Filter edges by source node id
+  --to              Filter edges by target node id
+  --json            Print machine-readable JSON
+
 Examples:
   fiction-map generate
   fiction-map generate --check
   fiction-map generate --root-dir ./src --output-dir ./dist
   fiction-map validate
   fiction-map validate --strict
+  fiction-map query nodes --graph story
+  fiction-map query edges --from entrance
+  fiction-map query paths --json
+  fiction-map graph show story
+  fiction-map explain dark-chapter
 `)
 }
 
@@ -55,6 +73,11 @@ async function main(): Promise<void> {
       "output-dir": { type: "string" },
       check: { type: "boolean" },
       strict: { type: "boolean" },
+      graph: { type: "string" },
+      type: { type: "string" },
+      from: { type: "string" },
+      to: { type: "string" },
+      json: { type: "boolean" },
     },
   })
 
@@ -100,6 +123,45 @@ async function main(): Promise<void> {
         console.error("Unknown hooks command. Did you mean `fiction-map hooks install`?")
         process.exit(1)
       }
+      break
+
+    case "query":
+      if (positionals[1] === "nodes" || positionals[1] === "edges" || positionals[1] === "paths") {
+        await query(positionals[1], {
+          rootDir: values["root-dir"],
+          outputDir: values["output-dir"],
+          graph: values.graph,
+          type: values.type,
+          from: values.from,
+          to: values.to,
+          json: values.json,
+        })
+      } else {
+        console.error("Unknown query command. Use `fiction-map query nodes|edges|paths`.")
+        process.exit(1)
+      }
+      break
+
+    case "graph":
+      if (positionals[1] === "show") {
+        await showGraph(positionals[2], {
+          rootDir: values["root-dir"],
+          outputDir: values["output-dir"],
+          json: values.json,
+        })
+      } else {
+        console.error("Unknown graph command. Use `fiction-map graph show <graph-id>`.")
+        process.exit(1)
+      }
+      break
+
+    case "explain":
+      await explain(positionals[1], {
+        rootDir: values["root-dir"],
+        outputDir: values["output-dir"],
+        graph: values.graph,
+        json: values.json,
+      })
       break
 
     default:

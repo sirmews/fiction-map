@@ -29,8 +29,7 @@ import {
   hasDanglingTransitions,
   hasUnreachableNodes,
 } from "../core/validation";
-import { builtinEvaluators } from "../conditions/builtin";
-import { builtinHandlers } from "../effects/builtin";
+import { builtinEvaluators, builtinHandlers } from "../default-bindings";
 import type { Transition, ConditionSet } from "../types";
 
 describe("condition evaluation", () => {

@@ -13,6 +13,7 @@ async function createTestFixture() {
   await mkdir(join(TEST_DIR, "edges"), { recursive: true })
   await mkdir(join(TEST_DIR, "conditions"), { recursive: true })
   await mkdir(join(TEST_DIR, "effects"), { recursive: true })
+  await mkdir(join(TEST_DIR, "graphs"), { recursive: true })
   
   await writeFile(
     join(TEST_DIR, "nodes", "test.node.ts"),
@@ -76,6 +77,30 @@ export const SetValueEffect = defineEffect({
     key: { type: "string", required: true },
     value: { type: "string" },
   },
+})
+`
+  )
+
+  await writeFile(
+    join(TEST_DIR, "graphs", "test.graph.ts"),
+    `
+import { defineGraph } from "@fiction-map/core"
+
+export const TestGraph = defineGraph({
+  id: "test-graph",
+  nodes: [
+    { id: "start", type: "test", name: "Start" },
+    { id: "end", type: "test", name: "End" },
+  ],
+  edges: [
+    {
+      id: "to-end",
+      type: "link",
+      source: "start",
+      target: "end",
+      conditions: [{ type: "hasFlag", key: "opened" }],
+    },
+  ],
 })
 `
   )
@@ -231,7 +256,11 @@ describe("generator", () => {
       expect(metadata.edgeTypes).toHaveLength(1)
       expect(metadata.conditions).toHaveLength(1)
       expect(metadata.effects).toHaveLength(1)
-      expect(metadata.graphs).toHaveLength(0)
+      expect(metadata.graphs).toHaveLength(1)
+      expect(metadata.graphs[0].errors).toEqual([])
+      expect(metadata.graphs[0].maxDepth).toBe(1)
+      expect(metadata.graphs[0].endings).toEqual(["end"])
+      expect(metadata.graphs[0].conditionsUsed).toEqual(["hasFlag"])
       await expect(access(join(TEST_DIR, ".fiction-map", "metadata.json"))).rejects.toThrow()
     })
 

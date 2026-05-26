@@ -1,0 +1,23 @@
+{
+  "name": "@app/literature-rpg",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/main.ts",
+    "generate": "bun node_modules/fiction-map/dist/cli.js generate --root-dir src",
+    "validate": "bun node_modules/fiction-map/dist/cli.js validate --root-dir src",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fiction-map/core": "workspace:*",
+    "@fiction-map/entities": "workspace:*",
+    "@fiction-map/runtime": "workspace:*",
+    "fiction-map": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.0.0"
+  }
+}

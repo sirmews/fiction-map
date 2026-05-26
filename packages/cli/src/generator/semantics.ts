@@ -25,6 +25,27 @@ import type {
 
 const INDENT = "  "
 
+function formatInstanceFieldValue(value: unknown): string {
+  if (typeof value === "string") return JSON.stringify(value)
+  return JSON.stringify(value)
+}
+
+function formatConditionInstance(condition: { type: string; [key: string]: unknown }): string {
+  const args = Object.entries(condition)
+    .filter(([key]) => key !== "type")
+    .map(([key, value]) => `${key}=${formatInstanceFieldValue(value)}`)
+
+  return args.length > 0 ? `${condition.type}(${args.join(", ")})` : condition.type
+}
+
+function formatEffectInstance(effect: { type: string; [key: string]: unknown }): string {
+  const args = Object.entries(effect)
+    .filter(([key]) => key !== "type")
+    .map(([key, value]) => `${key}=${formatInstanceFieldValue(value)}`)
+
+  return args.length > 0 ? `${effect.type}(${args.join(", ")})` : effect.type
+}
+
 function formatPropertySchema(schema: PropertySchema): string {
   const fields: string[] = [`type: "${schema.type}"`]
   if (schema.required) fields.push("required: true")
@@ -139,6 +160,12 @@ function renderGraphBlock(graph: GraphDefinition): string {
   if (graph.endings.length > 0) {
     lines.push(`- Endings: ${graph.endings.map((e) => `\`${e}\``).join(", ")}`)
   }
+  if (graph.conditionsUsed.length > 0) {
+    lines.push(`- Conditions used: ${graph.conditionsUsed.map((c) => `\`${c}\``).join(", ")}`)
+  }
+  if (graph.effectsUsed.length > 0) {
+    lines.push(`- Effects used: ${graph.effectsUsed.map((e) => `\`${e}\``).join(", ")}`)
+  }
   if (graph.errors.length > 0) {
     lines.push(`- ⚠️ ${graph.errors.length} validation error${graph.errors.length === 1 ? "" : "s"}`)
   }
@@ -152,11 +179,25 @@ function renderGraphBlock(graph: GraphDefinition): string {
       nodeTypeById.set(node.id, node.type)
     }
 
-    lines.push("", "**Topology:**", "", "| Source | Edge | Target |", "|---|---|---|")
+    lines.push(
+      "",
+      "**Topology:**",
+      "",
+      "| Source | Edge | Target | Conditions | Effects |",
+      "|---|---|---|---|---|"
+    )
     for (const edge of graph.edges) {
       const sourceType = nodeTypeById.get(edge.source) ?? "?"
       const targetType = nodeTypeById.get(edge.target) ?? "?"
-      lines.push(`| \`${edge.source}\` (${sourceType}) | \`${edge.id}\` (${edge.type}) | \`${edge.target}\` (${targetType}) |`)
+      const conditions = edge.conditions && edge.conditions.length > 0
+        ? edge.conditions.map((condition) => `\`${formatConditionInstance(condition)}\``).join("<br>")
+        : "—"
+      const effects = edge.effects && edge.effects.length > 0
+        ? edge.effects.map((effect) => `\`${formatEffectInstance(effect)}\``).join("<br>")
+        : "—"
+      lines.push(
+        `| \`${edge.source}\` (${sourceType}) | \`${edge.id}\` (${edge.type}) | \`${edge.target}\` (${targetType}) | ${conditions} | ${effects} |`
+      )
     }
   }
 

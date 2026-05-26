@@ -1,0 +1,128 @@
+{
+  "nodeTypes": [
+    {
+      "id": "scene",
+      "name": "sceneNode",
+      "location": {
+        "file": "nodes/scene.node.ts",
+        "line": 4,
+        "column": 26
+      },
+      "properties": {
+        "title": {
+          "type": "string",
+          "required": true
+        },
+        "body": {
+          "type": "string"
+        }
+      },
+      "outgoingEdges": [
+        "choice"
+      ],
+      "incomingEdges": [
+        "choice"
+      ]
+    }
+  ],
+  "edgeTypes": [
+    {
+      "id": "choice",
+      "name": "choiceEdge",
+      "location": {
+        "file": "edges/choice.edge.ts",
+        "line": 4,
+        "column": 27
+      },
+      "properties": {
+        "text": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "sourceTypes": [
+        "scene"
+      ],
+      "targetTypes": [
+        "scene"
+      ]
+    }
+  ],
+  "conditions": [],
+  "effects": [],
+  "graphs": [
+    {
+      "id": "library-mystery",
+      "name": "libraryMysteryGraph",
+      "location": {
+        "file": "graphs/story.graph.ts",
+        "line": 17,
+        "column": 22
+      },
+      "nodes": [
+        {
+          "id": "entrance",
+          "type": "scene",
+          "title": "Entrance",
+          "body": "You stand at the entrance to the old library."
+        },
+        {
+          "id": "main-hall",
+          "type": "scene",
+          "title": "Main Hall",
+          "body": "Dust motes float in shafts of grey light. A lantern sits on a table."
+        },
+        {
+          "id": "dark-chapter",
+          "type": "scene",
+          "title": "Dark Chapter",
+          "body": "A narrow passage drops into darkness."
+        }
+      ],
+      "edges": [
+        {
+          "id": "enter-hall",
+          "type": "choice",
+          "source": "entrance",
+          "target": "main-hall",
+          "text": "Step inside"
+        },
+        {
+          "id": "descend",
+          "type": "choice",
+          "source": "main-hall",
+          "target": "dark-chapter",
+          "text": "Descend into the passage",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "lantern"
+            }
+          ]
+        }
+      ],
+      "nodeCount": 3,
+      "edgeCount": 2,
+      "maxDepth": 2,
+      "endings": [
+        "dark-chapter"
+      ],
+      "nodeTypesUsed": [
+        "scene"
+      ],
+      "edgeTypesUsed": [
+        "choice"
+      ],
+      "conditionsUsed": [
+        "hasEntity"
+      ],
+      "effectsUsed": [],
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "validation": {
+    "errors": [],
+    "warnings": []
+  }
+}

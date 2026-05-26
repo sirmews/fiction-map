@@ -6,7 +6,8 @@
 
 import { lstat, mkdir, readFile, rm, writeFile } from "fs/promises"
 import { dirname, join } from "path"
-import { ProjectRegistry, validateGraph, type GraphMetadata, type NodeTypeDefinition, type EdgeTypeDefinition, type ConditionDefinition, type EffectDefinition, type GraphDefinition } from "@fiction-map/core"
+import { ProjectRegistry, analyzeGraph, type GraphMetadata, type NodeTypeDefinition, type EdgeTypeDefinition, type ConditionDefinition, type EffectDefinition, type GraphDefinition } from "@fiction-map/core"
+import { builtinConditionConfigs, builtinEffectConfigs } from "@fiction-map/runtime"
 import { discoverFiles } from "./discover"
 import { extractNodeType, extractEdgeType, extractCondition, extractEffect, extractGraph } from "./extract"
 import { renderSemantics } from "./semantics"
@@ -38,6 +39,30 @@ interface FileBackup {
   contents?: string
   exists: boolean
   isFile: boolean
+}
+
+function seedBuiltins(registry: ProjectRegistry): void {
+  for (const condition of builtinConditionConfigs) {
+    if (!registry.conditions.has(condition.id)) {
+      registry.conditions.set(condition.id, {
+        id: condition.id,
+        name: condition.id,
+        parameters: condition.parameters ?? {},
+        location: { file: "@fiction-map/runtime", line: 1, column: 1 },
+      })
+    }
+  }
+
+  for (const effect of builtinEffectConfigs) {
+    if (!registry.effects.has(effect.id)) {
+      registry.effects.set(effect.id, {
+        id: effect.id,
+        name: effect.id,
+        parameters: effect.parameters ?? {},
+        location: { file: "@fiction-map/runtime", line: 1, column: 1 },
+      })
+    }
+  }
 }
 
 function resolveGeneratorOptions(options: GeneratorOptions): ResolvedGeneratorOptions {
@@ -135,6 +160,7 @@ export async function buildMetadata(options: Pick<GeneratorOptions, "rootDir">):
   const registry = new ProjectRegistry()
   for (const nt of nodeTypes) registry.nodeTypes.set(nt.id, nt)
   for (const et of edgeTypes) registry.edgeTypes.set(et.id, et)
+  seedBuiltins(registry)
   for (const cond of conditions) registry.conditions.set(cond.id, cond)
   for (const eff of effects) registry.effects.set(eff.id, eff)
 
@@ -142,9 +168,7 @@ export async function buildMetadata(options: Pick<GeneratorOptions, "rootDir">):
   const topLevelWarnings: any[] = []
 
   for (const graph of graphs) {
-    const { errors, warnings } = validateGraph(registry, graph.nodes, graph.edges)
-    graph.errors = errors
-    graph.warnings = warnings
+    Object.assign(graph, analyzeGraph(registry, graph.nodes, graph.edges))
   }
 
   return {

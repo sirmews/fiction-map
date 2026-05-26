@@ -14,12 +14,13 @@
     }
   },
   "scripts": {
-    "build": "tsup src/cli.ts src/index.ts --format esm --dts",
+    "build": "tsup src/cli.ts src/index.ts --format esm --platform node --external typescript --dts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
     "@fiction-map/core": "workspace:*",
+    "@fiction-map/runtime": "workspace:*",
     "glob": "^10.0.0"
   },
   "devDependencies": {

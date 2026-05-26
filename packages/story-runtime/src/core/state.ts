@@ -4,6 +4,7 @@ import type {
   SerializableEntityState,
   SerializableState,
 } from "../types";
+import { SERIALIZATION_SCHEMA_VERSION } from "../types";
 
 /**
  * Create initial state at a starting node.
@@ -386,11 +387,13 @@ function deserializeEntityState(
 
 /**
  * Convert state to a JSON-serializable format.
- * 
- * Sets are converted to arrays.
+ *
+ * Sets are converted to arrays. Emits the current `schemaVersion` so
+ * consumers can migrate old saves. See `docs/decisions/2026-05-20-persistence-contract.md`.
  */
 export function serializeState(state: GraphRuntimeState): SerializableState {
   return {
+    schemaVersion: SERIALIZATION_SCHEMA_VERSION,
     currentNodeId: state.currentNodeId,
     history: [...state.history],
     variables: { ...state.variables },
@@ -403,10 +406,20 @@ export function serializeState(state: GraphRuntimeState): SerializableState {
 
 /**
  * Restore state from a serialized format.
- * 
- * Arrays are converted back to Sets.
+ *
+ * Arrays are converted back to Sets. Unknown `schemaVersion` values are
+ * rejected with a descriptive error; the consumer must migrate the data
+ * to the current version before calling this function.
  */
 export function deserializeState(data: SerializableState): GraphRuntimeState {
+  if (data.schemaVersion !== SERIALIZATION_SCHEMA_VERSION) {
+    throw new Error(
+      `Unsupported save schemaVersion: ${data.schemaVersion}. ` +
+        `Current version is ${SERIALIZATION_SCHEMA_VERSION}. ` +
+        `Migrate the data before calling deserializeState.`
+    );
+  }
+
   return {
     currentNodeId: data.currentNodeId,
     history: [...data.history],

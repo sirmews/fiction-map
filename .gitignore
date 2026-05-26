@@ -41,3 +41,6 @@ pnpm-lock.yaml
 *.tmp
 *.temp
 .cache/
+
+# Gemini review artifacts
+.gemini-review/

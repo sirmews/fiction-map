@@ -14,6 +14,12 @@ import {
 } from "./types"
 import type { ProjectRegistry } from "./registry"
 
+function formatKnownValues(values: string[], label: string): string {
+  return values.length > 0
+    ? ` Known ${label}: ${values.map((value) => `"${value}"`).join(", ")}.`
+    : ` No ${label} are currently registered.`
+}
+
 /**
  * Get the current call site for source location
  */
@@ -65,7 +71,9 @@ export function validateGraph(
     if (!nodeType) {
       errors.push({
         code: "UNKNOWN_NODE_TYPE",
-        message: `Unknown node type: "${node.type}"`,
+        message:
+          `Unknown node type "${node.type}" on node "${node.id}".` +
+          formatKnownValues(Array.from(registry.nodeTypes.keys()), "node types"),
         nodeId: node.id,
       })
     }
@@ -77,7 +85,9 @@ export function validateGraph(
     if (!nodeIndex.has(edge.source)) {
       errors.push({
         code: "UNKNOWN_SOURCE",
-        message: `Edge "${edge.id}" references unknown source node: "${edge.source}"`,
+        message:
+          `Edge "${edge.id}" references unknown source node "${edge.source}".` +
+          formatKnownValues(Array.from(nodeIndex.keys()), "node ids"),
         edgeId: edge.id,
       })
     }
@@ -86,7 +96,9 @@ export function validateGraph(
     if (!nodeIndex.has(edge.target)) {
       errors.push({
         code: "UNKNOWN_TARGET",
-        message: `Edge "${edge.id}" references unknown target node: "${edge.target}"`,
+        message:
+          `Edge "${edge.id}" references unknown target node "${edge.target}".` +
+          formatKnownValues(Array.from(nodeIndex.keys()), "node ids"),
         edgeId: edge.id,
       })
     }
@@ -96,7 +108,9 @@ export function validateGraph(
     if (!edgeType) {
       errors.push({
         code: "UNKNOWN_EDGE_TYPE",
-        message: `Unknown edge type: "${edge.type}"`,
+        message:
+          `Unknown edge type "${edge.type}" on edge "${edge.id}".` +
+          formatKnownValues(Array.from(registry.edgeTypes.keys()), "edge types"),
         edgeId: edge.id,
       })
       continue
@@ -110,7 +124,9 @@ export function validateGraph(
       if (!edgeType.sourceTypes.includes(sourceNode.type)) {
         errors.push({
           code: "INVALID_SOURCE_TYPE",
-          message: `Edge type "${edge.type}" cannot start from node type "${sourceNode.type}"`,
+          message:
+            `Edge type "${edge.type}" cannot start from node type "${sourceNode.type}" on edge "${edge.id}". ` +
+            `Allowed source types: ${edgeType.sourceTypes.map((type) => `"${type}"`).join(", ")}.`,
           edgeId: edge.id,
           nodeId: edge.source,
         })
@@ -121,7 +137,9 @@ export function validateGraph(
       if (!edgeType.targetTypes.includes(targetNode.type)) {
         errors.push({
           code: "INVALID_TARGET_TYPE",
-          message: `Edge type "${edge.type}" cannot target node type "${targetNode.type}"`,
+          message:
+            `Edge type "${edge.type}" cannot target node type "${targetNode.type}" on edge "${edge.id}". ` +
+            `Allowed target types: ${edgeType.targetTypes.map((type) => `"${type}"`).join(", ")}.`,
           edgeId: edge.id,
           nodeId: edge.target,
         })
@@ -135,7 +153,9 @@ export function validateGraph(
         if (!conditionDef) {
           errors.push({
             code: "UNKNOWN_CONDITION",
-            message: `Unknown condition type: "${condition.type}"`,
+            message:
+              `Unknown condition type "${condition.type}" on edge "${edge.id}".` +
+              formatKnownValues(Array.from(registry.conditions.keys()), "conditions"),
             edgeId: edge.id,
           })
         }
@@ -149,7 +169,9 @@ export function validateGraph(
         if (!effectDef) {
           errors.push({
             code: "UNKNOWN_EFFECT",
-            message: `Unknown effect type: "${effect.type}"`,
+            message:
+              `Unknown effect type "${effect.type}" on edge "${edge.id}".` +
+              formatKnownValues(Array.from(registry.effects.keys()), "effects"),
             edgeId: edge.id,
           })
         }
@@ -205,6 +227,32 @@ export function validateGraph(
   }
   
   return { errors, warnings }
+}
+
+export function analyzeGraph(
+  registry: ProjectRegistry,
+  nodes: NodeInstance[],
+  edges: EdgeInstance[]
+): {
+  errors: ValidationError[]
+  warnings: ValidationWarning[]
+  maxDepth: number
+  endings: string[]
+  nodeTypesUsed: string[]
+  edgeTypesUsed: string[]
+  conditionsUsed: string[]
+  effectsUsed: string[]
+} {
+  const { errors, warnings } = validateGraph(registry, nodes, edges)
+  const usage = collectTypeUsage(nodes, edges)
+
+  return {
+    errors,
+    warnings,
+    maxDepth: calculateMaxDepth(nodes, edges),
+    endings: findEndings(nodes, edges),
+    ...usage,
+  }
 }
 
 /**
@@ -319,8 +367,7 @@ export function defineGraph(registry: ProjectRegistry, config: GraphConfig): Gra
     throw new Error(`Graph "${config.id}" is already defined in this registry`)
   }
   
-  const { errors, warnings } = validateGraph(registry, config.nodes, config.edges)
-  const usage = collectTypeUsage(config.nodes, config.edges)
+  const analysis = analyzeGraph(registry, config.nodes, config.edges)
   
   const definition: GraphDefinition = {
     id: config.id,
@@ -330,15 +377,10 @@ export function defineGraph(registry: ProjectRegistry, config: GraphConfig): Gra
     edges: config.edges,
     nodeCount: config.nodes.length,
     edgeCount: config.edges.length,
-    maxDepth: calculateMaxDepth(config.nodes, config.edges),
-    endings: findEndings(config.nodes, config.edges),
-    ...usage,
-    errors,
-    warnings,
+    ...analysis,
   }
   
   registry.graphs.set(config.id, definition)
   
   return definition
 }
-

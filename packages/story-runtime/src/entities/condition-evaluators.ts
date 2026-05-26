@@ -1,0 +1,80 @@
+/**
+ * Entity-aware built-in condition evaluators.
+ *
+ * Separated from `conditions/builtin.ts` so that the core (non-entity)
+ * built-ins do not depend on entity state helpers. The default
+ * `GraphRuntime` composes both maps via `default-bindings.ts`; consumers
+ * that want a non-entity runtime can use `coreBuiltinEvaluators` alone.
+ */
+
+import type { Condition, ConditionEvaluator } from "../types"
+import {
+  ownsEntity,
+  entityIsActive,
+  entityIsUnlocked,
+  getResource,
+} from "../core/state"
+
+type EntityCondition = Condition & { entityId: string }
+type NumericCondition = Condition & { key: string; value: number }
+
+export const hasEntityEvaluator: ConditionEvaluator = (
+  state,
+  condition,
+  context
+): boolean => {
+  const { entityId } = condition as EntityCondition
+  if (typeof entityId !== "string") return false
+
+  if (context?.derivedState?.ownedEntityIds?.has(entityId)) {
+    return true
+  }
+  return ownsEntity(state, entityId)
+}
+
+export const entityActiveEvaluator: ConditionEvaluator = (
+  state,
+  condition,
+  context
+): boolean => {
+  const { entityId } = condition as EntityCondition
+  if (typeof entityId !== "string") return false
+
+  if (context?.derivedState?.activeEntityIds?.has(entityId)) {
+    return true
+  }
+  return entityIsActive(state, entityId)
+}
+
+export const entityUnlockedEvaluator: ConditionEvaluator = (
+  state,
+  condition,
+  context
+): boolean => {
+  const { entityId } = condition as EntityCondition
+  if (typeof entityId !== "string") return false
+
+  if (context?.derivedState?.effectiveEntityIds?.has(entityId)) {
+    return true
+  }
+  return entityIsUnlocked(state, entityId)
+}
+
+export const resourceAtLeastEvaluator: ConditionEvaluator = (
+  state,
+  condition
+): boolean => {
+  const { key, value } = condition as NumericCondition
+  return (
+    typeof key === "string" &&
+    typeof value === "number" &&
+    getResource(state, key) >= value
+  )
+}
+
+export const entityBuiltinEvaluators: Map<string, ConditionEvaluator> = new Map([
+  ["hasEntity", hasEntityEvaluator],
+  ["entityActive", entityActiveEvaluator],
+  ["entityUnlocked", entityUnlockedEvaluator],
+  ["resourceAtLeast", resourceAtLeastEvaluator],
+])

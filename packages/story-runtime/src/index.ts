@@ -1,3 +1,6 @@
+// Persistence schema version constant
+export { SERIALIZATION_SCHEMA_VERSION } from "./types";
+
 // Core types
 export type {
   EntityRuntimeState,
@@ -79,7 +82,7 @@ export {
   createComposedEvaluator,
 } from "./conditions";
 
-// Built-in condition evaluators
+// Built-in condition evaluators (core, non-entity)
 export {
   equalsEvaluator,
   notEqualsEvaluator,
@@ -93,14 +96,26 @@ export {
   notVisitedEvaluator,
   currentNodeEvaluator,
   hasVariableEvaluator,
+  coreBuiltinEvaluators,
+} from "./conditions/builtin";
+
+// Built-in condition evaluators (entity-aware)
+export {
   hasEntityEvaluator,
   entityActiveEvaluator,
   entityUnlockedEvaluator,
   resourceAtLeastEvaluator,
-  builtinEvaluators,
-} from "./conditions/builtin";
+  entityBuiltinEvaluators,
+} from "./entities/condition-evaluators";
 
-export { registerBuiltins } from "./builtins";
+// Combined default evaluator map (core + entity)
+export { builtinEvaluators, builtinHandlers } from "./default-bindings";
+
+export {
+  registerBuiltins,
+  builtinConditionConfigs,
+  builtinEffectConfigs,
+} from "./builtins";
 
 // Effect application
 export {
@@ -109,7 +124,7 @@ export {
   combineHandlers,
 } from "./effects";
 
-// Built-in effect handlers
+// Built-in effect handlers (core, non-entity)
 export {
   setVariableHandler,
   deleteVariableHandler,
@@ -123,6 +138,11 @@ export {
   noOpHandler,
   setExtensionHandler,
   mergeExtensionHandler,
+  coreBuiltinHandlers,
+} from "./effects/builtin";
+
+// Built-in effect handlers (entity-aware)
+export {
   grantEntityHandler,
   revokeEntityHandler,
   activateEntityHandler,
@@ -131,8 +151,10 @@ export {
   lockEntityHandler,
   addResourceHandler,
   spendResourceHandler,
-  builtinHandlers,
-} from "./effects/builtin";
+  entityBuiltinHandlers,
+} from "./entities/effect-handlers";
+
+// `builtinHandlers` (combined) is exported above via ./default-bindings
 
 // Transition engine
 export {
@@ -158,3 +180,9 @@ export {
   type TraversalPath,
 } from "./runtime";
 
+// Blueprint types accepted by the GraphRuntime constructor
+export type {
+  GraphBlueprint,
+  NodeBlueprint,
+  EdgeBlueprint,
+} from "./adapter";

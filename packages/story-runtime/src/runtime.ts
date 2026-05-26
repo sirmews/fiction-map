@@ -19,8 +19,7 @@ import {
   applyTransition,
 } from "./core/transition"
 import { validateGraph } from "./core/validation"
-import { builtinEvaluators } from "./conditions/builtin"
-import { builtinHandlers } from "./effects/builtin"
+import { builtinEvaluators, builtinHandlers } from "./default-bindings"
 import {
   parseGraph,
   type GraphBlueprint,
