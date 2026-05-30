@@ -1,52 +1,27 @@
 /**
  * Runtime entry point for the literature-rpg consumer app.
  *
- * Builds a `GraphRuntime` over the same scenes defined in
- * `graphs/story.graph.ts`, walks from the entrance to the dark chapter,
- * and prints each transition. Granting the lantern at the main hall
- * unlocks the gated `descend` choice.
- *
- * NOTE: the runtime takes a blueprint shape (id/source/target/
- * conditions/effects) that is not the same shape as the `defineGraph`
- * output. See NOTES.md item 1.
+ * Builds a `GraphRuntime` from the authored graph in `graphs/story.graph.ts`,
+ * walks from the entrance to the dark chapter, and prints each transition.
+ * Granting the lantern at the main hall unlocks the gated `descend` choice.
  */
 
 import {
-  GraphRuntime,
   createInitialState,
+  createRuntimeFromGraph,
   deriveEntityState,
   registerBuiltins,
 } from "@fiction-map/runtime";
+import { story } from "./graphs/story.graph";
 import { registry } from "./project";
 import { world } from "./world";
 
 registerBuiltins(registry);
 
-export const runtime = new GraphRuntime({
-  startNode: "entrance",
-  nodes: [
-    { id: "entrance", type: "scene" },
-    { id: "main-hall", type: "scene" },
-    { id: "dark-chapter", type: "scene" },
-  ],
-  edges: [
-    {
-      id: "enter-hall",
-      source: "entrance",
-      target: "main-hall",
-      effects: [{ type: "grantEntity", entityId: "lantern" }],
-    },
-    {
-      id: "descend",
-      source: "main-hall",
-      target: "dark-chapter",
-      conditions: [{ type: "hasEntity", entityId: "lantern" }],
-    },
-  ],
-});
+export const runtime = createRuntimeFromGraph(story);
 
 export function playOnce(): { reachedEnding: boolean; visited: string[] } {
-  let state = createInitialState("entrance");
+  let state = createInitialState(runtime.startNodeId);
   const visited: string[] = [state.currentNodeId];
 
   while (true) {

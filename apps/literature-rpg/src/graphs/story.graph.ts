@@ -1,14 +1,8 @@
 /**
  * Static graph definition for `fiction-map generate`.
  *
- * This drives `metadata.json` and `SEMANTICS.md` so agents and CI can
- * read the structure without running the app. The runtime in `main.ts`
- * exercises the same nodes/edges programmatically.
- *
- * NOTE: today `defineGraph` (core) and `GraphRuntime` (runtime) take
- * different shapes, so the same graph is expressed twice — once here for
- * the static layer and once in `main.ts` for the runtime layer. See
- * NOTES.md item 1.
+ * This drives `metadata.json`, `SEMANTICS.md`, and runtime execution so
+ * agents, CI, and the app all read the same authored graph structure.
  */
 
 import { defineGraph } from "@fiction-map/core";
@@ -28,6 +22,7 @@ export const story = defineGraph(registry, {
       source: "entrance",
       target: "main-hall",
       text: "Step inside",
+      effects: [{ type: "grantEntity", entityId: "lantern" }],
     },
     {
       id: "descend",
