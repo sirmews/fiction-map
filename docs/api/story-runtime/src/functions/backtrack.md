@@ -8,7 +8,7 @@
 
 > **backtrack**(`state`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/core/state.ts:115](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L115)
+Defined in: [story-runtime/src/core/state.ts:116](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L116)
 
 Go back to the previous node in history.
 

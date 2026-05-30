@@ -8,7 +8,7 @@
 
 > **getTransitionsByAvailability**(`state`, `transitions`, `evaluators`, `context?`): `object`
 
-Defined in: [story-runtime/src/core/transition.ts:363](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/transition.ts#L363)
+Defined in: [story-runtime/src/core/transition.ts:363](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/transition.ts#L363)
 
 Get transitions grouped by availability status.
 

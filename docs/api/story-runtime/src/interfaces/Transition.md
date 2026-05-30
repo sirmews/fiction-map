@@ -6,7 +6,7 @@
 
 # Interface: Transition
 
-Defined in: [story-runtime/src/types.ts:84](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L84)
+Defined in: [story-runtime/src/types.ts:84](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L84)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:84](https://github.com/sirmews/fiction-m
 
 > `optional` **effects?**: [`Effect`](Effect.md)[]
 
-Defined in: [story-runtime/src/types.ts:90](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L90)
+Defined in: [story-runtime/src/types.ts:90](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L90)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:90](https://github.com/sirmews/fiction-m
 
 > `optional` **failureEffects?**: [`Effect`](Effect.md)[]
 
-Defined in: [story-runtime/src/types.ts:91](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L91)
+Defined in: [story-runtime/src/types.ts:91](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L91)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:91](https://github.com/sirmews/fiction-m
 
 > `optional` **failureTargetNodeId?**: `string`
 
-Defined in: [story-runtime/src/types.ts:92](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L92)
+Defined in: [story-runtime/src/types.ts:92](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L92)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/types.ts:92](https://github.com/sirmews/fiction-m
 
 > **id**: `string`
 
-Defined in: [story-runtime/src/types.ts:85](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L85)
+Defined in: [story-runtime/src/types.ts:85](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L85)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [story-runtime/src/types.ts:85](https://github.com/sirmews/fiction-m
 
 > `optional` **label?**: `string`
 
-Defined in: [story-runtime/src/types.ts:93](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L93)
+Defined in: [story-runtime/src/types.ts:93](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L93)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [story-runtime/src/types.ts:93](https://github.com/sirmews/fiction-m
 
 > `optional` **metadata?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:94](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L94)
+Defined in: [story-runtime/src/types.ts:94](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L94)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [story-runtime/src/types.ts:94](https://github.com/sirmews/fiction-m
 
 > `optional` **requirements?**: [`ConditionSet`](ConditionSet.md)
 
-Defined in: [story-runtime/src/types.ts:88](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L88)
+Defined in: [story-runtime/src/types.ts:88](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L88)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [story-runtime/src/types.ts:88](https://github.com/sirmews/fiction-m
 
 > **sourceNodeId**: `string`
 
-Defined in: [story-runtime/src/types.ts:86](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L86)
+Defined in: [story-runtime/src/types.ts:86](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L86)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [story-runtime/src/types.ts:86](https://github.com/sirmews/fiction-m
 
 > `optional` **targetNodeId?**: `string`
 
-Defined in: [story-runtime/src/types.ts:87](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L87)
+Defined in: [story-runtime/src/types.ts:87](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L87)
 
 ***
 
@@ -86,4 +86,4 @@ Defined in: [story-runtime/src/types.ts:87](https://github.com/sirmews/fiction-m
 
 > `optional` **visibility?**: [`ConditionSet`](ConditionSet.md)
 
-Defined in: [story-runtime/src/types.ts:89](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L89)
+Defined in: [story-runtime/src/types.ts:89](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L89)

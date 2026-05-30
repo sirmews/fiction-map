@@ -6,7 +6,7 @@
 
 # Interface: StepResult
 
-Defined in: [story-runtime/src/runtime.ts:28](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L28)
+Defined in: [story-runtime/src/runtime.ts:29](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L29)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/runtime.ts:28](https://github.com/sirmews/fiction
 
 > **applied**: [`TransitionResult`](TransitionResult.md)
 
-Defined in: [story-runtime/src/runtime.ts:32](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L32)
+Defined in: [story-runtime/src/runtime.ts:33](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L33)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/runtime.ts:32](https://github.com/sirmews/fiction
 
 > **available**: [`Transition`](Transition.md)[]
 
-Defined in: [story-runtime/src/runtime.ts:31](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L31)
+Defined in: [story-runtime/src/runtime.ts:32](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L32)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/runtime.ts:31](https://github.com/sirmews/fiction
 
 > **nodeId**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:30](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L30)
+Defined in: [story-runtime/src/runtime.ts:31](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L31)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [story-runtime/src/runtime.ts:30](https://github.com/sirmews/fiction
 
 > **state**: [`GraphRuntimeState`](GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/runtime.ts:29](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L29)
+Defined in: [story-runtime/src/runtime.ts:30](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L30)

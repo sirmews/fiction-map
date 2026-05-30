@@ -8,7 +8,7 @@
 
 > **visitCount**(`state`, `nodeId`): `number`
 
-Defined in: [story-runtime/src/core/state.ts:137](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L137)
+Defined in: [story-runtime/src/core/state.ts:138](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L138)
 
 Get the number of times a node has been visited.
 Note: This counts based on history + current position.

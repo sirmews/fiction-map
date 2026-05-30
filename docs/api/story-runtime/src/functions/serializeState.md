@@ -8,11 +8,12 @@
 
 > **serializeState**(`state`): [`SerializableState`](../interfaces/SerializableState.md)
 
-Defined in: [story-runtime/src/core/state.ts:392](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L392)
+Defined in: [story-runtime/src/core/state.ts:394](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L394)
 
 Convert state to a JSON-serializable format.
 
-Sets are converted to arrays.
+Sets are converted to arrays. Emits the current `schemaVersion` so
+consumers can migrate old saves. See `docs/decisions/2026-05-20-persistence-contract.md`.
 
 ## Parameters
 

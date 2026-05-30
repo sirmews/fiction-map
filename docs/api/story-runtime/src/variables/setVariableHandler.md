@@ -8,4 +8,4 @@
 
 > `const` **setVariableHandler**: [`EffectHandler`](../type-aliases/EffectHandler.md)
 
-Defined in: [story-runtime/src/effects/builtin.ts:29](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/effects/builtin.ts#L29)
+Defined in: [story-runtime/src/effects/builtin.ts:20](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/effects/builtin.ts#L20)

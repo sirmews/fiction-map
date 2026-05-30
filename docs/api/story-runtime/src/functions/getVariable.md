@@ -8,7 +8,7 @@
 
 > **getVariable**(`state`, `key`): `unknown`
 
-Defined in: [story-runtime/src/core/state.ts:198](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L198)
+Defined in: [story-runtime/src/core/state.ts:199](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L199)
 
 Get a variable value.
 

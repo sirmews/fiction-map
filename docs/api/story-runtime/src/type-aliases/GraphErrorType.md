@@ -8,4 +8,4 @@
 
 > **GraphErrorType** = `"dangling-transition"` \| `"unreachable-node"` \| `"orphan-node"` \| `"missing-property"` \| `"empty-graph"` \| `"missing-start-node"` \| `"unknown-entity-reference"`
 
-Defined in: [story-runtime/src/types.ts:151](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L151)
+Defined in: [story-runtime/src/types.ts:151](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L151)

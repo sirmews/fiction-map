@@ -8,4 +8,4 @@
 
 > `const` **revokeEntityHandler**: [`EffectHandler`](../type-aliases/EffectHandler.md)
 
-Defined in: [story-runtime/src/effects/builtin.ts:173](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/effects/builtin.ts#L173)
+Defined in: [story-runtime/src/entities/effect-handlers.ts:33](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/effect-handlers.ts#L33)

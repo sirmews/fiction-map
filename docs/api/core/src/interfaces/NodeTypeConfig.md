@@ -6,7 +6,7 @@
 
 # Interface: NodeTypeConfig
 
-Defined in: [core/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L72)
+Defined in: [core/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L72)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/b
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L73)
+Defined in: [core/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L73)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **incomingEdges?**: `string`[]
 
-Defined in: [core/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L76)
+Defined in: [core/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L76)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [core/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **outgoingEdges?**: `string`[]
 
-Defined in: [core/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L75)
+Defined in: [core/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L75)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [core/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **properties?**: [`PropertyDefinition`](PropertyDefinition.md)
 
-Defined in: [core/src/types.ts:74](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L74)
+Defined in: [core/src/types.ts:74](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L74)

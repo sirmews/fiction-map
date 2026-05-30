@@ -8,7 +8,7 @@
 
 > **applyEffects**(`state`, `effects`, `handlers`, `context?`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/effects/index.ts:45](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/effects/index.ts#L45)
+Defined in: [story-runtime/src/effects/index.ts:45](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/effects/index.ts#L45)
 
 Apply multiple effects in sequence.
 

@@ -6,7 +6,7 @@
 
 # Interface: NodeInstance
 
-Defined in: [core/src/types.ts:151](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L151)
+Defined in: [core/src/types.ts:151](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L151)
 
 ## Indexable
 
@@ -18,7 +18,7 @@ Defined in: [core/src/types.ts:151](https://github.com/sirmews/fiction-map/blob/
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:152](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L152)
+Defined in: [core/src/types.ts:152](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L152)
 
 ***
 
@@ -26,4 +26,4 @@ Defined in: [core/src/types.ts:152](https://github.com/sirmews/fiction-map/blob/
 
 > **type**: `string`
 
-Defined in: [core/src/types.ts:153](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L153)
+Defined in: [core/src/types.ts:153](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L153)

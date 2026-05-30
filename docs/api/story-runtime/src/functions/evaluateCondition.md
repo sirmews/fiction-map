@@ -8,7 +8,7 @@
 
 > **evaluateCondition**(`state`, `condition`, `evaluators`, `context?`): `boolean`
 
-Defined in: [story-runtime/src/conditions/index.ts:18](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/conditions/index.ts#L18)
+Defined in: [story-runtime/src/conditions/index.ts:18](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/conditions/index.ts#L18)
 
 Evaluate a single condition using the provided evaluators.
 

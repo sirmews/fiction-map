@@ -8,7 +8,7 @@
 
 > **deriveEntityState**(`world`, `state`): [`DerivedEntityState`](../interfaces/DerivedEntityState.md)
 
-Defined in: [story-runtime/src/entities/derived.ts:30](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L30)
+Defined in: [story-runtime/src/entities/derived.ts:30](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L30)
 
 ## Parameters
 

@@ -8,7 +8,7 @@
 
 > **validateGraph**(`nodes`, `transitions`, `startNodeId`): [`ValidationResult`](../interfaces/ValidationResult.md)
 
-Defined in: [story-runtime/src/core/validation.ts:24](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/validation.ts#L24)
+Defined in: [story-runtime/src/core/validation.ts:24](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/validation.ts#L24)
 
 Validate graph integrity.
 

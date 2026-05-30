@@ -6,7 +6,7 @@
 
 # Interface: ConditionInstance
 
-Defined in: [core/src/types.ts:119](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L119)
+Defined in: [core/src/types.ts:119](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L119)
 
 ## Indexable
 
@@ -18,4 +18,4 @@ Defined in: [core/src/types.ts:119](https://github.com/sirmews/fiction-map/blob/
 
 > **type**: `string`
 
-Defined in: [core/src/types.ts:120](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L120)
+Defined in: [core/src/types.ts:120](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L120)

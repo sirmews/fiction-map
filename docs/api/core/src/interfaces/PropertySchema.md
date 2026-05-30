@@ -6,7 +6,7 @@
 
 # Interface: PropertySchema
 
-Defined in: [core/src/types.ts:33](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L33)
+Defined in: [core/src/types.ts:33](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L33)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:33](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **default?**: `unknown`
 
-Defined in: [core/src/types.ts:36](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L36)
+Defined in: [core/src/types.ts:36](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L36)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:36](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **description?**: `string`
 
-Defined in: [core/src/types.ts:37](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L37)
+Defined in: [core/src/types.ts:37](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L37)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [core/src/types.ts:37](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **items?**: `PropertySchema`
 
-Defined in: [core/src/types.ts:43](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L43)
+Defined in: [core/src/types.ts:43](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L43)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [core/src/types.ts:43](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **keyType?**: [`PropertyType`](../type-aliases/PropertyType.md)
 
-Defined in: [core/src/types.ts:46](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L46)
+Defined in: [core/src/types.ts:46](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L46)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [core/src/types.ts:46](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **referenceTo?**: `string`
 
-Defined in: [core/src/types.ts:50](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L50)
+Defined in: [core/src/types.ts:50](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L50)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [core/src/types.ts:50](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **required?**: `boolean`
 
-Defined in: [core/src/types.ts:35](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L35)
+Defined in: [core/src/types.ts:35](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L35)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [core/src/types.ts:35](https://github.com/sirmews/fiction-map/blob/b
 
 > **type**: [`PropertyType`](../type-aliases/PropertyType.md)
 
-Defined in: [core/src/types.ts:34](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L34)
+Defined in: [core/src/types.ts:34](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L34)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [core/src/types.ts:34](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **values?**: `string`[]
 
-Defined in: [core/src/types.ts:40](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L40)
+Defined in: [core/src/types.ts:40](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L40)
 
 ***
 
@@ -78,4 +78,4 @@ Defined in: [core/src/types.ts:40](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **valueType?**: `PropertySchema`
 
-Defined in: [core/src/types.ts:47](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L47)
+Defined in: [core/src/types.ts:47](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L47)

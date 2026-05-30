@@ -6,7 +6,7 @@
 
 # Interface: EffectConfig
 
-Defined in: [core/src/types.ts:137](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L137)
+Defined in: [core/src/types.ts:137](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L137)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:137](https://github.com/sirmews/fiction-map/blob/
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:138](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L138)
+Defined in: [core/src/types.ts:138](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L138)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [core/src/types.ts:138](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **parameters?**: [`PropertyDefinition`](PropertyDefinition.md)
 
-Defined in: [core/src/types.ts:139](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L139)
+Defined in: [core/src/types.ts:139](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L139)

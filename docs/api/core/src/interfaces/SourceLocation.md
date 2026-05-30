@@ -6,7 +6,7 @@
 
 # Interface: SourceLocation
 
-Defined in: [core/src/types.ts:11](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L11)
+Defined in: [core/src/types.ts:11](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L11)
 
 Fiction Map — Core Types
 
@@ -18,7 +18,7 @@ The metadata schema for graph-based systems.
 
 > **column**: `number`
 
-Defined in: [core/src/types.ts:14](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L14)
+Defined in: [core/src/types.ts:14](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L14)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [core/src/types.ts:14](https://github.com/sirmews/fiction-map/blob/b
 
 > **file**: `string`
 
-Defined in: [core/src/types.ts:12](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L12)
+Defined in: [core/src/types.ts:12](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L12)
 
 ***
 
@@ -34,4 +34,4 @@ Defined in: [core/src/types.ts:12](https://github.com/sirmews/fiction-map/blob/b
 
 > **line**: `number`
 
-Defined in: [core/src/types.ts:13](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L13)
+Defined in: [core/src/types.ts:13](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L13)

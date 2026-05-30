@@ -8,7 +8,7 @@
 
 > **hasDanglingTransitions**(`transitions`, `nodeIds`): `boolean`
 
-Defined in: [story-runtime/src/core/validation.ts:172](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/validation.ts#L172)
+Defined in: [story-runtime/src/core/validation.ts:172](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/validation.ts#L172)
 
 Check if a graph has dangling transitions.
 

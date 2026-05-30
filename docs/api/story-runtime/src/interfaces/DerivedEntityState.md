@@ -6,7 +6,7 @@
 
 # Interface: DerivedEntityState
 
-Defined in: [story-runtime/src/entities/derived.ts:20](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L20)
+Defined in: [story-runtime/src/entities/derived.ts:20](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L20)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/entities/derived.ts:20](https://github.com/sirmew
 
 > **activeEntityIds**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/entities/derived.ts:22](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L22)
+Defined in: [story-runtime/src/entities/derived.ts:22](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L22)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/entities/derived.ts:22](https://github.com/sirmew
 
 > **activeModifiers**: [`ActiveEntityModifier`](ActiveEntityModifier.md)[]
 
-Defined in: [story-runtime/src/entities/derived.ts:25](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L25)
+Defined in: [story-runtime/src/entities/derived.ts:25](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L25)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/entities/derived.ts:25](https://github.com/sirmew
 
 > **effectiveEntityIds**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/entities/derived.ts:24](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L24)
+Defined in: [story-runtime/src/entities/derived.ts:24](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L24)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/entities/derived.ts:24](https://github.com/sirmew
 
 > **missingEntityIds**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/entities/derived.ts:27](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L27)
+Defined in: [story-runtime/src/entities/derived.ts:27](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L27)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [story-runtime/src/entities/derived.ts:27](https://github.com/sirmew
 
 > **ownedEntityIds**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/entities/derived.ts:21](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L21)
+Defined in: [story-runtime/src/entities/derived.ts:21](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L21)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [story-runtime/src/entities/derived.ts:21](https://github.com/sirmew
 
 > **prerequisites**: [`EntityPrerequisiteResult`](EntityPrerequisiteResult.md)[]
 
-Defined in: [story-runtime/src/entities/derived.ts:26](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L26)
+Defined in: [story-runtime/src/entities/derived.ts:26](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L26)
 
 ***
 
@@ -62,4 +62,4 @@ Defined in: [story-runtime/src/entities/derived.ts:26](https://github.com/sirmew
 
 > **unlockedEntityIds**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/entities/derived.ts:23](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L23)
+Defined in: [story-runtime/src/entities/derived.ts:23](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L23)

@@ -60,12 +60,13 @@ Source: `edges/choice.edge.ts:4`
 - 3 nodes, 2 edges, max depth: 2
 - Endings: `dark-chapter`
 - Conditions used: `hasEntity`
+- Effects used: `grantEntity`
 
 **Topology:**
 
 | Source | Edge | Target | Conditions | Effects |
 |---|---|---|---|---|
-| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | — |
+| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="lantern")` |
 | `main-hall` (scene) | `descend` (choice) | `dark-chapter` (scene) | `hasEntity(entityId="lantern")` | — |
 
-Source: `graphs/story.graph.ts:17`
+Source: `graphs/story.graph.ts:11`

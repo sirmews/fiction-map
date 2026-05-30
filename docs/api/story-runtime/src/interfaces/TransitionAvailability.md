@@ -6,7 +6,7 @@
 
 # Interface: TransitionAvailability
 
-Defined in: [story-runtime/src/types.ts:97](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L97)
+Defined in: [story-runtime/src/types.ts:97](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L97)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:97](https://github.com/sirmews/fiction-m
 
 > **allowed**: `boolean`
 
-Defined in: [story-runtime/src/types.ts:98](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L98)
+Defined in: [story-runtime/src/types.ts:98](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L98)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:98](https://github.com/sirmews/fiction-m
 
 > `optional` **failedConditions?**: [`FailedCondition`](FailedCondition.md)[]
 
-Defined in: [story-runtime/src/types.ts:101](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L101)
+Defined in: [story-runtime/src/types.ts:101](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L101)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:101](https://github.com/sirmews/fiction-
 
 > `optional` **reason?**: `string`
 
-Defined in: [story-runtime/src/types.ts:100](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L100)
+Defined in: [story-runtime/src/types.ts:100](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L100)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [story-runtime/src/types.ts:100](https://github.com/sirmews/fiction-
 
 > **visible**: `boolean`
 
-Defined in: [story-runtime/src/types.ts:99](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L99)
+Defined in: [story-runtime/src/types.ts:99](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L99)

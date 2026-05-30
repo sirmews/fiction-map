@@ -6,7 +6,7 @@
 
 # Interface: SerializableState
 
-Defined in: [story-runtime/src/types.ts:192](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L192)
+Defined in: [story-runtime/src/types.ts:203](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L203)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:192](https://github.com/sirmews/fiction-
 
 > **currentNodeId**: `string`
 
-Defined in: [story-runtime/src/types.ts:193](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L193)
+Defined in: [story-runtime/src/types.ts:206](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L206)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:193](https://github.com/sirmews/fiction-
 
 > `optional` **entityState?**: [`SerializableEntityState`](SerializableEntityState.md)
 
-Defined in: [story-runtime/src/types.ts:198](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L198)
+Defined in: [story-runtime/src/types.ts:211](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L211)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:198](https://github.com/sirmews/fiction-
 
 > `optional` **extensions?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:199](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L199)
+Defined in: [story-runtime/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L212)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/types.ts:199](https://github.com/sirmews/fiction-
 
 > **flags**: `Record`\<`string`, `boolean` \| `string` \| `number`\>
 
-Defined in: [story-runtime/src/types.ts:196](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L196)
+Defined in: [story-runtime/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L209)
 
 ***
 
@@ -46,7 +46,17 @@ Defined in: [story-runtime/src/types.ts:196](https://github.com/sirmews/fiction-
 
 > **history**: `string`[]
 
-Defined in: [story-runtime/src/types.ts:194](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L194)
+Defined in: [story-runtime/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L207)
+
+***
+
+### schemaVersion
+
+> **schemaVersion**: `1`
+
+Defined in: [story-runtime/src/types.ts:205](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L205)
+
+Schema version. Always equals `SERIALIZATION_SCHEMA_VERSION` on write.
 
 ***
 
@@ -54,7 +64,7 @@ Defined in: [story-runtime/src/types.ts:194](https://github.com/sirmews/fiction-
 
 > **variables**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:195](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L195)
+Defined in: [story-runtime/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L208)
 
 ***
 
@@ -62,4 +72,4 @@ Defined in: [story-runtime/src/types.ts:195](https://github.com/sirmews/fiction-
 
 > **visited**: `string`[]
 
-Defined in: [story-runtime/src/types.ts:197](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L197)
+Defined in: [story-runtime/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L210)

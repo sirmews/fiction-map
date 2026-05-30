@@ -6,7 +6,7 @@
 
 # Interface: GraphError
 
-Defined in: [story-runtime/src/types.ts:160](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L160)
+Defined in: [story-runtime/src/types.ts:160](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L160)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:160](https://github.com/sirmews/fiction-
 
 > **message**: `string`
 
-Defined in: [story-runtime/src/types.ts:164](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L164)
+Defined in: [story-runtime/src/types.ts:164](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L164)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:164](https://github.com/sirmews/fiction-
 
 > `optional` **nodeId?**: `string`
 
-Defined in: [story-runtime/src/types.ts:162](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L162)
+Defined in: [story-runtime/src/types.ts:162](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L162)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:162](https://github.com/sirmews/fiction-
 
 > `optional` **transitionId?**: `string`
 
-Defined in: [story-runtime/src/types.ts:163](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L163)
+Defined in: [story-runtime/src/types.ts:163](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L163)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [story-runtime/src/types.ts:163](https://github.com/sirmews/fiction-
 
 > **type**: [`GraphErrorType`](../type-aliases/GraphErrorType.md)
 
-Defined in: [story-runtime/src/types.ts:161](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L161)
+Defined in: [story-runtime/src/types.ts:161](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L161)

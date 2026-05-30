@@ -6,7 +6,7 @@
 
 # Interface: TraversalPath
 
-Defined in: [story-runtime/src/runtime.ts:42](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L42)
+Defined in: [story-runtime/src/runtime.ts:43](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L43)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/runtime.ts:42](https://github.com/sirmews/fiction
 
 > **endedAt**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:45](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L45)
+Defined in: [story-runtime/src/runtime.ts:46](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L46)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/runtime.ts:45](https://github.com/sirmews/fiction
 
 > **finalNodeId**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:44](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L44)
+Defined in: [story-runtime/src/runtime.ts:45](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L45)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/runtime.ts:44](https://github.com/sirmews/fiction
 
 > **state**: [`GraphRuntimeState`](GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/runtime.ts:46](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L46)
+Defined in: [story-runtime/src/runtime.ts:47](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L47)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [story-runtime/src/runtime.ts:46](https://github.com/sirmews/fiction
 
 > **steps**: [`PathStep`](PathStep.md)[]
 
-Defined in: [story-runtime/src/runtime.ts:43](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L43)
+Defined in: [story-runtime/src/runtime.ts:44](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L44)

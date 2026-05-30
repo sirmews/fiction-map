@@ -8,7 +8,7 @@
 
 > **setFlag**(`state`, `key`, `value`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/core/state.ts:146](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L146)
+Defined in: [story-runtime/src/core/state.ts:147](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L147)
 
 Set a flag value.
 

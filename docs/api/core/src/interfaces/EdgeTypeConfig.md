@@ -6,7 +6,7 @@
 
 # Interface: EdgeTypeConfig
 
-Defined in: [core/src/types.ts:94](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L94)
+Defined in: [core/src/types.ts:94](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L94)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:94](https://github.com/sirmews/fiction-map/blob/b
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:95](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L95)
+Defined in: [core/src/types.ts:95](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L95)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:95](https://github.com/sirmews/fiction-map/blob/b
 
 > `optional` **properties?**: [`PropertyDefinition`](PropertyDefinition.md)
 
-Defined in: [core/src/types.ts:96](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L96)
+Defined in: [core/src/types.ts:96](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L96)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [core/src/types.ts:96](https://github.com/sirmews/fiction-map/blob/b
 
 > **sourceTypes**: `string`[]
 
-Defined in: [core/src/types.ts:97](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L97)
+Defined in: [core/src/types.ts:97](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L97)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [core/src/types.ts:97](https://github.com/sirmews/fiction-map/blob/b
 
 > **targetTypes**: `string`[]
 
-Defined in: [core/src/types.ts:98](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L98)
+Defined in: [core/src/types.ts:98](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L98)

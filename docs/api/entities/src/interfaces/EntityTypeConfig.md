@@ -6,7 +6,7 @@
 
 # Interface: EntityTypeConfig
 
-Defined in: [entities/src/types.ts:31](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L31)
+Defined in: [entities/src/types.ts:31](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L31)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [entities/src/types.ts:31](https://github.com/sirmews/fiction-map/bl
 
 > **id**: `string`
 
-Defined in: [entities/src/types.ts:32](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L32)
+Defined in: [entities/src/types.ts:32](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L32)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [entities/src/types.ts:32](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **properties?**: `PropertyDefinition`
 
-Defined in: [entities/src/types.ts:33](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L33)
+Defined in: [entities/src/types.ts:33](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L33)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [entities/src/types.ts:33](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **references?**: `Record`\<`string`, [`EntityReferenceConfig`](EntityReferenceConfig.md)\>
 
-Defined in: [entities/src/types.ts:34](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L34)
+Defined in: [entities/src/types.ts:34](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L34)

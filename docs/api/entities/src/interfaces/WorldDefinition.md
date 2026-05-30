@@ -6,7 +6,7 @@
 
 # Interface: WorldDefinition
 
-Defined in: [entities/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L72)
+Defined in: [entities/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L72)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [entities/src/types.ts:72](https://github.com/sirmews/fiction-map/bl
 
 > **entities**: [`EntityInstance`](EntityInstance.md)[]
 
-Defined in: [entities/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L76)
+Defined in: [entities/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L76)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [entities/src/types.ts:76](https://github.com/sirmews/fiction-map/bl
 
 > **entityCount**: `number`
 
-Defined in: [entities/src/types.ts:77](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L77)
+Defined in: [entities/src/types.ts:77](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L77)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [entities/src/types.ts:77](https://github.com/sirmews/fiction-map/bl
 
 > **entityTypesUsed**: `string`[]
 
-Defined in: [entities/src/types.ts:78](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L78)
+Defined in: [entities/src/types.ts:78](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L78)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [entities/src/types.ts:78](https://github.com/sirmews/fiction-map/bl
 
 > **errors**: `ValidationError`[]
 
-Defined in: [entities/src/types.ts:79](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L79)
+Defined in: [entities/src/types.ts:79](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L79)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [entities/src/types.ts:79](https://github.com/sirmews/fiction-map/bl
 
 > **id**: `string`
 
-Defined in: [entities/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L73)
+Defined in: [entities/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L73)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [entities/src/types.ts:73](https://github.com/sirmews/fiction-map/bl
 
 > **location**: `SourceLocation`
 
-Defined in: [entities/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L75)
+Defined in: [entities/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L75)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [entities/src/types.ts:75](https://github.com/sirmews/fiction-map/bl
 
 > **name**: `string`
 
-Defined in: [entities/src/types.ts:74](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L74)
+Defined in: [entities/src/types.ts:74](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L74)
 
 ***
 
@@ -70,4 +70,4 @@ Defined in: [entities/src/types.ts:74](https://github.com/sirmews/fiction-map/bl
 
 > **warnings**: `ValidationWarning`[]
 
-Defined in: [entities/src/types.ts:80](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L80)
+Defined in: [entities/src/types.ts:80](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L80)

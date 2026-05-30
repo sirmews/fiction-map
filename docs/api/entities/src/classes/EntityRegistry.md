@@ -6,7 +6,7 @@
 
 # Class: EntityRegistry
 
-Defined in: [entities/src/registry.ts:4](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/registry.ts#L4)
+Defined in: [entities/src/registry.ts:4](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L4)
 
 ## Extends
 
@@ -32,7 +32,7 @@ Defined in: [entities/src/registry.ts:4](https://github.com/sirmews/fiction-map/
 
 > **conditions**: `Map`\<`string`, `ConditionDefinition`\>
 
-Defined in: core/dist/index.d.ts:184
+Defined in: core/dist/index.d.ts:157
 
 #### Inherited from
 
@@ -44,7 +44,7 @@ Defined in: core/dist/index.d.ts:184
 
 > **edgeTypes**: `Map`\<`string`, `EdgeTypeDefinition`\>
 
-Defined in: core/dist/index.d.ts:183
+Defined in: core/dist/index.d.ts:156
 
 #### Inherited from
 
@@ -56,7 +56,7 @@ Defined in: core/dist/index.d.ts:183
 
 > **effects**: `Map`\<`string`, `EffectDefinition`\>
 
-Defined in: core/dist/index.d.ts:185
+Defined in: core/dist/index.d.ts:158
 
 #### Inherited from
 
@@ -68,7 +68,7 @@ Defined in: core/dist/index.d.ts:185
 
 > **entityTypes**: `Map`\<`string`, [`EntityTypeDefinition`](../interfaces/EntityTypeDefinition.md)\>
 
-Defined in: [entities/src/registry.ts:5](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/registry.ts#L5)
+Defined in: [entities/src/registry.ts:5](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L5)
 
 ***
 
@@ -76,7 +76,7 @@ Defined in: [entities/src/registry.ts:5](https://github.com/sirmews/fiction-map/
 
 > **graphs**: `Map`\<`string`, `GraphDefinition`\>
 
-Defined in: core/dist/index.d.ts:186
+Defined in: core/dist/index.d.ts:159
 
 #### Inherited from
 
@@ -88,7 +88,7 @@ Defined in: core/dist/index.d.ts:186
 
 > **nodeTypes**: `Map`\<`string`, `NodeTypeDefinition`\>
 
-Defined in: core/dist/index.d.ts:182
+Defined in: core/dist/index.d.ts:155
 
 #### Inherited from
 
@@ -100,7 +100,7 @@ Defined in: core/dist/index.d.ts:182
 
 > **worlds**: `Map`\<`string`, [`WorldDefinition`](../interfaces/WorldDefinition.md)\>
 
-Defined in: [entities/src/registry.ts:6](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/registry.ts#L6)
+Defined in: [entities/src/registry.ts:6](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L6)
 
 ## Methods
 
@@ -108,7 +108,7 @@ Defined in: [entities/src/registry.ts:6](https://github.com/sirmews/fiction-map/
 
 > **clear**(): `void`
 
-Defined in: [entities/src/registry.ts:8](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/registry.ts#L8)
+Defined in: [entities/src/registry.ts:8](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L8)
 
 #### Returns
 

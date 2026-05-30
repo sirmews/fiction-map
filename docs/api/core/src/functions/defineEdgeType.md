@@ -8,7 +8,7 @@
 
 > **defineEdgeType**(`registry`, `config`): [`EdgeTypeDefinition`](../interfaces/EdgeTypeDefinition.md)
 
-Defined in: [core/src/edge-type.ts:45](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/edge-type.ts#L45)
+Defined in: [core/src/edge-type.ts:45](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/edge-type.ts#L45)
 
 Define an edge type
 

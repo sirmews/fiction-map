@@ -8,7 +8,7 @@
 
 > **getAvailableTransitions**(`state`, `transitions`, `evaluators`, `context?`): [`Transition`](../interfaces/Transition.md)[]
 
-Defined in: [story-runtime/src/core/transition.ts:332](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/transition.ts#L332)
+Defined in: [story-runtime/src/core/transition.ts:332](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/transition.ts#L332)
 
 Get all available transitions from the current node.
 

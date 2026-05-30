@@ -8,7 +8,7 @@
 
 > **incrementVariable**(`state`, `key`, `delta`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/core/state.ts:207](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L207)
+Defined in: [story-runtime/src/core/state.ts:208](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L208)
 
 Increment a numeric variable.
 

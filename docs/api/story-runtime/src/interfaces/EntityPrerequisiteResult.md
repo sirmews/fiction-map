@@ -6,7 +6,7 @@
 
 # Interface: EntityPrerequisiteResult
 
-Defined in: [story-runtime/src/entities/derived.ts:14](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L14)
+Defined in: [story-runtime/src/entities/derived.ts:14](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L14)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/entities/derived.ts:14](https://github.com/sirmew
 
 > **entityId**: `string`
 
-Defined in: [story-runtime/src/entities/derived.ts:15](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L15)
+Defined in: [story-runtime/src/entities/derived.ts:15](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L15)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/entities/derived.ts:15](https://github.com/sirmew
 
 > **prerequisite**: `EntityPrerequisite`
 
-Defined in: [story-runtime/src/entities/derived.ts:16](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L16)
+Defined in: [story-runtime/src/entities/derived.ts:16](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L16)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [story-runtime/src/entities/derived.ts:16](https://github.com/sirmew
 
 > **satisfied**: `boolean`
 
-Defined in: [story-runtime/src/entities/derived.ts:17](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/entities/derived.ts#L17)
+Defined in: [story-runtime/src/entities/derived.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L17)

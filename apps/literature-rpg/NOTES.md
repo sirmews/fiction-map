@@ -6,17 +6,20 @@ Each item lists what a real consumer hits, the workaround used in this app, and 
 
 ---
 
-## 1. Two-layer schema duplication — same graph expressed twice
+## 1. ~~Two-layer schema duplication — same graph expressed twice~~ ✅ FIXED
 
-**Severity:** high. This is the biggest API friction.
+Resolved by adding `graphDefinitionToBlueprint()` and
+`createRuntimeFromGraph()` to `@fiction-map/runtime`, then moving the
+`grantEntity` effect into the authored graph definition.
 
-`defineGraph` (from `@fiction-map/core`) takes `{ nodes: NodeInstance[], edges: EdgeInstance[] }` shaped for the static metadata layer. `GraphRuntime` (from `@fiction-map/runtime`) takes a `GraphBlueprint` shaped for the runtime layer with different field names and a different way of expressing conditions/effects.
+The static graph in [src/graphs/story.graph.ts](src/graphs/story.graph.ts)
+now drives both generated artifacts and runtime execution in [src/main.ts](src/main.ts).
+Generated `metadata.json` and `SEMANTICS.md` include the `grantEntity` effect on
+`enter-hall`, so agents, CI, and the runtime share the same graph source.
 
-There is no public adapter that lets a consumer write the graph once and feed it to both. So the same three scenes and two edges appear in [src/graphs/story.graph.ts](src/graphs/story.graph.ts) and again in [src/main.ts](src/main.ts).
-
-**Workaround:** duplicate the graph and add a NOTE comment in both files.
-
-**Fix:** expose a single graph shape (or a `loadFromMetadata(metadata)` helper that builds a `GraphRuntime` from `metadata.json`). This is the natural Encore-style flow — generate writes metadata, runtime reads metadata — and the framework should ship the seam.
+Remaining caveat: `GraphRuntime` still uses the first authored node as the
+start node because `defineGraph` does not expose an explicit `startNode` field.
+That matches existing runtime behavior and is acceptable for this consumer proof.
 
 ## 2. ~~CLI binary has no shebang~~ ✅ FIXED
 

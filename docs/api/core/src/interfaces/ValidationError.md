@@ -6,7 +6,7 @@
 
 # Interface: ValidationError
 
-Defined in: [core/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L207)
+Defined in: [core/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L207)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/
 
 > **code**: `string`
 
-Defined in: [core/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L208)
+Defined in: [core/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L208)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **edgeId?**: `string`
 
-Defined in: [core/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L212)
+Defined in: [core/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L212)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [core/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **location?**: [`SourceLocation`](SourceLocation.md)
 
-Defined in: [core/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L210)
+Defined in: [core/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L210)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [core/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/
 
 > **message**: `string`
 
-Defined in: [core/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L209)
+Defined in: [core/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L209)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [core/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **nodeId?**: `string`
 
-Defined in: [core/src/types.ts:211](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/core/src/types.ts#L211)
+Defined in: [core/src/types.ts:211](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L211)

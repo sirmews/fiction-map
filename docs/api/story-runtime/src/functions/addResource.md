@@ -8,7 +8,7 @@
 
 > **addResource**(`state`, `key`, `amount`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/core/state.ts:316](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L316)
+Defined in: [story-runtime/src/core/state.ts:317](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L317)
 
 ## Parameters
 

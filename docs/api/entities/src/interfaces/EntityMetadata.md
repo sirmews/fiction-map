@@ -6,7 +6,7 @@
 
 # Interface: EntityMetadata
 
-Defined in: [entities/src/types.ts:88](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L88)
+Defined in: [entities/src/types.ts:88](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L88)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [entities/src/types.ts:88](https://github.com/sirmews/fiction-map/bl
 
 > **entityTypes**: [`EntityTypeDefinition`](EntityTypeDefinition.md)[]
 
-Defined in: [entities/src/types.ts:89](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L89)
+Defined in: [entities/src/types.ts:89](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L89)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [entities/src/types.ts:89](https://github.com/sirmews/fiction-map/bl
 
 > **validation**: `object`
 
-Defined in: [entities/src/types.ts:91](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L91)
+Defined in: [entities/src/types.ts:91](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L91)
 
 #### errors
 
@@ -38,4 +38,4 @@ Defined in: [entities/src/types.ts:91](https://github.com/sirmews/fiction-map/bl
 
 > **worlds**: [`WorldDefinition`](WorldDefinition.md)[]
 
-Defined in: [entities/src/types.ts:90](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L90)
+Defined in: [entities/src/types.ts:90](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L90)

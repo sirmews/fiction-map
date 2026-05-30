@@ -8,4 +8,4 @@
 
 > **EntityPrerequisiteOperator** = `"has"` \| `"equals"` \| `"gte"` \| `"includes"`
 
-Defined in: [entities/src/types.ts:53](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/types.ts#L53)
+Defined in: [entities/src/types.ts:53](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L53)

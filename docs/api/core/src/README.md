@@ -24,16 +24,12 @@
 - [GraphConfig](interfaces/GraphConfig.md)
 - [GraphDefinition](interfaces/GraphDefinition.md)
 - [GraphMetadata](interfaces/GraphMetadata.md)
-- [GraphState](interfaces/GraphState.md)
 - [NodeInstance](interfaces/NodeInstance.md)
 - [NodeTypeConfig](interfaces/NodeTypeConfig.md)
 - [NodeTypeDefinition](interfaces/NodeTypeDefinition.md)
 - [PropertyDefinition](interfaces/PropertyDefinition.md)
 - [PropertySchema](interfaces/PropertySchema.md)
-- [Registry](interfaces/Registry.md)
 - [SourceLocation](interfaces/SourceLocation.md)
-- [TraceEvent](interfaces/TraceEvent.md)
-- [TraversalResult](interfaces/TraversalResult.md)
 - [ValidationError](interfaces/ValidationError.md)
 - [ValidationWarning](interfaces/ValidationWarning.md)
 
@@ -43,8 +39,10 @@
 
 ## Functions
 
+- [analyzeGraph](functions/analyzeGraph.md)
 - [defineCondition](functions/defineCondition.md)
 - [defineEdgeType](functions/defineEdgeType.md)
 - [defineEffect](functions/defineEffect.md)
 - [defineGraph](functions/defineGraph.md)
 - [defineNodeType](functions/defineNodeType.md)
+- [validateGraph](functions/validateGraph.md)

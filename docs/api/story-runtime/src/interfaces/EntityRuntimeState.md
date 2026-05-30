@@ -6,7 +6,7 @@
 
 # Interface: EntityRuntimeState
 
-Defined in: [story-runtime/src/types.ts:23](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L23)
+Defined in: [story-runtime/src/types.ts:23](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L23)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:23](https://github.com/sirmews/fiction-m
 
 > **active**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/types.ts:25](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L25)
+Defined in: [story-runtime/src/types.ts:25](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L25)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:25](https://github.com/sirmews/fiction-m
 
 > `optional` **extensions?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:28](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L28)
+Defined in: [story-runtime/src/types.ts:28](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L28)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:28](https://github.com/sirmews/fiction-m
 
 > **owned**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/types.ts:24](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L24)
+Defined in: [story-runtime/src/types.ts:24](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L24)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/types.ts:24](https://github.com/sirmews/fiction-m
 
 > **resources**: `Record`\<`string`, `number`\>
 
-Defined in: [story-runtime/src/types.ts:27](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L27)
+Defined in: [story-runtime/src/types.ts:27](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L27)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [story-runtime/src/types.ts:27](https://github.com/sirmews/fiction-m
 
 > **unlocked**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/types.ts:26](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L26)
+Defined in: [story-runtime/src/types.ts:26](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L26)

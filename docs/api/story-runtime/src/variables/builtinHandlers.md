@@ -8,4 +8,4 @@
 
 > `const` **builtinHandlers**: `Map`\<`string`, [`EffectHandler`](../type-aliases/EffectHandler.md)\>
 
-Defined in: [story-runtime/src/effects/builtin.ts:233](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/effects/builtin.ts#L233)
+Defined in: [story-runtime/src/default-bindings.ts:25](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/default-bindings.ts#L25)

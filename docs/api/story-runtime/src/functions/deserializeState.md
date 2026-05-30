@@ -8,11 +8,13 @@
 
 > **deserializeState**(`data`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/core/state.ts:409](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L409)
+Defined in: [story-runtime/src/core/state.ts:414](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L414)
 
 Restore state from a serialized format.
 
-Arrays are converted back to Sets.
+Arrays are converted back to Sets. Unknown `schemaVersion` values are
+rejected with a descriptive error; the consumer must migrate the data
+to the current version before calling this function.
 
 ## Parameters
 

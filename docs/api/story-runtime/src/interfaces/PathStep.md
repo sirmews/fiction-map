@@ -6,7 +6,7 @@
 
 # Interface: PathStep
 
-Defined in: [story-runtime/src/runtime.ts:35](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L35)
+Defined in: [story-runtime/src/runtime.ts:36](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L36)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/runtime.ts:35](https://github.com/sirmews/fiction
 
 > **fromNodeId**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:37](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L37)
+Defined in: [story-runtime/src/runtime.ts:38](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L38)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/runtime.ts:37](https://github.com/sirmews/fiction
 
 > **success**: `boolean`
 
-Defined in: [story-runtime/src/runtime.ts:39](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L39)
+Defined in: [story-runtime/src/runtime.ts:40](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L40)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/runtime.ts:39](https://github.com/sirmews/fiction
 
 > **toNodeId**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:38](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L38)
+Defined in: [story-runtime/src/runtime.ts:39](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L39)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [story-runtime/src/runtime.ts:38](https://github.com/sirmews/fiction
 
 > **transitionId**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:36](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/runtime.ts#L36)
+Defined in: [story-runtime/src/runtime.ts:37](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L37)

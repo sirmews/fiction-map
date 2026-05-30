@@ -6,7 +6,7 @@
 
 # Interface: EntityTransitionReferenceValidationResult
 
-Defined in: [story-runtime/src/types.ts:183](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L183)
+Defined in: [story-runtime/src/types.ts:183](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L183)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:183](https://github.com/sirmews/fiction-
 
 > **errors**: [`EntityTransitionReferenceError`](EntityTransitionReferenceError.md)[]
 
-Defined in: [story-runtime/src/types.ts:185](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L185)
+Defined in: [story-runtime/src/types.ts:185](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L185)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [story-runtime/src/types.ts:185](https://github.com/sirmews/fiction-
 
 > **valid**: `boolean`
 
-Defined in: [story-runtime/src/types.ts:184](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L184)
+Defined in: [story-runtime/src/types.ts:184](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L184)

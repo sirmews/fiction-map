@@ -6,7 +6,7 @@
 
 # Interface: EffectContext
 
-Defined in: [story-runtime/src/types.ts:68](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L68)
+Defined in: [story-runtime/src/types.ts:68](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L68)
 
 ## Indexable
 
@@ -18,7 +18,7 @@ Defined in: [story-runtime/src/types.ts:68](https://github.com/sirmews/fiction-m
 
 > `optional` **registry?**: `unknown`
 
-Defined in: [story-runtime/src/types.ts:69](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L69)
+Defined in: [story-runtime/src/types.ts:69](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L69)
 
 ***
 
@@ -26,4 +26,4 @@ Defined in: [story-runtime/src/types.ts:69](https://github.com/sirmews/fiction-m
 
 > `optional` **scope?**: `string`
 
-Defined in: [story-runtime/src/types.ts:70](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/types.ts#L70)
+Defined in: [story-runtime/src/types.ts:70](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L70)

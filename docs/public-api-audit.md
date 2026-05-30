@@ -1,7 +1,7 @@
 # Public API Audit
 
 **Date:** 2026-05-19 (post-ergonomics refactor)
-**Context:** Snapshot of the current public surfaces of `@fiction-map/core`, `@fiction-map/entities`, and `@fiction-map/runtime` after Tasks 5–7 of the [engine-ergonomics plan](superpowers/plans/2026-05-18-engine-ergonomics.md) landed (commits `fe53a65`, `c932a16`, `438d95e`, `b370981`). Use this document to judge what is safe for a consumer Story Editor to depend on.
+**Context:** Snapshot of the public surfaces of `@fiction-map/core`, `@fiction-map/entities`, and `@fiction-map/runtime` after Tasks 5–7 of the [engine-ergonomics plan](superpowers/plans/2026-05-18-engine-ergonomics.md) landed (commits `fe53a65`, `c932a16`, `438d95e`, `b370981`), updated after the authored-graph runtime adapter work on 2026-05-30. Use this document to judge what is safe for a consumer Story Editor to depend on.
 
 The boundary this audit is measured against is documented in [docs/decisions/2026-05-16-headless-engine-direction.md](decisions/2026-05-16-headless-engine-direction.md).
 
@@ -20,11 +20,9 @@ Source: [`packages/core/src/index.ts`](../packages/core/src/index.ts).
 - **Types (re-exported via `export * from "./types"`):**
   `PropertyType`, `PropertySchema`, `PropertyDefinition`, `NodeTypeDefinition`, `EdgeTypeDefinition`, `ConditionDefinition`, `EffectDefinition`, `GraphDefinition`, `NodeInstance`, `EdgeInstance`, `ValidationError`, `ValidationWarning`, `SourceLocation`.
 
-### Known Smell — Split-Brain Runtime Types
+### Resolved Smell — Split-Brain Runtime Types
 
-`packages/core/src/types.ts` still defines and re-exports the legacy `GraphState`, `TraversalResult`, and `TraceEvent` shapes ([types.ts#L255-L290](../packages/core/src/types.ts#L255)). They overlap conceptually with the richer `GraphRuntimeState` / `TransitionResult` / `TransitionTrace` shapes in `@fiction-map/runtime`. They are reachable through `export * from "./types"` but are not used anywhere downstream.
-
-*Recommendation:* mark them `@deprecated` and plan a follow-up to remove them in the next minor.
+The legacy `GraphState`, `TraversalResult`, and `TraceEvent` shapes have been removed from `packages/core/src/types.ts`. Runtime state, transition results, and traces now live in `@fiction-map/runtime`.
 
 ### What is no longer exported
 
@@ -55,6 +53,7 @@ Source: [`packages/story-runtime/src/index.ts`](../packages/story-runtime/src/in
 ### Stable Consumer-Facing API (high level)
 
 - **High-Level Engine:** `GraphRuntime` and its companion types `StepResult`, `PathStep`, `TraversalPath`.
+- **Authored Graph Runtime Adapter:** `graphDefinitionToBlueprint`, `createRuntimeFromGraph`, plus the `GraphBlueprint`, `NodeBlueprint`, and `EdgeBlueprint` types accepted by `GraphRuntime`.
 - **State Lifecycle:** `createInitialState`, `serializeState`, `deserializeState`, `cloneState`, `mergeState`.
 - **Entity Derivation:** `deriveEntityState`, `ActiveEntityModifier`, `EntityPrerequisiteResult`, `DerivedEntityState`.
 - **Entity-Aware Validation:** `validateEntityTransitionReferences`, `EntityTransitionReferenceError`, `EntityTransitionReferenceValidationResult`.
@@ -75,17 +74,21 @@ These remain in `index.ts` and continue to power the literature-RPG example test
 - Graph validation primitives: `validateGraph`, `findReachableNodes`, `hasDanglingTransitions`, `hasUnreachableNodes`.
 - Individual built-in evaluators and handlers (`equalsEvaluator`, `setVariableHandler`, etc.) alongside the aggregated `builtinEvaluators` / `builtinHandlers` maps.
 
-*Recommendation:* keep them exported until `GraphRuntime` covers all current example flows, then move the individual primitives behind a `registerBuiltins(registry)` style entrypoint in a follow-up.
+*Recommendation:* keep them exported until `GraphRuntime` covers all current example flows. Consumers using metadata validation should prefer `registerBuiltins(registry)` over wiring individual built-in definitions manually.
 
 ### What Has Been Pruned
 
-The adapter layer is no longer in the public surface: `parseGraph`, `determineEndings`, `EdgeBlueprint`, `NodeBlueprint`, `GraphBlueprint`, `ParsedGraph`. They still exist in `packages/story-runtime/src/adapter.ts` for internal use by `GraphRuntime` but are not re-exported from `index.ts`.
+The low-level parser remains internal: `parseGraph`, `determineEndings`, and
+`ParsedGraph` are not part of the public surface. The blueprint types
+`GraphBlueprint`, `NodeBlueprint`, and `EdgeBlueprint` are exported because the
+public `GraphRuntime` constructor accepts that shape. Consumers that already
+have a core `GraphDefinition` should prefer `createRuntimeFromGraph()` or
+`graphDefinitionToBlueprint()` instead of hand-writing a blueprint.
 
 ---
 
 ## Gaps / Open Questions
 
-1. **Legacy core runtime types** (`GraphState`, `TraversalResult`, `TraceEvent`) should be deprecated and removed; nothing in the current packages reads them.
-2. **No `registerBuiltins(registry)` helper yet.** Consumers still wire `builtinEvaluators` / `builtinHandlers` manually, which is the lone friction point flagged by the Task 7 commit message but not fully addressed.
-3. **`GraphRuntime` parity.** Before lower-level helpers like `checkTransitionAvailability` are removed, `GraphRuntime` needs to demonstrate every current example flow (notably the `{ derivedState }` evaluation path used in [`literature-rpg.test.ts`](../packages/story-runtime/src/examples/literature-rpg.test.ts)).
-4. **TypeDoc output.** API reference now lives under [`docs/api/`](api/) (generated via `bun run docs:api`). It is currently committed; decide whether to keep it in git or generate on demand.
+1. **`GraphRuntime.walk()` context recomputation.** The consumer app still uses an explicit `getByAvailability()` + `step()` loop because derived state must be recomputed between transitions.
+2. **Lower-level helper exports.** Before helpers like `checkTransitionAvailability` are removed, `GraphRuntime` needs to demonstrate every current example flow.
+3. **TypeDoc output.** API reference now lives under [`docs/api/`](api/) (generated via `bun run docs:api`). It is currently committed; decide whether to keep it in git or generate on demand.

@@ -8,4 +8,4 @@
 
 > `const` **greaterThanEvaluator**: [`ConditionEvaluator`](../type-aliases/ConditionEvaluator.md)
 
-Defined in: [story-runtime/src/conditions/builtin.ts:36](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/conditions/builtin.ts#L36)
+Defined in: [story-runtime/src/conditions/builtin.ts:37](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/conditions/builtin.ts#L37)

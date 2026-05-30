@@ -8,7 +8,7 @@
 
 > **defineWorld**(`registry`, `config`): [`WorldDefinition`](../interfaces/WorldDefinition.md)
 
-Defined in: [entities/src/world.ts:222](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/entities/src/world.ts#L222)
+Defined in: [entities/src/world.ts:222](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/world.ts#L222)
 
 ## Parameters
 

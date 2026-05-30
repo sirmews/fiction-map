@@ -8,7 +8,7 @@
 
 > **entityIsActive**(`state`, `entityId`): `boolean`
 
-Defined in: [story-runtime/src/core/state.ts:290](https://github.com/sirmews/fiction-map/blob/b370981c8043baa0195ceed6d309f2ea761ca379/packages/story-runtime/src/core/state.ts#L290)
+Defined in: [story-runtime/src/core/state.ts:291](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L291)
 
 ## Parameters
 
