@@ -180,6 +180,12 @@ export {
   type TraversalPath,
 } from "./runtime";
 
+// Graph definition adapter
+export {
+  graphDefinitionToBlueprint,
+  createRuntimeFromGraph,
+} from "./graph-definition";
+
 // Blueprint types accepted by the GraphRuntime constructor
 export type {
   GraphBlueprint,

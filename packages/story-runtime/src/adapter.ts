@@ -10,6 +10,7 @@ export interface EdgeBlueprint {
   failureEffects?: Effect[]
   failureTarget?: string
   label?: string
+  metadata?: Record<string, unknown>
 }
 
 export interface NodeBlueprint {
@@ -42,6 +43,7 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
     effects: e.effects?.length ? e.effects : undefined,
     failureEffects: e.failureEffects?.length ? e.failureEffects : undefined,
     failureTargetNodeId: e.failureTarget,
+    metadata: e.metadata,
   }))
 
   const startNodeId =
