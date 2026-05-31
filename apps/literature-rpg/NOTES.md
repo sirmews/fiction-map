@@ -45,18 +45,17 @@ $ bun x fiction-map generate --root-dir src --check
 ✅ Generated artifacts are up to date.
 ```
 
-## 4. Packages must be built before consumer apps work
+## 4. ~~Packages must be built before consumer apps work~~ ✅ FIXED
 
-**Severity:** medium. Affects every new contributor and CI run.
+**Severity:** medium.
 
-The packages publish `./dist/*` only (`exports: { ".": { "import": "./dist/index.js" } }`). If `dist/` is stale (e.g., a new export was added to `src/index.ts` but the package wasn't rebuilt), the consumer gets `TypeError: registerBuiltins is not a function` instead of a clear error.
+The workspace app now treats package rebuilds as part of its command lifecycle:
+- `start`, `generate`, `validate`, `test`, and `typecheck` run `bun run build:deps` first.
+- `build:deps` builds `@fiction-map/core`, `@fiction-map/entities`,
+  `@fiction-map/runtime`, and `fiction-map`.
 
-**Workaround:** `bun run build` at repo root before running this app.
-
-**Fix:** one of —
-- add a `prepare`/`postinstall` build step at root so workspace consumers always see fresh dist
-- expose `src/index.ts` directly via conditional exports for workspace dev (e.g. `"./*": { "amp-dev": "./src/*", "default": "./dist/*" }`)
-- ship publishConfig with a `prepublishOnly` build and rely on real npm installs for non-monorepo consumers
+This keeps app execution aligned with the current workspace sources without
+changing package exports or requiring hacky environment flags.
 
 ## 5. ~~`fiction-map validate` rejects built-in runtime condition types~~ ✅ FIXED
 

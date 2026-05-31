@@ -4,10 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build:deps": "bun run --filter @fiction-map/core build && bun run --filter @fiction-map/entities build && bun run --filter @fiction-map/runtime build && bun run --filter fiction-map build",
+    "prestart": "bun run build:deps",
     "start": "bun run src/main.ts",
+    "pregenerate": "bun run build:deps",
     "generate": "bun node_modules/fiction-map/dist/cli.js generate --root-dir src",
+    "prevalidate": "bun run build:deps",
     "validate": "bun node_modules/fiction-map/dist/cli.js validate --root-dir src",
+    "pretest": "bun run build:deps",
     "test": "vitest run",
+    "pretypecheck": "bun run build:deps",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
