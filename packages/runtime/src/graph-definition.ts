@@ -38,8 +38,20 @@ function graphEdgeToBlueprint(edge: EdgeInstance): EdgeBlueprint {
     blueprint.conditions = edge.conditions
   }
 
+  if (Array.isArray(edge.visibility) && edge.visibility.length) {
+    blueprint.visibility = edge.visibility as any
+  }
+
   if (edge.effects?.length) {
     blueprint.effects = edge.effects
+  }
+
+  if (Array.isArray(edge.failureEffects) && edge.failureEffects.length) {
+    blueprint.failureEffects = edge.failureEffects as any
+  }
+
+  if (typeof edge.failureTarget === "string") {
+    blueprint.failureTarget = edge.failureTarget
   }
 
   if (typeof edge.text === "string") {

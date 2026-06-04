@@ -300,13 +300,13 @@ Status verified against source tree on 2026-05-26.
 
 ---
 
-### Milestone 5: Polish
+### Milestone 5: Polish ✅ COMPLETE
 
-- [ ] Error messages
-- [ ] Documentation
-- [ ] Examples (story, workflow, game)
-- [ ] Testing
-- [ ] Performance
+- [x] Error messages (`RegistryError`, `RuntimeError` classes added, CLI output refined)
+- [x] Documentation (`consumer-usage-guide.md` and codebase TSDocs updated)
+- [x] Examples (story, workflow, game provided via `packages/runtime/src/examples/` and `apps/literature-rpg`)
+- [x] Testing (Full suite passing, including end-to-end traversal scenarios)
+- [x] Performance (Derived-state `walkWithContext` loop optimization added)
 
 **Deliverable:** v1.0.0 release
 
