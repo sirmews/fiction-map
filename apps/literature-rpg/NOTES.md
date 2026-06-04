@@ -106,7 +106,7 @@ Bun's `import.meta.main` is not in the standard `ImportMeta` lib type. Consumers
 
 **Fix:** suggest adding `@types/bun` in the consumer-usage guide, or recommend an explicit entry pattern instead of `import.meta.main`.
 
-## 10. `GraphRuntime.walk()` is too static for derived-state-driven traversal
+## 10. ~~`GraphRuntime.walk()` is too static for derived-state-driven traversal~~ ✅ FIXED
 
 **Severity:** low. Not a blocker, but it weakens the highest-level runtime ergonomics.
 
@@ -124,9 +124,7 @@ walk, which does not fit this pattern cleanly.
 **Workaround:** use an explicit loop for any consumer flow where transition
 availability depends on derived state that changes during traversal.
 
-**Fix:** either document `walk()` as a low-level primitive, or add a higher-level
-helper such as `walkWithContext(state, makeContext)` or `walkDerived(world, state)`
-that recomputes context between steps.
+**Fix:** Added a new `walkWithContext(state, makeContext)` helper that recomputes context between steps, which `apps/literature-rpg/src/main.ts` now uses.
 
 ---
 

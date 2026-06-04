@@ -192,3 +192,6 @@ export type {
   NodeBlueprint,
   EdgeBlueprint,
 } from "./adapter";
+
+// Export runtime error for convenience
+export { RuntimeError } from "@fiction-map/core";

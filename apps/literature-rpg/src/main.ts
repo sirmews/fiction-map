@@ -24,17 +24,22 @@ export function playOnce(): { reachedEnding: boolean; visited: string[] } {
   let state = createInitialState(runtime.startNodeId);
   const visited: string[] = [state.currentNodeId];
 
-  while (true) {
-    const derivedState = deriveEntityState(world, state);
-    const { available } = runtime.getByAvailability(state, { derivedState });
-    if (available.length === 0) break;
+  const steps = runtime.walkWithContext(state, (currentState) => {
+    return { derivedState: deriveEntityState(world, currentState) };
+  });
 
-    const choice = available[0];
-    const result = runtime.step(state, choice, { derivedState });
-    if (!result.success) break;
-
-    state = result.state;
-    visited.push(state.currentNodeId);
+  if (steps.length > 0) {
+    // The last step returned gives us the final state.
+    // walkWithContext pushes a final "empty available" StepResult if no transitions remain.
+    const lastStep = steps[steps.length - 1];
+    state = lastStep.state;
+    
+    // Add visited nodes (skipping the first one as it's already in the array)
+    for (const step of steps) {
+      if (step.applied) {
+        visited.push(step.state.currentNodeId);
+      }
+    }
   }
 
   return {

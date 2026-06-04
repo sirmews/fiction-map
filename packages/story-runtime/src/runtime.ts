@@ -131,6 +131,63 @@ export class GraphRuntime {
     )
   }
 
+  /**
+   * Traverse the graph continuously until no more transitions are available.
+   * Useful for derived-state scenarios where the context needs to be recomputed
+   * after every step (e.g. updating character stats or entities).
+   * 
+   * @param state - The starting state
+   * @param makeContext - A callback invoked before each step to provide the context
+   * @param maxSteps - Safety limit (default 100)
+   */
+  walkWithContext(
+    state: GraphRuntimeState,
+    makeContext: (state: GraphRuntimeState) => EvaluationContext & EffectContext,
+    maxSteps: number = 100
+  ): StepResult[] {
+    const steps: StepResult[] = []
+
+    for (let i = 0; i < maxSteps; i++) {
+      const context = makeContext(state)
+      const available = this.getAvailable(state, context)
+
+      if (available.length === 0) {
+        steps.push({
+          state: cloneState(state),
+          nodeId: state.currentNodeId,
+          available: [],
+          applied: null,
+        })
+        break
+      }
+
+      const result = this.step(state, available[0], context)
+      
+      const stepResult: StepResult = {
+        state: result.state,
+        nodeId: result.state.currentNodeId,
+        available,
+        applied: result
+      }
+      
+      steps.push(stepResult)
+      
+      // Update state for the next iteration
+      state = result.state
+    }
+
+    return steps
+  }
+
+  /**
+   * Traverse the graph continuously until no more transitions are available.
+   * Uses a static context object for the entire walk. For derived-state usage,
+   * prefer `walkWithContext`.
+   * 
+   * @param state - The starting state
+   * @param maxSteps - Safety limit (default 100)
+   * @param context - Static context for the evaluation and effects
+   */
   walk(
     state: GraphRuntimeState,
     maxSteps: number = 100,

@@ -13,6 +13,7 @@ import {
   SourceLocation,
 } from "./types"
 import type { ProjectRegistry } from "./registry"
+import { RegistryError } from "./errors"
 
 function formatKnownValues(values: string[], label: string): string {
   return values.length > 0
@@ -360,11 +361,11 @@ function findEndings(nodes: NodeInstance[], edges: EdgeInstance[]): string[] {
  */
 export function defineGraph(registry: ProjectRegistry, config: GraphConfig): GraphDefinition {
   if (!config.id) {
-    throw new Error("Graph must have an id")
+    throw new RegistryError("Graph must have an id", "ERR_REGISTRY_MISSING_ID")
   }
   
   if (registry.graphs.has(config.id)) {
-    throw new Error(`Graph "${config.id}" is already defined in this registry`)
+    throw new RegistryError(`Graph "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
   }
   
   const analysis = analyzeGraph(registry, config.nodes, config.edges)

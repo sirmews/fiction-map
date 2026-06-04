@@ -4,6 +4,7 @@
 
 import { NodeTypeDefinition, NodeTypeConfig, PropertyDefinition, SourceLocation } from "./types"
 import type { ProjectRegistry } from "./registry"
+import { RegistryError } from "./errors"
 
 /**
  * Get the current call site for source location
@@ -46,11 +47,11 @@ function getCallSite(): SourceLocation {
  */
 export function defineNodeType(registry: ProjectRegistry, config: NodeTypeConfig): NodeTypeDefinition {
   if (!config.id) {
-    throw new Error("Node type must have an id")
+    throw new RegistryError("Node type must have an id", "ERR_REGISTRY_MISSING_ID")
   }
   
   if (registry.nodeTypes.has(config.id)) {
-    throw new Error(`Node type "${config.id}" is already defined in this registry`)
+    throw new RegistryError(`Node type "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
   }
   
   const definition: NodeTypeDefinition = {

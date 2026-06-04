@@ -4,6 +4,7 @@
 
 import { ConditionDefinition, ConditionConfig, SourceLocation } from "./types"
 import type { ProjectRegistry } from "./registry"
+import { RegistryError } from "./errors"
 
 /**
  * Get the current call site for source location
@@ -40,11 +41,11 @@ function getCallSite(): SourceLocation {
  */
 export function defineCondition(registry: ProjectRegistry, config: ConditionConfig): ConditionDefinition {
   if (!config.id) {
-    throw new Error("Condition must have an id")
+    throw new RegistryError("Condition must have an id", "ERR_REGISTRY_MISSING_ID")
   }
   
   if (registry.conditions.has(config.id)) {
-    throw new Error(`Condition "${config.id}" is already defined in this registry`)
+    throw new RegistryError(`Condition "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
   }
   
   const definition: ConditionDefinition = {

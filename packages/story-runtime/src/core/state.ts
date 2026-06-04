@@ -5,6 +5,7 @@ import type {
   SerializableState,
 } from "../types";
 import { SERIALIZATION_SCHEMA_VERSION } from "../types";
+import { RuntimeError } from "@fiction-map/core";
 
 /**
  * Create initial state at a starting node.
@@ -413,10 +414,11 @@ export function serializeState(state: GraphRuntimeState): SerializableState {
  */
 export function deserializeState(data: SerializableState): GraphRuntimeState {
   if (data.schemaVersion !== SERIALIZATION_SCHEMA_VERSION) {
-    throw new Error(
+    throw new RuntimeError(
       `Unsupported save schemaVersion: ${data.schemaVersion}. ` +
         `Current version is ${SERIALIZATION_SCHEMA_VERSION}. ` +
-        `Migrate the data before calling deserializeState.`
+        `Migrate the data before calling deserializeState.`,
+      "ERR_RUNTIME_SCHEMA_MISMATCH"
     );
   }
 

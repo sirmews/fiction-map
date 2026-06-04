@@ -4,6 +4,7 @@
 
 import { EdgeTypeDefinition, EdgeTypeConfig, SourceLocation } from "./types"
 import type { ProjectRegistry } from "./registry"
+import { RegistryError } from "./errors"
 
 /**
  * Get the current call site for source location
@@ -44,11 +45,11 @@ function getCallSite(): SourceLocation {
  */
 export function defineEdgeType(registry: ProjectRegistry, config: EdgeTypeConfig): EdgeTypeDefinition {
   if (!config.id) {
-    throw new Error("Edge type must have an id")
+    throw new RegistryError("Edge type must have an id", "ERR_REGISTRY_MISSING_ID")
   }
   
   if (registry.edgeTypes.has(config.id)) {
-    throw new Error(`Edge type "${config.id}" is already defined in this registry`)
+    throw new RegistryError(`Edge type "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
   }
   
   const definition: EdgeTypeDefinition = {

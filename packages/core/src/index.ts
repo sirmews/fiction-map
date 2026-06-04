@@ -7,6 +7,9 @@
 // Types
 export * from "./types"
 
+// Errors
+export * from "./errors"
+
 // Registry
 export { ProjectRegistry } from "./registry"
 

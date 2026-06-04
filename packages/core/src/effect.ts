@@ -4,6 +4,7 @@
 
 import { EffectDefinition, EffectConfig, SourceLocation } from "./types"
 import type { ProjectRegistry } from "./registry"
+import { RegistryError } from "./errors"
 
 /**
  * Get the current call site for source location
@@ -41,11 +42,11 @@ function getCallSite(): SourceLocation {
  */
 export function defineEffect(registry: ProjectRegistry, config: EffectConfig): EffectDefinition {
   if (!config.id) {
-    throw new Error("Effect must have an id")
+    throw new RegistryError("Effect must have an id", "ERR_REGISTRY_MISSING_ID")
   }
   
   if (registry.effects.has(config.id)) {
-    throw new Error(`Effect "${config.id}" is already defined in this registry`)
+    throw new RegistryError(`Effect "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
   }
   
   const definition: EffectDefinition = {
