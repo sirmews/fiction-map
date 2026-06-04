@@ -96,13 +96,13 @@ const runtime = new GraphRuntime(blueprint);
 
 **Fix:** when `--root-dir` is set but `--output-dir` is not, default `--output-dir` to the project root (parent of `--root-dir`) or to cwd. Done in the generator CLI configuration.
 
-## 9. `import.meta.main` requires a cast under tsc
+## 9. ~~`import.meta.main` requires a cast under tsc~~ ✅ FIXED
 
 **Severity:** trivial.
 
 Bun's `import.meta.main` is not in the standard `ImportMeta` lib type. Consumers using `bun run src/main.ts` as an entry point need to cast or add `@types/bun`. This app casts inline.
 
-**Fix:** suggest adding `@types/bun` in the consumer-usage guide, or recommend an explicit entry pattern instead of `import.meta.main`.
+**Fix:** Added a note to the consumer usage guide recommending the `@types/bun` dev dependency.
 
 ## 10. ~~`GraphRuntime.walk()` is too static for derived-state-driven traversal~~ ✅ FIXED
 

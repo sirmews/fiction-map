@@ -263,3 +263,5 @@ Note that `dark-cave` was never explicitly stored as `unlocked` in runtime state
 5. Run the simulation using `@fiction-map/runtime`, passing `{ derivedState }` so cascaded unlocks Just Work.
 
 Your consumer app wraps all of these calls in visual panels, menus, save/load serialization, and gameplay rendering loops.
+
+*Note for Bun users: If you are building an executable consumer app (e.g. `bun run src/main.ts`) and relying on `import.meta.main` for entry point detection, make sure to install `@types/bun` as a dev dependency so TypeScript recognizes the extension.*
