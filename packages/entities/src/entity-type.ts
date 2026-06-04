@@ -1,4 +1,5 @@
 import type { SourceLocation } from "@fiction-map/core"
+import { RegistryError } from "@fiction-map/core"
 import type { EntityTypeConfig, EntityTypeDefinition } from "./types"
 import type { EntityRegistry } from "./registry"
 
@@ -20,11 +21,11 @@ function getCallSite(): SourceLocation {
 
 export function defineEntityType(registry: EntityRegistry, config: EntityTypeConfig): EntityTypeDefinition {
   if (!config.id) {
-    throw new Error("Entity type must have an id")
+    throw new RegistryError("Entity type must have an id", "ERR_REGISTRY_MISSING_ID")
   }
 
   if (registry.entityTypes.has(config.id)) {
-    throw new Error(`Entity type "${config.id}" is already defined in this registry`)
+    throw new RegistryError(`Entity type "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
   }
 
   const definition: EntityTypeDefinition = {

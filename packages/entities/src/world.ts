@@ -1,8 +1,9 @@
-import type {
-  PropertySchema,
-  SourceLocation,
-  ValidationError,
-  ValidationWarning,
+import {
+  RegistryError,
+  type PropertySchema,
+  type SourceLocation,
+  type ValidationError,
+  type ValidationWarning,
 } from "@fiction-map/core"
 import type { EntityRegistry } from "./registry"
 import type {
@@ -221,11 +222,11 @@ function validateWorld(
 
 export function defineWorld(registry: EntityRegistry, config: WorldConfig): WorldDefinition {
   if (!config.id) {
-    throw new Error("World must have an id")
+    throw new RegistryError("World must have an id", "ERR_REGISTRY_MISSING_ID")
   }
 
   if (registry.worlds.has(config.id)) {
-    throw new Error(`World "${config.id}" is already defined in this registry`)
+    throw new RegistryError(`World "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
   }
 
   const { errors, warnings } = validateWorld(registry, config.entities)
