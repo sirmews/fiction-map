@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / NodeBlueprint
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / NodeBlueprint
 
 # Interface: NodeBlueprint
 
-Defined in: [story-runtime/src/adapter.ts:16](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L16)
+Defined in: [runtime/src/adapter.ts:16](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L16)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/adapter.ts:16](https://github.com/sirmews/fiction
 
 > **id**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L17)
+Defined in: [runtime/src/adapter.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L17)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [story-runtime/src/adapter.ts:17](https://github.com/sirmews/fiction
 
 > `optional` **type?**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:18](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L18)
+Defined in: [runtime/src/adapter.ts:18](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L18)

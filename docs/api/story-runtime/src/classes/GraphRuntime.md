@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / GraphRuntime
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / GraphRuntime
 
 # Class: GraphRuntime
 
-Defined in: [story-runtime/src/runtime.ts:50](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L50)
+Defined in: [runtime/src/runtime.ts:50](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L50)
 
 ## Constructors
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/runtime.ts:50](https://github.com/sirmews/fiction
 
 > **new GraphRuntime**(`blueprint`, `evaluators?`, `handlers?`): `GraphRuntime`
 
-Defined in: [story-runtime/src/runtime.ts:55](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L55)
+Defined in: [runtime/src/runtime.ts:55](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L55)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [story-runtime/src/runtime.ts:55](https://github.com/sirmews/fiction
 
 > **get** **endingNodeIds**(): `Set`\<`string`\>
 
-Defined in: [story-runtime/src/runtime.ts:77](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L77)
+Defined in: [runtime/src/runtime.ts:77](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L77)
 
 ##### Returns
 
@@ -56,7 +56,7 @@ Defined in: [story-runtime/src/runtime.ts:77](https://github.com/sirmews/fiction
 
 > **get** **nodes**(): `Map`\<`string`, [`NodeDefinition`](../interfaces/NodeDefinition.md)\>
 
-Defined in: [story-runtime/src/runtime.ts:69](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L69)
+Defined in: [runtime/src/runtime.ts:69](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L69)
 
 ##### Returns
 
@@ -70,7 +70,7 @@ Defined in: [story-runtime/src/runtime.ts:69](https://github.com/sirmews/fiction
 
 > **get** **startNodeId**(): `string`
 
-Defined in: [story-runtime/src/runtime.ts:73](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L73)
+Defined in: [runtime/src/runtime.ts:73](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L73)
 
 ##### Returns
 
@@ -84,7 +84,7 @@ Defined in: [story-runtime/src/runtime.ts:73](https://github.com/sirmews/fiction
 
 > **get** **transitions**(): [`Transition`](../interfaces/Transition.md)[]
 
-Defined in: [story-runtime/src/runtime.ts:65](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L65)
+Defined in: [runtime/src/runtime.ts:65](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L65)
 
 ##### Returns
 
@@ -96,7 +96,7 @@ Defined in: [story-runtime/src/runtime.ts:65](https://github.com/sirmews/fiction
 
 > **createState**(`initialVariables?`, `initialExtensions?`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/runtime.ts:85](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L85)
+Defined in: [runtime/src/runtime.ts:85](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L85)
 
 #### Parameters
 
@@ -118,7 +118,7 @@ Defined in: [story-runtime/src/runtime.ts:85](https://github.com/sirmews/fiction
 
 > **enumeratePaths**(`maxDepth?`, `maxPaths?`, `context?`): [`TraversalPath`](../interfaces/TraversalPath.md)[]
 
-Defined in: [story-runtime/src/runtime.ts:168](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L168)
+Defined in: [runtime/src/runtime.ts:168](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L168)
 
 #### Parameters
 
@@ -144,7 +144,7 @@ Defined in: [story-runtime/src/runtime.ts:168](https://github.com/sirmews/fictio
 
 > **getAvailable**(`state`, `context?`): [`Transition`](../interfaces/Transition.md)[]
 
-Defined in: [story-runtime/src/runtime.ts:96](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L96)
+Defined in: [runtime/src/runtime.ts:96](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L96)
 
 #### Parameters
 
@@ -166,7 +166,7 @@ Defined in: [story-runtime/src/runtime.ts:96](https://github.com/sirmews/fiction
 
 > **getByAvailability**(`state`, `context?`): `object`
 
-Defined in: [story-runtime/src/runtime.ts:108](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L108)
+Defined in: [runtime/src/runtime.ts:108](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L108)
 
 #### Parameters
 
@@ -200,7 +200,7 @@ Defined in: [story-runtime/src/runtime.ts:108](https://github.com/sirmews/fictio
 
 > **isEnding**(`nodeId`): `boolean`
 
-Defined in: [story-runtime/src/runtime.ts:81](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L81)
+Defined in: [runtime/src/runtime.ts:81](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L81)
 
 #### Parameters
 
@@ -218,7 +218,7 @@ Defined in: [story-runtime/src/runtime.ts:81](https://github.com/sirmews/fiction
 
 > **step**(`state`, `transition`, `context?`): [`TransitionResult`](../interfaces/TransitionResult.md)
 
-Defined in: [story-runtime/src/runtime.ts:120](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L120)
+Defined in: [runtime/src/runtime.ts:120](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L120)
 
 #### Parameters
 
@@ -244,7 +244,7 @@ Defined in: [story-runtime/src/runtime.ts:120](https://github.com/sirmews/fictio
 
 > **validate**(): [`ValidationResult`](../interfaces/ValidationResult.md)
 
-Defined in: [story-runtime/src/runtime.ts:240](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L240)
+Defined in: [runtime/src/runtime.ts:240](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L240)
 
 #### Returns
 
@@ -256,7 +256,7 @@ Defined in: [story-runtime/src/runtime.ts:240](https://github.com/sirmews/fictio
 
 > **walk**(`state`, `maxSteps?`, `context?`): [`StepResult`](../interfaces/StepResult.md)[]
 
-Defined in: [story-runtime/src/runtime.ts:134](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L134)
+Defined in: [runtime/src/runtime.ts:134](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L134)
 
 #### Parameters
 

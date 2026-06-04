@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / applyTransition
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / applyTransition
 
 # Function: applyTransition()
 
 > **applyTransition**(`state`, `transition`, `evaluators`, `handlers`, `context?`): [`TransitionResult`](../interfaces/TransitionResult.md)
 
-Defined in: [story-runtime/src/core/transition.ts:107](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/transition.ts#L107)
+Defined in: [runtime/src/core/transition.ts:107](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/transition.ts#L107)
 
 Execute a transition.
 

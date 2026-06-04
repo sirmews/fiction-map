@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / serializeState
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / serializeState
 
 # Function: serializeState()
 
 > **serializeState**(`state`): [`SerializableState`](../interfaces/SerializableState.md)
 
-Defined in: [story-runtime/src/core/state.ts:394](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L394)
+Defined in: [runtime/src/core/state.ts:394](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/state.ts#L394)
 
 Convert state to a JSON-serializable format.
 

@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / EdgeBlueprint
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / EdgeBlueprint
 
 # Interface: EdgeBlueprint
 
-Defined in: [story-runtime/src/adapter.ts:3](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L3)
+Defined in: [runtime/src/adapter.ts:3](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L3)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/adapter.ts:3](https://github.com/sirmews/fiction-
 
 > `optional` **conditions?**: [`Condition`](Condition.md)[]
 
-Defined in: [story-runtime/src/adapter.ts:7](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L7)
+Defined in: [runtime/src/adapter.ts:7](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L7)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/adapter.ts:7](https://github.com/sirmews/fiction-
 
 > `optional` **effects?**: [`Effect`](Effect.md)[]
 
-Defined in: [story-runtime/src/adapter.ts:9](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L9)
+Defined in: [runtime/src/adapter.ts:9](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L9)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/adapter.ts:9](https://github.com/sirmews/fiction-
 
 > `optional` **failureEffects?**: [`Effect`](Effect.md)[]
 
-Defined in: [story-runtime/src/adapter.ts:10](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L10)
+Defined in: [runtime/src/adapter.ts:10](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L10)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/adapter.ts:10](https://github.com/sirmews/fiction
 
 > `optional` **failureTarget?**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:11](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L11)
+Defined in: [runtime/src/adapter.ts:11](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L11)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [story-runtime/src/adapter.ts:11](https://github.com/sirmews/fiction
 
 > **id**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:4](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L4)
+Defined in: [runtime/src/adapter.ts:4](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L4)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [story-runtime/src/adapter.ts:4](https://github.com/sirmews/fiction-
 
 > `optional` **label?**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:12](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L12)
+Defined in: [runtime/src/adapter.ts:12](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L12)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [story-runtime/src/adapter.ts:12](https://github.com/sirmews/fiction
 
 > `optional` **metadata?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/adapter.ts:13](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L13)
+Defined in: [runtime/src/adapter.ts:13](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L13)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [story-runtime/src/adapter.ts:13](https://github.com/sirmews/fiction
 
 > **source**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:5](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L5)
+Defined in: [runtime/src/adapter.ts:5](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L5)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [story-runtime/src/adapter.ts:5](https://github.com/sirmews/fiction-
 
 > `optional` **target?**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:6](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L6)
+Defined in: [runtime/src/adapter.ts:6](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L6)
 
 ***
 
@@ -86,4 +86,4 @@ Defined in: [story-runtime/src/adapter.ts:6](https://github.com/sirmews/fiction-
 
 > `optional` **visibility?**: [`Condition`](Condition.md)[]
 
-Defined in: [story-runtime/src/adapter.ts:8](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L8)
+Defined in: [runtime/src/adapter.ts:8](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L8)

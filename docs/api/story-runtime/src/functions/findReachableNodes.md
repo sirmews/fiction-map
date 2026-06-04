@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / findReachableNodes
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / findReachableNodes
 
 # Function: findReachableNodes()
 
 > **findReachableNodes**(`nodes`, `transitions`, `startNodeId`): `Set`\<`string`\>
 
-Defined in: [story-runtime/src/core/validation.ts:156](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/validation.ts#L156)
+Defined in: [runtime/src/core/validation.ts:156](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/validation.ts#L156)
 
 Find all reachable nodes from a starting node.
 

@@ -4,7 +4,7 @@ This guide demonstrates how a separate consumer application (such as a Story Edi
 
 Fiction Map is a **headless framework**. It does not own your UI, your database persistence, or your specific game/narrative mechanics. Instead, it provides the generic abstractions for nodes, graphs, world entities, and state transitions.
 
-The examples below use a "Literature RPG" concept to illustrate the flow, matching the executable test found in [`packages/story-runtime/src/examples/literature-rpg.test.ts`](../packages/story-runtime/src/examples/literature-rpg.test.ts).
+The examples below use a "Literature RPG" concept to illustrate the flow, matching the executable test found in [`packages/runtime/src/examples/literature-rpg.test.ts`](../packages/runtime/src/examples/literature-rpg.test.ts).
 
 ## The Framework / Editor Boundary
 

@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / GraphRuntimeState
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / GraphRuntimeState
 
 # Interface: GraphRuntimeState
 
-Defined in: [story-runtime/src/types.ts:13](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L13)
+Defined in: [runtime/src/types.ts:13](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L13)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:13](https://github.com/sirmews/fiction-m
 
 > **currentNodeId**: `string`
 
-Defined in: [story-runtime/src/types.ts:14](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L14)
+Defined in: [runtime/src/types.ts:14](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L14)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:14](https://github.com/sirmews/fiction-m
 
 > `optional` **entityState?**: [`EntityRuntimeState`](EntityRuntimeState.md)
 
-Defined in: [story-runtime/src/types.ts:19](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L19)
+Defined in: [runtime/src/types.ts:19](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L19)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:19](https://github.com/sirmews/fiction-m
 
 > `optional` **extensions?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:20](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L20)
+Defined in: [runtime/src/types.ts:20](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L20)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/types.ts:20](https://github.com/sirmews/fiction-m
 
 > **flags**: `Record`\<`string`, `boolean` \| `string` \| `number`\>
 
-Defined in: [story-runtime/src/types.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L17)
+Defined in: [runtime/src/types.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L17)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [story-runtime/src/types.ts:17](https://github.com/sirmews/fiction-m
 
 > **history**: `string`[]
 
-Defined in: [story-runtime/src/types.ts:15](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L15)
+Defined in: [runtime/src/types.ts:15](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L15)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [story-runtime/src/types.ts:15](https://github.com/sirmews/fiction-m
 
 > **variables**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:16](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L16)
+Defined in: [runtime/src/types.ts:16](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L16)
 
 ***
 
@@ -62,4 +62,4 @@ Defined in: [story-runtime/src/types.ts:16](https://github.com/sirmews/fiction-m
 
 > **visited**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/types.ts:18](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L18)
+Defined in: [runtime/src/types.ts:18](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L18)

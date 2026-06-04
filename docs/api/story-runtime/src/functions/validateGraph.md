@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / validateGraph
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / validateGraph
 
 # Function: validateGraph()
 
 > **validateGraph**(`nodes`, `transitions`, `startNodeId`): [`ValidationResult`](../interfaces/ValidationResult.md)
 
-Defined in: [story-runtime/src/core/validation.ts:24](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/validation.ts#L24)
+Defined in: [runtime/src/core/validation.ts:24](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/validation.ts#L24)
 
 Validate graph integrity.
 

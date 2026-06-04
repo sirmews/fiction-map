@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / SerializableState
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / SerializableState
 
 # Interface: SerializableState
 
-Defined in: [story-runtime/src/types.ts:203](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L203)
+Defined in: [runtime/src/types.ts:203](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L203)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:203](https://github.com/sirmews/fiction-
 
 > **currentNodeId**: `string`
 
-Defined in: [story-runtime/src/types.ts:206](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L206)
+Defined in: [runtime/src/types.ts:206](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L206)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:206](https://github.com/sirmews/fiction-
 
 > `optional` **entityState?**: [`SerializableEntityState`](SerializableEntityState.md)
 
-Defined in: [story-runtime/src/types.ts:211](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L211)
+Defined in: [runtime/src/types.ts:211](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L211)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:211](https://github.com/sirmews/fiction-
 
 > `optional` **extensions?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L212)
+Defined in: [runtime/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L212)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/types.ts:212](https://github.com/sirmews/fiction-
 
 > **flags**: `Record`\<`string`, `boolean` \| `string` \| `number`\>
 
-Defined in: [story-runtime/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L209)
+Defined in: [runtime/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L209)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [story-runtime/src/types.ts:209](https://github.com/sirmews/fiction-
 
 > **history**: `string`[]
 
-Defined in: [story-runtime/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L207)
+Defined in: [runtime/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L207)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [story-runtime/src/types.ts:207](https://github.com/sirmews/fiction-
 
 > **schemaVersion**: `1`
 
-Defined in: [story-runtime/src/types.ts:205](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L205)
+Defined in: [runtime/src/types.ts:205](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L205)
 
 Schema version. Always equals `SERIALIZATION_SCHEMA_VERSION` on write.
 
@@ -64,7 +64,7 @@ Schema version. Always equals `SERIALIZATION_SCHEMA_VERSION` on write.
 
 > **variables**: `Record`\<`string`, `unknown`\>
 
-Defined in: [story-runtime/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L208)
+Defined in: [runtime/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L208)
 
 ***
 
@@ -72,4 +72,4 @@ Defined in: [story-runtime/src/types.ts:208](https://github.com/sirmews/fiction-
 
 > **visited**: `string`[]
 
-Defined in: [story-runtime/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L210)
+Defined in: [runtime/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L210)

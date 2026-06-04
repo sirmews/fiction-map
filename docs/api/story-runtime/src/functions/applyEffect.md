@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / applyEffect
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / applyEffect
 
 # Function: applyEffect()
 
 > **applyEffect**(`state`, `effect`, `handlers`, `context?`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/effects/index.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/effects/index.ts#L17)
+Defined in: [runtime/src/effects/index.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/effects/index.ts#L17)
 
 Apply a single effect using the provided handlers.
 

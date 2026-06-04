@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / TraversalPath
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / TraversalPath
 
 # Interface: TraversalPath
 
-Defined in: [story-runtime/src/runtime.ts:43](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L43)
+Defined in: [runtime/src/runtime.ts:43](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L43)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/runtime.ts:43](https://github.com/sirmews/fiction
 
 > **endedAt**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:46](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L46)
+Defined in: [runtime/src/runtime.ts:46](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L46)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/runtime.ts:46](https://github.com/sirmews/fiction
 
 > **finalNodeId**: `string`
 
-Defined in: [story-runtime/src/runtime.ts:45](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L45)
+Defined in: [runtime/src/runtime.ts:45](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L45)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/runtime.ts:45](https://github.com/sirmews/fiction
 
 > **state**: [`GraphRuntimeState`](GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/runtime.ts:47](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L47)
+Defined in: [runtime/src/runtime.ts:47](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L47)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [story-runtime/src/runtime.ts:47](https://github.com/sirmews/fiction
 
 > **steps**: [`PathStep`](PathStep.md)[]
 
-Defined in: [story-runtime/src/runtime.ts:44](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/runtime.ts#L44)
+Defined in: [runtime/src/runtime.ts:44](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/runtime.ts#L44)

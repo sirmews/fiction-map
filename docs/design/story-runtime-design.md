@@ -482,7 +482,7 @@ function createSchemaEvaluators(
 ## Package Structure
 
 ```
-packages/story-runtime/
+packages/runtime/
 ├── src/
 │   ├── index.ts                    # Public exports
 │   │

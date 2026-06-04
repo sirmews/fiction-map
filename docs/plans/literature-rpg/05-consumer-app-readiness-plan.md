@@ -101,7 +101,7 @@ example fixture.
 
 Actions:
 
-- Review `packages/story-runtime/src/examples/literature-rpg.test.ts`.
+- Review `packages/runtime/src/examples/literature-rpg.test.ts`.
 - Decide whether to keep it as an executable test, extract shared example data, or create a
   separate example package later.
 - Document the decision.

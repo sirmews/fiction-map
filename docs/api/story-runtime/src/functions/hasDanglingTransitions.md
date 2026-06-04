@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / hasDanglingTransitions
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / hasDanglingTransitions
 
 # Function: hasDanglingTransitions()
 
 > **hasDanglingTransitions**(`transitions`, `nodeIds`): `boolean`
 
-Defined in: [story-runtime/src/core/validation.ts:172](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/validation.ts#L172)
+Defined in: [runtime/src/core/validation.ts:172](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/validation.ts#L172)
 
 Check if a graph has dangling transitions.
 

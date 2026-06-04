@@ -93,7 +93,7 @@ git commit -m "refactor(core): replace global registries with ProjectRegistry cl
 - Modify: `packages/entities/src/entity-type.ts`
 - Modify: `packages/entities/src/world.ts`
 - Modify: `packages/entities/src/index.ts`
-- Modify: `packages/story-runtime/src/examples/literature-rpg.test.ts`
+- Modify: `packages/runtime/src/examples/literature-rpg.test.ts`
 
 - [ ] **Step 1: Create EntityRegistry class**
 
@@ -121,7 +121,7 @@ Modify `packages/entities/src/entity-type.ts` and `packages/entities/src/world.t
 
 - [ ] **Step 3: Fix runtime tests relying on entities**
 
-Update `packages/story-runtime/src/examples/literature-rpg.test.ts` to instantiate `new EntityRegistry()` and pass it to `defineEntityType` and `defineWorld`.
+Update `packages/runtime/src/examples/literature-rpg.test.ts` to instantiate `new EntityRegistry()` and pass it to `defineEntityType` and `defineWorld`.
 
 - [ ] **Step 4: Run tests**
 
@@ -131,20 +131,20 @@ Expected: PASS
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/entities packages/story-runtime/src/examples
+git add packages/entities packages/runtime/src/examples
 git commit -m "refactor(entities): replace global registries with EntityRegistry class"
 ```
 
 ### Task 3: Solve the Unlock Trap (Seamless Evaluation)
 
 **Files:**
-- Modify: `packages/story-runtime/src/types.ts`
-- Modify: `packages/story-runtime/src/core/transition.ts`
-- Modify: `packages/story-runtime/src/conditions/builtin.ts`
+- Modify: `packages/runtime/src/types.ts`
+- Modify: `packages/runtime/src/core/transition.ts`
+- Modify: `packages/runtime/src/conditions/builtin.ts`
 
 - [ ] **Step 1: Add DerivedState to EvaluationContext**
 
-Modify `packages/story-runtime/src/types.ts` to include `DerivedEntityState` in `EvaluationContext`:
+Modify `packages/runtime/src/types.ts` to include `DerivedEntityState` in `EvaluationContext`:
 
 ```typescript
 import type { DerivedEntityState } from "./entities/derived";
@@ -159,7 +159,7 @@ export interface EvaluationContext {
 
 - [ ] **Step 2: Update built-in entity evaluators**
 
-Modify `packages/story-runtime/src/conditions/builtin.ts`. Update `entityUnlockedEvaluator`, `hasEntityEvaluator`, and `entityActiveEvaluator` to check `context.derivedState.effectiveEntityIds` if provided.
+Modify `packages/runtime/src/conditions/builtin.ts`. Update `entityUnlockedEvaluator`, `hasEntityEvaluator`, and `entityActiveEvaluator` to check `context.derivedState.effectiveEntityIds` if provided.
 
 Example:
 ```typescript
@@ -175,7 +175,7 @@ export const entityUnlockedEvaluator: ConditionEvaluator = (state, condition, co
 
 - [ ] **Step 3: Update checkTransitionAvailability**
 
-Modify `packages/story-runtime/src/core/transition.ts` so that `checkTransitionAvailability` accepts an optional `EvaluationContext` and passes it to the evaluator.
+Modify `packages/runtime/src/core/transition.ts` so that `checkTransitionAvailability` accepts an optional `EvaluationContext` and passes it to the evaluator.
 
 - [ ] **Step 4: Verify in tests**
 
@@ -185,19 +185,19 @@ Update `literature-rpg.test.ts`. Create a test case showing that an entity in `d
 
 ```bash
 bun test
-git add packages/story-runtime
+git add packages/runtime
 git commit -m "feat(runtime): allow evaluators to seamlessly read from derived state"
 ```
 
 ### Task 4: Clean Up Noisy Public API
 
 **Files:**
-- Modify: `packages/story-runtime/src/index.ts`
+- Modify: `packages/runtime/src/index.ts`
 - Modify: `packages/core/src/index.ts`
 
 - [ ] **Step 1: Clean runtime exports**
 
-In `packages/story-runtime/src/index.ts`, remove exports for:
+In `packages/runtime/src/index.ts`, remove exports for:
 - `parseGraph`, `determineEndings`, `EdgeBlueprint`, `NodeBlueprint`, `GraphBlueprint`, `ParsedGraph` (keep them internal)
 - Simplify built-ins by exposing a `registerBuiltins(registry)` helper if applicable, or keep them grouped but obscure internal traversal loop functions like `checkTransitionAvailability` if `GraphRuntime` class is preferred. *For now, just un-export the adapter stuff.*
 
@@ -213,7 +213,7 @@ Expected: PASS
 - [ ] **Step 4: Commit**
 
 ```bash
-git add packages/core/src/index.ts packages/story-runtime/src/index.ts
+git add packages/core/src/index.ts packages/runtime/src/index.ts
 git commit -m "refactor: clean up noisy public exports"
 ```
 
@@ -239,7 +239,7 @@ Create `typedoc.json`:
   "entryPoints": [
     "packages/core/src/index.ts",
     "packages/entities/src/index.ts",
-    "packages/story-runtime/src/index.ts"
+    "packages/runtime/src/index.ts"
   ],
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown"],

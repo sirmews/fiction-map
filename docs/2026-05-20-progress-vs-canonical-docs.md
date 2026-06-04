@@ -22,10 +22,10 @@ Fiction Map is a TypeScript framework for building graph-based systems, inspired
 ### Code Artifacts Inspected
 1. `packages/core/src/registry.ts` – `ProjectRegistry` class implementation (minimal: Maps + clear())
 2. `packages/entities/src/registry.ts` – `EntityRegistry` (extends `ProjectRegistry`) implementation
-3. `packages/story-runtime/src/types.ts` – `EvaluationContext` with `derivedState` field (Line 49)
-4. `packages/story-runtime/src/index.ts` – Public API exports (pruned as per audit)
-5. `packages/story-runtime/src/runtime.ts` – `GraphRuntime` class (constructor leaks `GraphBlueprint` type from adapter)
-6. `packages/story-runtime/src/conditions/builtin.ts` – Entity evaluators import from `../core/state` (coupling confirmed)
+3. `packages/runtime/src/types.ts` – `EvaluationContext` with `derivedState` field (Line 49)
+4. `packages/runtime/src/index.ts` – Public API exports (pruned as per audit)
+5. `packages/runtime/src/runtime.ts` – `GraphRuntime` class (constructor leaks `GraphBlueprint` type from adapter)
+6. `packages/runtime/src/conditions/builtin.ts` – Entity evaluators import from `../core/state` (coupling confirmed)
 7. `packages/cli/src/commands/validate.ts` – CLI `validate` command (Milestone 4 artifact, reads static metadata)
 8. `packages/cli/src/commands/hooks.ts` – Git hooks command (Milestone 4 artifact)
 9. `packages/core/src/types.ts` – Contains legacy `GraphState`/`TraversalResult` types (flagged in audit)
@@ -192,7 +192,7 @@ The transition from global singletons to registry classes is genuinely the proje
 *Caveat*: The implementation is minimalist—just Maps with a `clear()` method. There's no duplicate ID detection, no event emission, no metrics. It works but is architecturally simple.
 
 **Derived State Integration**  
-`EvaluationContext.derivedState` (types.ts Line 49) is an elegant solution to the "Unlock Trap." Code inspection of `packages/story-runtime/src/conditions/builtin.ts` confirms built-in evaluators check `context?.derivedState` before falling back to runtime state. This allows cascading entity unlocks with zero developer overhead.
+`EvaluationContext.derivedState` (types.ts Line 49) is an elegant solution to the "Unlock Trap." Code inspection of `packages/runtime/src/conditions/builtin.ts` confirms built-in evaluators check `context?.derivedState` before falling back to runtime state. This allows cascading entity unlocks with zero developer overhead.
 
 **Two-Layer Validation Architecture**  
 An important distinction that deserves emphasis:
@@ -215,7 +215,7 @@ These are complementary layers serving different purposes (CI vs programmatic us
 The engine ergonomics plan (`docs/superpowers/plans/2026-05-18-engine-ergonomics.md`) has all tasks marked `[ ]` unchecked, but code confirms all tasks are implemented. This is an administrative issue, not an engineering gap.
 
 **Leaky Abstraction in Runtime**  
-The public API audit (`docs/public-api-audit.md`) said to remove adapter internals from exports. While `packages/story-runtime/src/index.ts` no longer exports `parseGraph` directly, the `GraphRuntime` constructor still accepts `GraphBlueprint` type from `./adapter`:
+The public API audit (`docs/public-api-audit.md`) said to remove adapter internals from exports. While `packages/runtime/src/index.ts` no longer exports `parseGraph` directly, the `GraphRuntime` constructor still accepts `GraphBlueprint` type from `./adapter`:
 ```typescript
 constructor(
   blueprint: GraphBlueprint,  // <-- type leak from adapter.ts
@@ -229,7 +229,7 @@ This is a type leak that violates the pruned API contract.
 The North Star mentions "CI validates graph integrity" but doesn't distinguish between static metadata validation and dynamic graph validation. This needs clearer documentation and possibly API unification.
 
 **Entity/Core Soft Coupling**  
-Confirmed by code inspection: `packages/story-runtime/src/conditions/builtin.ts` imports entity-specific helpers from `../core/state`:
+Confirmed by code inspection: `packages/runtime/src/conditions/builtin.ts` imports entity-specific helpers from `../core/state`:
 ```typescript
 import {
   ownsEntity,
@@ -254,7 +254,7 @@ All tooling assumes Bun and filter-based monorepo structure:
 
 **Literature-RPG Gravity**  
 Examples and tests are overwhelmingly narrative-RPG focused:
-- `packages/story-runtime/src/examples/literature-rpg.test.ts` is the main example
+- `packages/runtime/src/examples/literature-rpg.test.ts` is the main example
 - Derived unlock logic is specialized for narrative RPGs
 - May be over-engineered for generic graph use cases (workflows, state machines)
 
@@ -327,7 +327,7 @@ export class ProjectRegistry {
 }
 ```
 
-### EvaluationContext with derivedState (packages/story-runtime/src/types.ts)
+### EvaluationContext with derivedState (packages/runtime/src/types.ts)
 ```typescript
 export interface EvaluationContext {
   registry?: unknown
@@ -337,7 +337,7 @@ export interface EvaluationContext {
 }
 ```
 
-### GraphRuntime Constructor (Leaky Abstraction) (packages/story-runtime/src/runtime.ts)
+### GraphRuntime Constructor (Leaky Abstraction) (packages/runtime/src/runtime.ts)
 ```typescript
 // Type leak: GraphBlueprint is from adapter.ts, which should be internal
 constructor(
@@ -365,7 +365,7 @@ metadata = JSON.parse(raw) as GraphMetadata
   "entryPoints": [
     "packages/core/src/index.ts",
     "packages/entities/src/index.ts",
-    "packages/story-runtime/src/index.ts"
+    "packages/runtime/src/index.ts"
   ],
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown"],
@@ -374,7 +374,7 @@ metadata = JSON.parse(raw) as GraphMetadata
 }
 ```
 
-### Entity Evaluators Coupling (packages/story-runtime/src/conditions/builtin.ts)
+### Entity Evaluators Coupling (packages/runtime/src/conditions/builtin.ts)
 ```typescript
 // Soft coupling: runtime built-ins import from core/state
 import {

@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / getAvailableTransitions
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / getAvailableTransitions
 
 # Function: getAvailableTransitions()
 
 > **getAvailableTransitions**(`state`, `transitions`, `evaluators`, `context?`): [`Transition`](../interfaces/Transition.md)[]
 
-Defined in: [story-runtime/src/core/transition.ts:332](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/transition.ts#L332)
+Defined in: [runtime/src/core/transition.ts:332](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/transition.ts#L332)
 
 Get all available transitions from the current node.
 

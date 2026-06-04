@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / evaluateConditionSet
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / evaluateConditionSet
 
 # Function: evaluateConditionSet()
 
 > **evaluateConditionSet**(`state`, `conditionSet`, `evaluators`, `context?`): `boolean`
 
-Defined in: [story-runtime/src/conditions/index.ts:50](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/conditions/index.ts#L50)
+Defined in: [runtime/src/conditions/index.ts:50](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/conditions/index.ts#L50)
 
 Evaluate a condition set with all/any/none composition.
 

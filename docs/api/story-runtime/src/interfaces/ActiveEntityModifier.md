@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / ActiveEntityModifier
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / ActiveEntityModifier
 
 # Interface: ActiveEntityModifier
 
-Defined in: [story-runtime/src/entities/derived.ts:9](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L9)
+Defined in: [runtime/src/entities/derived.ts:9](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/entities/derived.ts#L9)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/entities/derived.ts:9](https://github.com/sirmews
 
 > **modifier**: `EntityModifier`
 
-Defined in: [story-runtime/src/entities/derived.ts:11](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L11)
+Defined in: [runtime/src/entities/derived.ts:11](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/entities/derived.ts#L11)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [story-runtime/src/entities/derived.ts:11](https://github.com/sirmew
 
 > **sourceEntityId**: `string`
 
-Defined in: [story-runtime/src/entities/derived.ts:10](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L10)
+Defined in: [runtime/src/entities/derived.ts:10](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/entities/derived.ts#L10)

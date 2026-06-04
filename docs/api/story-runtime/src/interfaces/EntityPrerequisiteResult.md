@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / EntityPrerequisiteResult
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / EntityPrerequisiteResult
 
 # Interface: EntityPrerequisiteResult
 
-Defined in: [story-runtime/src/entities/derived.ts:14](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L14)
+Defined in: [runtime/src/entities/derived.ts:14](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/entities/derived.ts#L14)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/entities/derived.ts:14](https://github.com/sirmew
 
 > **entityId**: `string`
 
-Defined in: [story-runtime/src/entities/derived.ts:15](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L15)
+Defined in: [runtime/src/entities/derived.ts:15](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/entities/derived.ts#L15)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/entities/derived.ts:15](https://github.com/sirmew
 
 > **prerequisite**: `EntityPrerequisite`
 
-Defined in: [story-runtime/src/entities/derived.ts:16](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L16)
+Defined in: [runtime/src/entities/derived.ts:16](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/entities/derived.ts#L16)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [story-runtime/src/entities/derived.ts:16](https://github.com/sirmew
 
 > **satisfied**: `boolean`
 
-Defined in: [story-runtime/src/entities/derived.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/entities/derived.ts#L17)
+Defined in: [runtime/src/entities/derived.ts:17](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/entities/derived.ts#L17)

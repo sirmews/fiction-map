@@ -266,7 +266,7 @@ The completed plan is:
 **3.7.b Close the three coupling/leak issues both reviewers caught**
 
 - [x] `GraphRuntime` constructor no longer leaks `GraphBlueprint` from the adapter — `GraphBlueprint`, `NodeBlueprint`, `EdgeBlueprint` re-exported from `@fiction-map/runtime`'s public surface
-- [x] `packages/story-runtime/src/conditions/builtin.ts` and `effects/builtin.ts` no longer import from `../core/state`; entity-aware evaluators/handlers moved to `entities/condition-evaluators.ts` and `entities/effect-handlers.ts`; default-bindings composition lives in [packages/story-runtime/src/default-bindings.ts](../packages/story-runtime/src/default-bindings.ts)
+- [x] `packages/runtime/src/conditions/builtin.ts` and `effects/builtin.ts` no longer import from `../core/state`; entity-aware evaluators/handlers moved to `entities/condition-evaluators.ts` and `entities/effect-handlers.ts`; default-bindings composition lives in [packages/runtime/src/default-bindings.ts](../packages/runtime/src/default-bindings.ts)
 - [x] Legacy `GraphState` / `TraversalResult` already removed from [packages/core/src/types.ts](../packages/core/src/types.ts) (the public-api-audit reference was stale; verified via repo-wide search returning zero matches)
 
 **3.7.c Persistence contract decided and documented**

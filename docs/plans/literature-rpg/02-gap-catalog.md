@@ -108,7 +108,7 @@ The runtime state currently provides generic containers:
 - `visited`
 - `extensions`
 
-See [packages/story-runtime/src/types.ts](/Users/nav/Projects/fiction-map/packages/story-runtime/src/types.ts).
+See [packages/runtime/src/types.ts](/Users/nav/Projects/fiction-map/packages/runtime/src/types.ts).
 
 This is flexible enough to store literature-RPG data, but it does not guide the consumer app
 toward a stable shape.
@@ -160,7 +160,7 @@ consistently.
 
 `GraphRuntime` accepts evaluator and handler maps directly.
 
-See [packages/story-runtime/src/runtime.ts](/Users/nav/Projects/fiction-map/packages/story-runtime/src/runtime.ts).
+See [packages/runtime/src/runtime.ts](/Users/nav/Projects/fiction-map/packages/runtime/src/runtime.ts).
 
 That means a consumer app is responsible for deciding how custom logic interacts with built-ins.
 
@@ -215,8 +215,8 @@ The runtime side models:
 See:
 
 - [packages/core/src/types.ts](/Users/nav/Projects/fiction-map/packages/core/src/types.ts)
-- [packages/story-runtime/src/types.ts](/Users/nav/Projects/fiction-map/packages/story-runtime/src/types.ts)
-- [packages/story-runtime/src/adapter.ts](/Users/nav/Projects/fiction-map/packages/story-runtime/src/adapter.ts)
+- [packages/runtime/src/types.ts](/Users/nav/Projects/fiction-map/packages/runtime/src/types.ts)
+- [packages/runtime/src/adapter.ts](/Users/nav/Projects/fiction-map/packages/runtime/src/adapter.ts)
 
 ### Why this matters
 
@@ -267,7 +267,7 @@ The runtime currently returns coarse reasons such as:
 
 The runtime also has trace structures, but the public explanation layer is still thin.
 
-See [packages/story-runtime/src/core/transition.ts](/Users/nav/Projects/fiction-map/packages/story-runtime/src/core/transition.ts).
+See [packages/runtime/src/core/transition.ts](/Users/nav/Projects/fiction-map/packages/runtime/src/core/transition.ts).
 
 ### Why this matters
 
@@ -369,7 +369,7 @@ Runtime validation is currently good at structural concerns such as:
 - unreachable nodes
 - orphan nodes
 
-See [packages/story-runtime/src/core/validation.ts](/Users/nav/Projects/fiction-map/packages/story-runtime/src/core/validation.ts).
+See [packages/runtime/src/core/validation.ts](/Users/nav/Projects/fiction-map/packages/runtime/src/core/validation.ts).
 
 ### Why this matters
 

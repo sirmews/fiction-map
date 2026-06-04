@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / Effect
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / Effect
 
 # Interface: Effect
 
-Defined in: [story-runtime/src/types.ts:63](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L63)
+Defined in: [runtime/src/types.ts:63](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L63)
 
 ## Indexable
 
@@ -18,4 +18,4 @@ Defined in: [story-runtime/src/types.ts:63](https://github.com/sirmews/fiction-m
 
 > **type**: `string`
 
-Defined in: [story-runtime/src/types.ts:64](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L64)
+Defined in: [runtime/src/types.ts:64](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L64)

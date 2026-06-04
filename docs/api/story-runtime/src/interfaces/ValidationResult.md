@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / ValidationResult
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / ValidationResult
 
 # Interface: ValidationResult
 
-Defined in: [story-runtime/src/types.ts:167](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L167)
+Defined in: [runtime/src/types.ts:167](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L167)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:167](https://github.com/sirmews/fiction-
 
 > **errors**: [`GraphError`](GraphError.md)[]
 
-Defined in: [story-runtime/src/types.ts:169](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L169)
+Defined in: [runtime/src/types.ts:169](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L169)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:169](https://github.com/sirmews/fiction-
 
 > **reachableNodes**: `Set`\<`string`\>
 
-Defined in: [story-runtime/src/types.ts:170](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L170)
+Defined in: [runtime/src/types.ts:170](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L170)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [story-runtime/src/types.ts:170](https://github.com/sirmews/fiction-
 
 > **valid**: `boolean`
 
-Defined in: [story-runtime/src/types.ts:168](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L168)
+Defined in: [runtime/src/types.ts:168](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L168)

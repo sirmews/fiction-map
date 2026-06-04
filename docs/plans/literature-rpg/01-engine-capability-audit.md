@@ -93,7 +93,7 @@ deeply when graph instances are validated.
 ## Current `runtime` surface
 
 The current runtime contracts are defined in
-[packages/story-runtime/src/types.ts](/Users/nav/Projects/fiction-map/packages/story-runtime/src/types.ts).
+[packages/runtime/src/types.ts](/Users/nav/Projects/fiction-map/packages/runtime/src/types.ts).
 
 The key pieces are:
 

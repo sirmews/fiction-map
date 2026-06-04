@@ -34,7 +34,7 @@
 
 | Package | Location | Purpose | Status |
 |---------|----------|---------|--------|
-| `@your-org/story-runtime` | [`packages/story-runtime/`](../packages/story-runtime/) | Schema-driven runtime engine extracted from Tale Weaver's domain package. Pluggable condition evaluators, effect handlers, transition engine, graph validation. | ✅ 34 tests passing |
+| `@your-org/story-runtime` | [`packages/runtime/`](../packages/runtime/) | Schema-driven runtime engine extracted from Tale Weaver's domain package. Pluggable condition evaluators, effect handlers, transition engine, graph validation. | ✅ 34 tests passing |
 
 ---
 

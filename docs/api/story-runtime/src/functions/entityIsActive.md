@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / entityIsActive
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / entityIsActive
 
 # Function: entityIsActive()
 
 > **entityIsActive**(`state`, `entityId`): `boolean`
 
-Defined in: [story-runtime/src/core/state.ts:291](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L291)
+Defined in: [runtime/src/core/state.ts:291](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/state.ts#L291)
 
 ## Parameters
 

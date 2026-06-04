@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / evaluateCondition
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / evaluateCondition
 
 # Function: evaluateCondition()
 
 > **evaluateCondition**(`state`, `condition`, `evaluators`, `context?`): `boolean`
 
-Defined in: [story-runtime/src/conditions/index.ts:18](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/conditions/index.ts#L18)
+Defined in: [runtime/src/conditions/index.ts:18](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/conditions/index.ts#L18)
 
 Evaluate a single condition using the provided evaluators.
 

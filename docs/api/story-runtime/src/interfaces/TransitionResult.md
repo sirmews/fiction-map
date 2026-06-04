@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / TransitionResult
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / TransitionResult
 
 # Interface: TransitionResult
 
-Defined in: [story-runtime/src/types.ts:130](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L130)
+Defined in: [runtime/src/types.ts:130](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L130)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/types.ts:130](https://github.com/sirmews/fiction-
 
 > `optional` **consequence?**: [`Consequence`](Consequence.md)
 
-Defined in: [story-runtime/src/types.ts:132](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L132)
+Defined in: [runtime/src/types.ts:132](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L132)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/types.ts:132](https://github.com/sirmews/fiction-
 
 > `optional` **failedConditions?**: [`FailedCondition`](FailedCondition.md)[]
 
-Defined in: [story-runtime/src/types.ts:137](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L137)
+Defined in: [runtime/src/types.ts:137](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L137)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/types.ts:137](https://github.com/sirmews/fiction-
 
 > `optional` **failureReason?**: `string`
 
-Defined in: [story-runtime/src/types.ts:136](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L136)
+Defined in: [runtime/src/types.ts:136](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L136)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [story-runtime/src/types.ts:136](https://github.com/sirmews/fiction-
 
 > `optional` **nextNodeId?**: `string`
 
-Defined in: [story-runtime/src/types.ts:134](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L134)
+Defined in: [runtime/src/types.ts:134](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L134)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [story-runtime/src/types.ts:134](https://github.com/sirmews/fiction-
 
 > **shouldNavigate**: `boolean`
 
-Defined in: [story-runtime/src/types.ts:133](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L133)
+Defined in: [runtime/src/types.ts:133](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L133)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [story-runtime/src/types.ts:133](https://github.com/sirmews/fiction-
 
 > **state**: [`GraphRuntimeState`](GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/types.ts:131](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L131)
+Defined in: [runtime/src/types.ts:131](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L131)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [story-runtime/src/types.ts:131](https://github.com/sirmews/fiction-
 
 > **success**: `boolean`
 
-Defined in: [story-runtime/src/types.ts:135](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L135)
+Defined in: [runtime/src/types.ts:135](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L135)
 
 ***
 
@@ -70,4 +70,4 @@ Defined in: [story-runtime/src/types.ts:135](https://github.com/sirmews/fiction-
 
 > `optional` **trace?**: [`TransitionTrace`](TransitionTrace.md)
 
-Defined in: [story-runtime/src/types.ts:138](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L138)
+Defined in: [runtime/src/types.ts:138](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L138)

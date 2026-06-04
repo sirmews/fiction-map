@@ -48,7 +48,7 @@ Source: [`packages/entities/src/index.ts`](../packages/entities/src/index.ts).
 
 ## 3. `@fiction-map/runtime`
 
-Source: [`packages/story-runtime/src/index.ts`](../packages/story-runtime/src/index.ts).
+Source: [`packages/runtime/src/index.ts`](../packages/runtime/src/index.ts).
 
 ### Stable Consumer-Facing API (high level)
 

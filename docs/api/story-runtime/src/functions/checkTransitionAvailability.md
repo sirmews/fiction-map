@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / checkTransitionAvailability
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / checkTransitionAvailability
 
 # Function: checkTransitionAvailability()
 
 > **checkTransitionAvailability**(`state`, `transition`, `evaluators`, `context?`): [`TransitionAvailability`](../interfaces/TransitionAvailability.md)
 
-Defined in: [story-runtime/src/core/transition.ts:39](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/transition.ts#L39)
+Defined in: [runtime/src/core/transition.ts:39](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/transition.ts#L39)
 
 Check if a transition is available.
 

@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / getTransitionsByAvailability
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / getTransitionsByAvailability
 
 # Function: getTransitionsByAvailability()
 
 > **getTransitionsByAvailability**(`state`, `transitions`, `evaluators`, `context?`): `object`
 
-Defined in: [story-runtime/src/core/transition.ts:363](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/transition.ts#L363)
+Defined in: [runtime/src/core/transition.ts:363](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/transition.ts#L363)
 
 Get transitions grouped by availability status.
 

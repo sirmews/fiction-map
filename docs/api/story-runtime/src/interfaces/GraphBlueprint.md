@@ -2,11 +2,11 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / GraphBlueprint
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / GraphBlueprint
 
 # Interface: GraphBlueprint
 
-Defined in: [story-runtime/src/adapter.ts:21](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L21)
+Defined in: [runtime/src/adapter.ts:21](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L21)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [story-runtime/src/adapter.ts:21](https://github.com/sirmews/fiction
 
 > **edges**: [`EdgeBlueprint`](EdgeBlueprint.md)[]
 
-Defined in: [story-runtime/src/adapter.ts:23](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L23)
+Defined in: [runtime/src/adapter.ts:23](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L23)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [story-runtime/src/adapter.ts:23](https://github.com/sirmews/fiction
 
 > `optional` **endings?**: `string`[]
 
-Defined in: [story-runtime/src/adapter.ts:24](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L24)
+Defined in: [runtime/src/adapter.ts:24](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L24)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [story-runtime/src/adapter.ts:24](https://github.com/sirmews/fiction
 
 > **nodes**: [`NodeBlueprint`](NodeBlueprint.md)[]
 
-Defined in: [story-runtime/src/adapter.ts:22](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L22)
+Defined in: [runtime/src/adapter.ts:22](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L22)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [story-runtime/src/adapter.ts:22](https://github.com/sirmews/fiction
 
 > `optional` **startNode?**: `string`
 
-Defined in: [story-runtime/src/adapter.ts:25](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/adapter.ts#L25)
+Defined in: [runtime/src/adapter.ts:25](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/adapter.ts#L25)

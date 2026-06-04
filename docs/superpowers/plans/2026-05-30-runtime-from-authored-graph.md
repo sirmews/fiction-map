@@ -12,16 +12,16 @@
 
 ## File Structure
 
-- Create `packages/story-runtime/src/graph-definition.test.ts`
+- Create `packages/runtime/src/graph-definition.test.ts`
   - Focused tests for converting a core `GraphDefinition` into a runtime `GraphBlueprint` and constructing a working `GraphRuntime`.
-- Create `packages/story-runtime/src/graph-definition.ts`
+- Create `packages/runtime/src/graph-definition.ts`
   - Runtime adapter functions:
     - `graphDefinitionToBlueprint(graph: GraphDefinition): GraphBlueprint`
     - `createRuntimeFromGraph(graph: GraphDefinition, evaluators?, handlers?): GraphRuntime`
-- Modify `packages/story-runtime/src/adapter.ts`
+- Modify `packages/runtime/src/adapter.ts`
   - Add optional `metadata` to `EdgeBlueprint`.
   - Preserve `metadata` on parsed runtime transitions.
-- Modify `packages/story-runtime/src/index.ts`
+- Modify `packages/runtime/src/index.ts`
   - Export the two new public adapter helpers.
 - Modify `apps/literature-rpg/src/graphs/story.graph.ts`
   - Move the `grantEntity` effect into the authored graph edge.
@@ -42,13 +42,13 @@
 ### Task 1: Add Failing Runtime Adapter Tests
 
 **Files:**
-- Create: `packages/story-runtime/src/graph-definition.test.ts`
-- Later modify: `packages/story-runtime/src/graph-definition.ts`
-- Later modify: `packages/story-runtime/src/adapter.ts`
+- Create: `packages/runtime/src/graph-definition.test.ts`
+- Later modify: `packages/runtime/src/graph-definition.ts`
+- Later modify: `packages/runtime/src/adapter.ts`
 
 - [ ] **Step 1: Write the failing test**
 
-Create `packages/story-runtime/src/graph-definition.test.ts`:
+Create `packages/runtime/src/graph-definition.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -152,7 +152,7 @@ describe("graphDefinitionToBlueprint", () => {
 Run:
 
 ```bash
-bun --cwd packages/story-runtime test src/graph-definition.test.ts
+bun --cwd packages/runtime test src/graph-definition.test.ts
 ```
 
 Expected: FAIL because `graphDefinitionToBlueprint` and `createRuntimeFromGraph` are not exported from `./index`.
@@ -160,7 +160,7 @@ Expected: FAIL because `graphDefinitionToBlueprint` and `createRuntimeFromGraph`
 - [ ] **Step 3: Commit the failing test**
 
 ```bash
-git add packages/story-runtime/src/graph-definition.test.ts
+git add packages/runtime/src/graph-definition.test.ts
 git commit -m "test: specify runtime graph definition adapter"
 ```
 
@@ -169,14 +169,14 @@ git commit -m "test: specify runtime graph definition adapter"
 ### Task 2: Implement the Runtime Adapter
 
 **Files:**
-- Create: `packages/story-runtime/src/graph-definition.ts`
-- Modify: `packages/story-runtime/src/adapter.ts`
-- Modify: `packages/story-runtime/src/index.ts`
-- Test: `packages/story-runtime/src/graph-definition.test.ts`
+- Create: `packages/runtime/src/graph-definition.ts`
+- Modify: `packages/runtime/src/adapter.ts`
+- Modify: `packages/runtime/src/index.ts`
+- Test: `packages/runtime/src/graph-definition.test.ts`
 
 - [ ] **Step 1: Add metadata support to runtime edge blueprints**
 
-Modify `packages/story-runtime/src/adapter.ts` so `EdgeBlueprint` includes `metadata` and `parseGraph()` forwards it:
+Modify `packages/runtime/src/adapter.ts` so `EdgeBlueprint` includes `metadata` and `parseGraph()` forwards it:
 
 ```ts
 export interface EdgeBlueprint {
@@ -227,7 +227,7 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
 
 - [ ] **Step 2: Add the graph-definition adapter implementation**
 
-Create `packages/story-runtime/src/graph-definition.ts`:
+Create `packages/runtime/src/graph-definition.ts`:
 
 ```ts
 import type { GraphDefinition, EdgeInstance } from "@fiction-map/core"
@@ -312,7 +312,7 @@ export function createRuntimeFromGraph(
 
 - [ ] **Step 3: Export the new helpers**
 
-Modify `packages/story-runtime/src/index.ts` near the high-level runtime exports:
+Modify `packages/runtime/src/index.ts` near the high-level runtime exports:
 
 ```ts
 // Graph definition adapter
@@ -327,7 +327,7 @@ export {
 Run:
 
 ```bash
-bun --cwd packages/story-runtime test src/graph-definition.test.ts
+bun --cwd packages/runtime test src/graph-definition.test.ts
 ```
 
 Expected: PASS, including both adapter tests.
@@ -337,7 +337,7 @@ Expected: PASS, including both adapter tests.
 Run:
 
 ```bash
-bun --cwd packages/story-runtime test
+bun --cwd packages/runtime test
 ```
 
 Expected: PASS for existing runtime tests plus `graph-definition.test.ts`.
@@ -345,7 +345,7 @@ Expected: PASS for existing runtime tests plus `graph-definition.test.ts`.
 - [ ] **Step 6: Commit the adapter implementation**
 
 ```bash
-git add packages/story-runtime/src/adapter.ts packages/story-runtime/src/graph-definition.ts packages/story-runtime/src/index.ts
+git add packages/runtime/src/adapter.ts packages/runtime/src/graph-definition.ts packages/runtime/src/index.ts
 git commit -m "feat(runtime): create runtime from authored graph"
 ```
 

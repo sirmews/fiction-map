@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / lockEntity
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / lockEntity
 
 # Function: lockEntity()
 
 > **lockEntity**(`state`, `entityId`): [`GraphRuntimeState`](../interfaces/GraphRuntimeState.md)
 
-Defined in: [story-runtime/src/core/state.ts:304](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/core/state.ts#L304)
+Defined in: [runtime/src/core/state.ts:304](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/core/state.ts#L304)
 
 ## Parameters
 

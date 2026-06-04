@@ -2,13 +2,13 @@
 
 ***
 
-[fiction-map](../../../README.md) / [story-runtime/src](../README.md) / ConditionEvaluator
+[fiction-map](../../../README.md) / [runtime/src](../README.md) / ConditionEvaluator
 
 # Type Alias: ConditionEvaluator
 
 > **ConditionEvaluator** = (`state`, `condition`, `context?`) => `boolean`
 
-Defined in: [story-runtime/src/types.ts:53](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/story-runtime/src/types.ts#L53)
+Defined in: [runtime/src/types.ts:53](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/runtime/src/types.ts#L53)
 
 ## Parameters
 

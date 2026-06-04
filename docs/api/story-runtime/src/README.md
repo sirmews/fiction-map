@@ -2,9 +2,9 @@
 
 ***
 
-[fiction-map](../../README.md) / story-runtime/src
+[fiction-map](../../README.md) / runtime/src
 
-# story-runtime/src
+# runtime/src
 
 ## Classes
 

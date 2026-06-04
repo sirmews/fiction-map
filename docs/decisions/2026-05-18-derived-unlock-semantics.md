@@ -38,7 +38,7 @@ This **preserves both invariants from the original rationale**:
 
 What changed is the *interface*: derived unlocks are now respected by the engine when the consumer opts in via the evaluation context, instead of through an explicit state-mutating helper.
 
-The [literature-rpg.test.ts example](../../packages/story-runtime/src/examples/literature-rpg.test.ts) demonstrates the full flow: the Lantern's `unlocks: ["dark-cave"]` is honored by `checkTransitionAvailability` without anyone ever calling `unlockEntity(state, "dark-cave")`, and `entityIsUnlocked(state, "dark-cave")` correctly remains `false` afterwards.
+The [literature-rpg.test.ts example](../../packages/runtime/src/examples/literature-rpg.test.ts) demonstrates the full flow: the Lantern's `unlocks: ["dark-cave"]` is honored by `checkTransitionAvailability` without anyone ever calling `unlockEntity(state, "dark-cave")`, and `entityIsUnlocked(state, "dark-cave")` correctly remains `false` afterwards.
 
 ## Story Editor Implications
 

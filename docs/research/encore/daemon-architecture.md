@@ -86,7 +86,7 @@ Fiction Map is... what?
 ### Option A: SDK Only (Simplest)
 
 ```
-packages/story-runtime/      # Runtime engine
+packages/runtime/      # Runtime engine
 consumer-app/                # App-owned UI and editor shell
 
 # Usage:
@@ -101,7 +101,7 @@ import { StoryCanvas } from "consumer-app"
 ### Option B: SDK + Playtest Server
 
 ```
-packages/story-runtime/
+packages/runtime/
 consumer-app/
 
 # CLI for playtesting:

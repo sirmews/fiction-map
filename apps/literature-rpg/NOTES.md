@@ -79,14 +79,14 @@ const blueprint: GraphBlueprint = { startNode: "...", nodes: [...], edges: [...]
 const runtime = new GraphRuntime(blueprint);
 ```
 
-## 7. Package naming inconsistency vs the North Star
+## 7. ~~Package naming inconsistency vs the North Star~~ ✅ FIXED
 
 **Severity:** low (docs lie).
 
 - North Star refers to `@fiction-map/cli`; the actual package is `fiction-map` (unscoped, because the bin name is `fiction-map`).
-- The runtime directory is `packages/story-runtime/` but the package is `@fiction-map/runtime`. Confusing for contributors browsing the tree.
+- The runtime directory is `packages/runtime/` and the package is `@fiction-map/runtime`.
 
-**Fix:** either rename the directory to `packages/runtime/` to match the package name, or update the North Star snippet to say `fiction-map` for the CLI. Pick one source of truth.
+**Fix:** renamed the directory to `packages/runtime/` to match the package name, resolving the friction.
 
 ## 8. ~~Generator output path defaults are confusing~~ ✅ FIXED
 

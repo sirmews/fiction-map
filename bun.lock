@@ -63,7 +63,7 @@
         "vitest": "^1.0.0",
       },
     },
-    "packages/story-runtime": {
+    "packages/runtime": {
       "name": "@fiction-map/runtime",
       "version": "0.1.0",
       "dependencies": {
@@ -161,7 +161,7 @@
 
     "@fiction-map/entities": ["@fiction-map/entities@workspace:packages/entities"],
 
-    "@fiction-map/runtime": ["@fiction-map/runtime@workspace:packages/story-runtime"],
+    "@fiction-map/runtime": ["@fiction-map/runtime@workspace:packages/runtime"],
 
     "@gerrit0/mini-shiki": ["@gerrit0/mini-shiki@3.23.0", "", { "dependencies": { "@shikijs/engine-oniguruma": "^3.23.0", "@shikijs/langs": "^3.23.0", "@shikijs/themes": "^3.23.0", "@shikijs/types": "^3.23.0", "@shikijs/vscode-textmate": "^10.0.2" } }, "sha512-bEMORlG0cqdjVyCEuU0cDQbORWX+kYCeo0kV1lbxF5bt4r7SID2l9bqsxJEM0zndaxpOUT7riCyIVEuqq/Ynxg=="],
 
