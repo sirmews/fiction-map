@@ -6,6 +6,7 @@
  * Granting the lantern at the main hall unlocks the gated `descend` choice.
  */
 
+import * as readline from "readline";
 import {
   createInitialState,
   createRuntimeFromGraph,
@@ -20,43 +21,89 @@ registerBuiltins(registry);
 
 export const runtime = createRuntimeFromGraph(story);
 
-export function playOnce(): { reachedEnding: boolean; visited: string[] } {
-  let state = createInitialState(runtime.startNodeId);
-  const visited: string[] = [state.currentNodeId];
-
-  const steps = runtime.walkWithContext(state, (currentState) => {
-    return { derivedState: deriveEntityState(world, currentState) };
+export async function playInteractive() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
   });
 
-  if (steps.length > 0) {
-    // The last step returned gives us the final state.
-    // walkWithContext pushes a final "empty available" StepResult if no transitions remain.
-    const lastStep = steps[steps.length - 1];
-    state = lastStep.state;
-    
-    // Add visited nodes (skipping the first one as it's already in the array)
-    for (const step of steps) {
-      if (step.applied) {
-        visited.push(step.state.currentNodeId);
-      }
+  const question = (prompt: string): Promise<string> => {
+    return new Promise((resolve) => rl.question(prompt, resolve));
+  };
+
+  let state = createInitialState(runtime.parsed.startNodeId);
+  console.log("\n============================================");
+  console.log("Welcome to Fiction Map: Literature RPG");
+  console.log("============================================\n");
+
+  while (true) {
+    // 1. Recompute context
+    const context = { derivedState: deriveEntityState(world, state) };
+
+    // 2. Display the current node
+    const currentNode = runtime.parsed.nodes.get(state.currentNodeId);
+    if (!currentNode) {
+      console.error(`\n❌ Error: Node '${state.currentNodeId}' not found.`);
+      break;
     }
+
+    console.log(`\n--- ${currentNode.title ?? currentNode.id} ---`);
+    if (currentNode.body) {
+      console.log(`${currentNode.body}\n`);
+    }
+
+    // 3. Find available choices
+    const available = runtime.getAvailable(state, context);
+    
+    if (available.length === 0) {
+      console.log("\n[ The End ]");
+      break;
+    }
+
+    // 4. Present choices
+    for (let i = 0; i < available.length; i++) {
+      const choice = available[i];
+      // Type-cast to extract text safely based on our app's 'choice' schema
+      const label = choice.label ?? (choice.metadata as any)?.text ?? choice.id;
+      console.log(`  ${i + 1}. ${label}`);
+    }
+
+    // 5. Ask for input
+    const answer = await question("\nWhat do you do? (number or 'q' to quit) > ");
+    
+    if (answer.toLowerCase() === "q" || answer.toLowerCase() === "quit") {
+      console.log("\nThanks for playing!");
+      break;
+    }
+
+    const choiceIndex = parseInt(answer, 10) - 1;
+    if (isNaN(choiceIndex) || choiceIndex < 0 || choiceIndex >= available.length) {
+      console.log("\nInvalid choice. Please pick a number from the list.");
+      continue;
+    }
+
+    const selectedChoice = available[choiceIndex];
+    console.log(`\n>> You chose: ${selectedChoice.label ?? (selectedChoice.metadata as any)?.text ?? selectedChoice.id}\n`);
+
+    // 6. Transition state
+    const result = runtime.step(state, selectedChoice, context);
+    if (!result.success) {
+      console.error("\n❌ Engine Error: Transition failed despite being available.", result.failureReason);
+      break;
+    }
+
+    state = result.state;
   }
 
-  return {
-    reachedEnding: state.currentNodeId === "dark-chapter",
-    visited,
-  };
+  rl.close();
 }
 
 // Only run when invoked directly (not when imported by tests).
-// `import.meta.main` is a Bun extension; cast to any to satisfy tsc.
 if ((import.meta as { main?: boolean }).main) {
-  const result = playOnce();
-  console.log("Visited:", result.visited.join(" → "));
-  console.log("Reached ending:", result.reachedEnding);
   if (world.errors.length > 0) {
-    console.error("World errors:", world.errors);
+    console.error("World definition has errors. Exiting.", world.errors);
     process.exit(1);
   }
-  process.exit(result.reachedEnding ? 0 : 1);
+  
+  await playInteractive();
 }
