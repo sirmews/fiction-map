@@ -6,7 +6,8 @@
  * Granting the lantern at the main hall unlocks the gated `descend` choice.
  */
 
-import * as readline from "readline";
+import { intro, outro, select, note, isCancel, spinner } from "@clack/prompts";
+import pc from "picocolors";
 import {
   createInitialState,
   createRuntimeFromGraph,
@@ -22,80 +23,67 @@ registerBuiltins(registry);
 export const runtime = createRuntimeFromGraph(story);
 
 export async function playInteractive() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  const question = (prompt: string): Promise<string> => {
-    return new Promise((resolve) => rl.question(prompt, resolve));
-  };
-
   let state = createInitialState(runtime.parsed.startNodeId);
-  console.log("\n============================================");
-  console.log("Welcome to Fiction Map: Literature RPG");
-  console.log("============================================\n");
+  
+  console.clear();
+  intro(pc.bgMagenta(pc.black(" FICTION MAP : LITERATURE RPG ")));
 
   while (true) {
     // 1. Recompute context
     const context = { derivedState: deriveEntityState(world, state) };
 
-    // 2. Display the current node
+    // 2. Locate the current node
     const currentNode = runtime.parsed.nodes.get(state.currentNodeId);
     if (!currentNode) {
-      console.error(`\n❌ Error: Node '${state.currentNodeId}' not found.`);
+      outro(pc.red(`❌ Error: Node '${state.currentNodeId}' not found.`));
       break;
     }
 
-    console.log(`\n--- ${currentNode.title ?? currentNode.id} ---`);
-    if (currentNode.body) {
-      console.log(`${currentNode.body}\n`);
-    }
+    // 3. Display the scene
+    const title = currentNode.title ? pc.cyan(pc.bold(String(currentNode.title))) : pc.cyan(currentNode.id);
+    const body = String(currentNode.body || "");
+    
+    note(body, title);
 
-    // 3. Find available choices
+    // 4. Find available choices
     const available = runtime.getAvailable(state, context);
     
     if (available.length === 0) {
-      console.log("\n[ The End ]");
+      outro(pc.green("✨ You have reached the end of the story. ✨"));
       break;
     }
 
-    // 4. Present choices
-    for (let i = 0; i < available.length; i++) {
-      const choice = available[i];
-      // Type-cast to extract text safely based on our app's 'choice' schema
+    // 5. Present choices with TUI
+    const options = available.map((choice) => {
       const label = choice.label ?? (choice.metadata as any)?.text ?? choice.id;
-      console.log(`  ${i + 1}. ${label}`);
-    }
+      return { value: choice, label: String(label) };
+    });
 
-    // 5. Ask for input
-    const answer = await question("\nWhat do you do? (number or 'q' to quit) > ");
-    
-    if (answer.toLowerCase() === "q" || answer.toLowerCase() === "quit") {
-      console.log("\nThanks for playing!");
+    const selectedChoice = await select({
+      message: "What do you do?",
+      options: options,
+    });
+
+    if (isCancel(selectedChoice)) {
+      outro(pc.yellow("Thanks for playing! (Cancelled)"));
       break;
     }
-
-    const choiceIndex = parseInt(answer, 10) - 1;
-    if (isNaN(choiceIndex) || choiceIndex < 0 || choiceIndex >= available.length) {
-      console.log("\nInvalid choice. Please pick a number from the list.");
-      continue;
-    }
-
-    const selectedChoice = available[choiceIndex];
-    console.log(`\n>> You chose: ${selectedChoice.label ?? (selectedChoice.metadata as any)?.text ?? selectedChoice.id}\n`);
 
     // 6. Transition state
-    const result = runtime.step(state, selectedChoice, context);
+    const result = runtime.step(state, selectedChoice as any, context);
     if (!result.success) {
-      console.error("\n❌ Engine Error: Transition failed despite being available.", result.failureReason);
+      outro(pc.red(`❌ Engine Error: Transition failed. ${result.failureReason}`));
       break;
     }
+
+    // A tiny simulated delay to make it feel like moving to the next room
+    const s = spinner();
+    s.start("...");
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    s.stop(pc.dim(`> ${options.find(o => o.value === selectedChoice)?.label}`));
 
     state = result.state;
   }
-
-  rl.close();
 }
 
 // Only run when invoked directly (not when imported by tests).

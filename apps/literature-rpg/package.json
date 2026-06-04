@@ -17,10 +17,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clack/prompts": "^1.5.1",
     "@fiction-map/core": "workspace:*",
     "@fiction-map/entities": "workspace:*",
     "@fiction-map/runtime": "workspace:*",
-    "fiction-map": "workspace:*"
+    "fiction-map": "workspace:*",
+    "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "typescript": "^5.4.0",
