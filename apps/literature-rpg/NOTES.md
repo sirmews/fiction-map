@@ -88,15 +88,13 @@ const runtime = new GraphRuntime(blueprint);
 
 **Fix:** either rename the directory to `packages/runtime/` to match the package name, or update the North Star snippet to say `fiction-map` for the CLI. Pick one source of truth.
 
-## 8. Generator output path defaults are confusing
+## 8. ~~Generator output path defaults are confusing~~ ✅ FIXED
 
 **Severity:** low.
 
 `fiction-map generate --root-dir src` writes to `src/.fiction-map/metadata.json` and `src/SEMANTICS.md`. A consumer typically wants metadata at the project root, not inside `src/`.
 
-**Workaround:** pass `--output-dir .` explicitly when desired. Not used here because the docs site might want it under `src/`.
-
-**Fix:** when `--root-dir` is set but `--output-dir` is not, default `--output-dir` to the project root (parent of `--root-dir`) or to cwd.
+**Fix:** when `--root-dir` is set but `--output-dir` is not, default `--output-dir` to the project root (parent of `--root-dir`) or to cwd. Done in the generator CLI configuration.
 
 ## 9. `import.meta.main` requires a cast under tsc
 

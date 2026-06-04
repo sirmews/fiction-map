@@ -9,7 +9,7 @@
  */
 
 import { readFile } from "fs/promises"
-import { join, relative, resolve } from "path"
+import { join, relative, resolve, dirname } from "path"
 import type { GraphMetadata } from "@fiction-map/core"
 
 export interface ValidateOptions {
@@ -52,7 +52,11 @@ function hintForIssue(code: string): string | null {
 
 export async function validate(options: ValidateOptions = {}): Promise<void> {
   const rootDir = resolve(options.rootDir || process.cwd())
-  const outputDir = options.outputDir ? resolve(options.outputDir) : rootDir
+  const outputDir = options.outputDir 
+    ? resolve(options.outputDir) 
+    : options.rootDir 
+      ? dirname(rootDir)
+      : rootDir
   const metadataPath = join(outputDir, ".fiction-map", "metadata.json")
 
   console.log(`\n🧪 Fiction Map Validator`)

@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises"
-import { join, relative, resolve } from "path"
+import { join, relative, resolve, dirname } from "path"
 import type {
   EdgeInstance,
   GraphDefinition,
@@ -50,7 +50,11 @@ function fail(message: string): never {
 
 async function loadMetadata(options: MetadataCommandOptions = {}): Promise<LoadedMetadata> {
   const rootDir = resolve(options.rootDir || process.cwd())
-  const outputDir = options.outputDir ? resolve(options.outputDir) : rootDir
+  const outputDir = options.outputDir 
+    ? resolve(options.outputDir) 
+    : options.rootDir 
+      ? dirname(rootDir)
+      : rootDir
   const metadataPath = join(outputDir, ".fiction-map", "metadata.json")
 
   try {

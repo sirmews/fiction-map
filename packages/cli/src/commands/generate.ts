@@ -6,7 +6,7 @@
  *   fiction-map generate --check
  */
 
-import { relative, resolve } from "path"
+import { relative, resolve, dirname } from "path"
 import { checkProject, generateProject } from "../generator"
 
 export interface GenerateOptions {
@@ -17,7 +17,13 @@ export interface GenerateOptions {
 
 export async function generate(options: GenerateOptions = {}): Promise<void> {
   const rootDir = resolve(options.rootDir || process.cwd())
-  const outputDir = options.outputDir ? resolve(options.outputDir) : rootDir
+  // If outputDir isn't specified but rootDir is, default to the parent of rootDir
+  // (e.g. --rootDir=src -> output to .) instead of polluting the source folder.
+  const outputDir = options.outputDir 
+    ? resolve(options.outputDir) 
+    : options.rootDir 
+      ? dirname(rootDir)
+      : rootDir
 
   if (options.check) {
     await runCheck({ rootDir, outputDir })
