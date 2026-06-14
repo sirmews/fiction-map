@@ -22,6 +22,8 @@ function App() {
   // Get dynamic state variables
   const health = state.entityState?.resources?.health ?? 0;
   const mana = state.entityState?.resources?.mana ?? 0;
+  const gold = state.entityState?.resources?.gold ?? 0;
+  const turns = state.entityState?.resources?.turns ?? 0;
   const cooldown = state.entityState?.resources?.heal_cooldown ?? 0;
   const isDead = state.currentNodeId === "death";
   const isVictory = state.currentNodeId === "victory";
@@ -35,26 +37,39 @@ function App() {
       {/* Dynamic RPG HUD Status Bar */}
       {state.currentNodeId !== "entrance" && (
         <div className="w-full max-w-lg mb-4 flex flex-col gap-3 bg-slate-900 border border-slate-800 rounded-lg p-3">
+          
+          {/* Collapsing Cavern Alert Warning */}
+          {turns > 10 && !isDead && !isVictory && (
+            <div className="bg-red-950/80 border border-red-900 rounded p-2 text-center text-xs text-red-200 animate-pulse font-semibold">
+              ⚠️ WARNING: THE CAVERN IS COLLAPSING! TAKING -25 DAMAGE PER TURN!
+            </div>
+          )}
+
           <div className="flex justify-between items-center gap-4">
             {/* HP Bar */}
-            <div className="flex items-center gap-2 w-1/2">
-              <span className="text-red-500 font-bold shrink-0 text-sm">❤️ {health} HP</span>
-              <div className="w-full bg-slate-800 rounded-full h-2">
+            <div className="flex items-center gap-2 w-1/3">
+              <span className="text-red-500 font-bold shrink-0 text-xs">❤️ {health} HP</span>
+              <div className="w-full bg-slate-800 rounded-full h-1.5">
                 <div 
-                  className="bg-red-600 h-2 rounded-full transition-all duration-300" 
+                  className="bg-red-600 h-1.5 rounded-full transition-all duration-300" 
                   style={{ width: `${Math.min(100, Math.max(0, health))}%` }}
                 ></div>
               </div>
             </div>
             {/* MP Bar */}
-            <div className="flex items-center gap-2 w-1/2">
-              <span className="text-cyan-500 font-bold shrink-0 text-sm">🧪 {mana} MP</span>
-              <div className="w-full bg-slate-800 rounded-full h-2">
+            <div className="flex items-center gap-2 w-1/3">
+              <span className="text-cyan-500 font-bold shrink-0 text-xs">🧪 {mana} MP</span>
+              <div className="w-full bg-slate-800 rounded-full h-1.5">
                 <div 
-                  className="bg-cyan-600 h-2 rounded-full transition-all duration-300" 
+                  className="bg-cyan-600 h-1.5 rounded-full transition-all duration-300" 
                   style={{ width: `${Math.min(100, Math.max(0, mana * 2))}%` }}
                 ></div>
               </div>
+            </div>
+            {/* Turn & Gold Counter */}
+            <div className="flex justify-end gap-3 w-1/3 text-xs shrink-0 font-semibold">
+              <span className="text-yellow-500">🪙 {gold}g</span>
+              <span className="text-slate-400">🕒 Turn: {turns}</span>
             </div>
           </div>
 
@@ -73,7 +88,7 @@ function App() {
                 <span className="text-xs text-slate-500 italic">Inventory empty</span>
               ) : (
                 inventory.map(item => {
-                  const icon = item.includes("spell") ? "✨" : item === "lantern" ? "🔦" : item === "elixir" ? "🧪" : "🔑";
+                  const icon = item.includes("spell") ? "✨" : item === "lantern" ? "🔦" : item === "elixir" ? "🧪" : item === "lockpick" ? "⚙️" : "🔑";
                   return (
                     <Badge key={item} variant="secondary" className="bg-amber-900/60 text-amber-100 hover:bg-amber-800 shrink-0 border border-amber-800/40 text-[10px] px-1.5 py-0.5">
                       {icon} {item}
