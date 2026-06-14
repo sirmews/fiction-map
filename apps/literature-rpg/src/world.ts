@@ -1,11 +1,3 @@
-/**
- * World definition: the consumer's domain concepts.
- *
- * For this small demo the world has one item the player can carry
- * (a lantern). Real consumer apps would define stats, traits,
- * species, locations, etc.
- */
-
 import { defineEntityType, defineWorld } from "@fiction-map/entities";
 import { registry } from "./project";
 
@@ -16,11 +8,21 @@ defineEntityType(registry, {
   },
 });
 
+defineEntityType(registry, {
+  id: "spell",
+  properties: {
+    label: { type: "string", required: true },
+    manaCost: { type: "number", required: true },
+  },
+});
+
 export const world = defineWorld(registry, {
   id: "library",
   entities: [
     { id: "lantern", type: "item", label: "Brass Lantern" },
     { id: "elixir", type: "item", label: "Healing Elixir" },
     { id: "key", type: "item", label: "Casket Key" },
+    { id: "heal-spell", type: "spell", label: "Heal", manaCost: 20 },
+    { id: "mage-light", type: "spell", label: "Mage Light", manaCost: 15 },
   ],
 });

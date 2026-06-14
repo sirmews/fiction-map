@@ -56,7 +56,7 @@
       "name": "libraryMysteryGraph",
       "location": {
         "file": "graphs/story.graph.ts",
-        "line": 11,
+        "line": 4,
         "column": 22
       },
       "nodes": [
@@ -76,7 +76,7 @@
           "id": "archives",
           "type": "scene",
           "title": "Dusty Archives",
-          "body": "Towering shelves hold forgotten lore. A glowing elixir sits on a pedestal."
+          "body": "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals."
         },
         {
           "id": "dark-chapter",
@@ -131,6 +131,11 @@
               "type": "addResource",
               "key": "health",
               "amount": 100
+            },
+            {
+              "type": "addResource",
+              "key": "mana",
+              "amount": 50
             }
           ]
         },
@@ -148,15 +153,48 @@
           ]
         },
         {
-          "id": "take-elixir",
+          "id": "study-heal",
           "type": "choice",
           "source": "archives",
-          "target": "main-hall",
-          "text": "Take the elixir and return to the Main Hall",
+          "target": "archives",
+          "text": "Study the Tome of Heal Spell",
+          "conditions": [
+            {
+              "type": "notVisited",
+              "nodeId": "study-heal"
+            }
+          ],
           "effects": [
             {
               "type": "grantEntity",
-              "entityId": "elixir"
+              "entityId": "heal-spell"
+            },
+            {
+              "type": "markVisited",
+              "nodeId": "study-heal"
+            }
+          ]
+        },
+        {
+          "id": "study-mage-light",
+          "type": "choice",
+          "source": "archives",
+          "target": "archives",
+          "text": "Study the Tome of Mage Light Spell",
+          "conditions": [
+            {
+              "type": "notVisited",
+              "nodeId": "study-mage-light"
+            }
+          ],
+          "effects": [
+            {
+              "type": "grantEntity",
+              "entityId": "mage-light"
+            },
+            {
+              "type": "markVisited",
+              "nodeId": "study-mage-light"
             }
           ]
         },
@@ -165,14 +203,14 @@
           "type": "choice",
           "source": "archives",
           "target": "main-hall",
-          "text": "Leave the elixir and return to the Main Hall"
+          "text": "Return to the Main Hall"
         },
         {
           "id": "descend",
           "type": "choice",
           "source": "main-hall",
           "target": "dark-chapter",
-          "text": "Descend into the passage",
+          "text": "Descend into the passage using the lantern",
           "conditions": [
             {
               "type": "hasEntity",
@@ -186,6 +224,32 @@
           "source": "dark-chapter",
           "target": "chamber-of-runes",
           "text": "Examine the glowing glyphs"
+        },
+        {
+          "id": "cast-mage-light",
+          "type": "choice",
+          "source": "dark-chapter",
+          "target": "chamber-of-runes",
+          "text": "Cast Mage Light Spell and proceed safely (-15 MP)",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "mage-light"
+            },
+            {
+              "type": "resourceAtLeast",
+              "key": "mana",
+              "value": 15
+            }
+          ],
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "mana",
+              "amount": 15,
+              "clampToZero": true
+            }
+          ]
         },
         {
           "id": "cross-bridge",
@@ -268,6 +332,47 @@
           ]
         },
         {
+          "id": "cast-heal",
+          "type": "choice",
+          "source": "collapsed-bridge",
+          "target": "collapsed-bridge",
+          "text": "Cast Heal Spell (+40 HP, -20 MP, 3t CD)",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "heal-spell"
+            },
+            {
+              "type": "resourceAtLeast",
+              "key": "mana",
+              "value": 20
+            },
+            {
+              "type": "resourceLessThan",
+              "key": "heal_cooldown",
+              "value": 1
+            }
+          ],
+          "effects": [
+            {
+              "type": "addResource",
+              "key": "health",
+              "amount": 40
+            },
+            {
+              "type": "spendResource",
+              "key": "mana",
+              "amount": 20,
+              "clampToZero": true
+            },
+            {
+              "type": "addResource",
+              "key": "heal_cooldown",
+              "amount": 3
+            }
+          ]
+        },
+        {
           "id": "climb-rubble",
           "type": "choice",
           "source": "collapsed-bridge",
@@ -318,7 +423,7 @@
         }
       ],
       "nodeCount": 9,
-      "edgeCount": 15,
+      "edgeCount": 18,
       "maxDepth": 5,
       "endings": [
         "victory",
@@ -333,11 +438,13 @@
       "conditionsUsed": [
         "notVisited",
         "hasEntity",
-        "resourceAtLeast"
+        "resourceAtLeast",
+        "resourceLessThan"
       ],
       "effectsUsed": [
         "grantEntity",
         "addResource",
+        "markVisited",
         "spendResource",
         "revokeEntity"
       ],

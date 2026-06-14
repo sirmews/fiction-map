@@ -1,10 +1,3 @@
-/**
- * Static graph definition for `fiction-map generate`.
- *
- * This drives `metadata.json`, `SEMANTICS.md`, and runtime execution so
- * agents, CI, and the app all read the same authored graph structure.
- */
-
 import { defineGraph } from "@fiction-map/core";
 import { registry } from "../project";
 
@@ -13,7 +6,7 @@ export const story = defineGraph(registry, {
   nodes: [
     { id: "entrance", type: "scene", title: "Entrance", body: "You stand at the entrance to the old library." },
     { id: "main-hall", type: "scene", title: "Main Hall", body: "Dust motes float in shafts of grey light. A lantern sits on a table." },
-    { id: "archives", type: "scene", title: "Dusty Archives", body: "Towering shelves hold forgotten lore. A glowing elixir sits on a pedestal." },
+    { id: "archives", type: "scene", title: "Dusty Archives", body: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals." },
     { id: "dark-chapter", type: "scene", title: "Dark Chapter", body: "A narrow passage drops into darkness. You hear the crackle of ancient magic." },
     { id: "chamber-of-runes", type: "scene", title: "Chamber of Runes", body: "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key." },
     { id: "collapsed-bridge", type: "scene", title: "Collapsed Bridge", body: "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere." },
@@ -31,6 +24,7 @@ export const story = defineGraph(registry, {
       effects: [
         { type: "grantEntity", entityId: "lantern" },
         { type: "addResource", key: "health", amount: 100 },
+        { type: "addResource", key: "mana", amount: 50 },
       ],
     },
     {
@@ -42,26 +36,42 @@ export const story = defineGraph(registry, {
       conditions: [{ type: "notVisited", nodeId: "archives" }],
     },
     {
-      id: "take-elixir",
+      id: "study-heal",
       type: "choice",
       source: "archives",
-      target: "main-hall",
-      text: "Take the elixir and return to the Main Hall",
-      effects: [{ type: "grantEntity", entityId: "elixir" }],
+      target: "archives",
+      text: "Study the Tome of Heal Spell",
+      conditions: [{ type: "notVisited", nodeId: "study-heal" }],
+      effects: [
+        { type: "grantEntity", entityId: "heal-spell" },
+        { type: "markVisited", nodeId: "study-heal" },
+      ],
+    },
+    {
+      id: "study-mage-light",
+      type: "choice",
+      source: "archives",
+      target: "archives",
+      text: "Study the Tome of Mage Light Spell",
+      conditions: [{ type: "notVisited", nodeId: "study-mage-light" }],
+      effects: [
+        { type: "grantEntity", entityId: "mage-light" },
+        { type: "markVisited", nodeId: "study-mage-light" },
+      ],
     },
     {
       id: "return-from-archives",
       type: "choice",
       source: "archives",
       target: "main-hall",
-      text: "Leave the elixir and return to the Main Hall",
+      text: "Return to the Main Hall",
     },
     {
       id: "descend",
       type: "choice",
       source: "main-hall",
       target: "dark-chapter",
-      text: "Descend into the passage",
+      text: "Descend into the passage using the lantern",
       conditions: [{ type: "hasEntity", entityId: "lantern" }],
     },
     {
@@ -70,6 +80,20 @@ export const story = defineGraph(registry, {
       source: "dark-chapter",
       target: "chamber-of-runes",
       text: "Examine the glowing glyphs",
+    },
+    {
+      id: "cast-mage-light",
+      type: "choice",
+      source: "dark-chapter",
+      target: "chamber-of-runes",
+      text: "Cast Mage Light Spell and proceed safely (-15 MP)",
+      conditions: [
+        { type: "hasEntity", entityId: "mage-light" },
+        { type: "resourceAtLeast", key: "mana", value: 15 },
+      ],
+      effects: [
+        { type: "spendResource", key: "mana", amount: 15, clampToZero: true },
+      ],
     },
     {
       id: "cross-bridge",
@@ -113,6 +137,23 @@ export const story = defineGraph(registry, {
       effects: [
         { type: "addResource", key: "health", amount: 50 },
         { type: "revokeEntity", entityId: "elixir" },
+      ],
+    },
+    {
+      id: "cast-heal",
+      type: "choice",
+      source: "collapsed-bridge",
+      target: "collapsed-bridge",
+      text: "Cast Heal Spell (+40 HP, -20 MP, 3t CD)",
+      conditions: [
+        { type: "hasEntity", entityId: "heal-spell" },
+        { type: "resourceAtLeast", key: "mana", value: 20 },
+        { type: "resourceLessThan", key: "heal_cooldown", value: 1 },
+      ],
+      effects: [
+        { type: "addResource", key: "health", amount: 40 },
+        { type: "spendResource", key: "mana", amount: 20, clampToZero: true },
+        { type: "addResource", key: "heal_cooldown", amount: 3 },
       ],
     },
     {
