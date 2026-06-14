@@ -57,16 +57,29 @@ Source: `edges/choice.edge.ts:4`
 
 ### `library-mystery`
 
-- 3 nodes, 2 edges, max depth: 2
-- Endings: `dark-chapter`
-- Conditions used: `hasEntity`
-- Effects used: `grantEntity`
+- 9 nodes, 15 edges, max depth: 5
+- Endings: `victory`, `death`
+- Conditions used: `notVisited`, `hasEntity`, `resourceAtLeast`
+- Effects used: `grantEntity`, `addResource`, `spendResource`, `revokeEntity`
 
 **Topology:**
 
 | Source | Edge | Target | Conditions | Effects |
 |---|---|---|---|---|
-| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="lantern")` |
+| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="lantern")`<br>`addResource(key="health", amount=100)` |
+| `main-hall` (scene) | `explore-archives` (choice) | `archives` (scene) | `notVisited(nodeId="archives")` | — |
+| `archives` (scene) | `take-elixir` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="elixir")` |
+| `archives` (scene) | `return-from-archives` (choice) | `main-hall` (scene) | — | — |
 | `main-hall` (scene) | `descend` (choice) | `dark-chapter` (scene) | `hasEntity(entityId="lantern")` | — |
+| `dark-chapter` (scene) | `examine-glyphs` (choice) | `chamber-of-runes` (scene) | — | — |
+| `dark-chapter` (scene) | `cross-bridge` (choice) | `collapsed-bridge` (scene) | — | `spendResource(key="health", amount=40)` |
+| `chamber-of-runes` (scene) | `translate-runes` (choice) | `forgotten-crypt` (scene) | `hasEntity(entityId="lantern")` | `grantEntity(entityId="key")` |
+| `chamber-of-runes` (scene) | `touch-pedestal` (choice) | `chamber-of-runes` (scene) | — | `spendResource(key="health", amount=30)` |
+| `chamber-of-runes` (scene) | `return-to-chapter` (choice) | `dark-chapter` (scene) | — | — |
+| `collapsed-bridge` (scene) | `heal-with-elixir` (choice) | `collapsed-bridge` (scene) | `hasEntity(entityId="elixir")` | `addResource(key="health", amount=50)`<br>`revokeEntity(entityId="elixir")` |
+| `collapsed-bridge` (scene) | `climb-rubble` (choice) | `forgotten-crypt` (scene) | `resourceAtLeast(key="health", value=30)` | `spendResource(key="health", amount=20)` |
+| `collapsed-bridge` (scene) | `succumb-to-injuries` (choice) | `death` (scene) | — | — |
+| `forgotten-crypt` (scene) | `unlock-casket` (choice) | `victory` (scene) | `hasEntity(entityId="key")` | — |
+| `forgotten-crypt` (scene) | `die-at-crypt` (choice) | `death` (scene) | — | — |
 
 Source: `graphs/story.graph.ts:11`

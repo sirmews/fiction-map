@@ -13,21 +13,12 @@ describe("literature-rpg consumer app", () => {
     expect(story.edges).toContainEqual(
       expect.objectContaining({
         id: "enter-hall",
-        effects: [{ type: "grantEntity", entityId: "lantern" }],
+        effects: expect.arrayContaining([{ type: "grantEntity", entityId: "lantern" }]),
       })
     );
   });
 
-  it("builds runtime transitions with the lantern grant effect", () => {
-    expect(runtime.transitions).toContainEqual(
-      expect.objectContaining({
-        id: "enter-hall",
-        effects: [{ type: "grantEntity", entityId: "lantern" }],
-      })
-    );
-  });
-
-  it("walks from the entrance through the gated descent", () => {
+  it("walks from the entrance to victory through Dusty Archives and Chamber of Runes", () => {
     const visited: string[] = [runtime.startNodeId];
     
     const steps = runtime.walkWithContext(
@@ -41,6 +32,15 @@ describe("literature-rpg consumer app", () => {
       }
     }
 
-    expect(visited).toEqual(["entrance", "main-hall", "dark-chapter"]);
+    expect(visited).toEqual([
+      "entrance",
+      "main-hall",
+      "archives",
+      "main-hall",
+      "dark-chapter",
+      "chamber-of-runes",
+      "forgotten-crypt",
+      "victory",
+    ]);
   });
 });

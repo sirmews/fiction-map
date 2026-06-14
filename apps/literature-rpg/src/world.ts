@@ -20,5 +20,7 @@ export const world = defineWorld(registry, {
   id: "library",
   entities: [
     { id: "lantern", type: "item", label: "Brass Lantern" },
+    { id: "elixir", type: "item", label: "Healing Elixir" },
+    { id: "key", type: "item", label: "Casket Key" },
   ],
 });

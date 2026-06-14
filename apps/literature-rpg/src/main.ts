@@ -43,7 +43,14 @@ export async function playInteractive() {
     const title = currentNode.title ? pc.cyan(pc.bold(String(currentNode.title))) : pc.cyan(currentNode.id);
     const body = String(currentNode.body || "");
     
-    note(body, title);
+    const hp = state.entityState?.resources?.health ?? 0;
+    const inventory = Array.from(context.derivedState.ownedEntityIds);
+    let hudText = `❤️ Health: ${hp} HP`;
+    if (inventory.length > 0) {
+      hudText += ` | 🎒 Items: ${inventory.join(", ")}`;
+    }
+    
+    note(body + `\n\n${pc.dim(hudText)}`, title);
 
     // 4. Find available choices
     const available = runtime.getAvailable(state, context);

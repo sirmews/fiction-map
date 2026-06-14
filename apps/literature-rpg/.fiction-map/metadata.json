@@ -73,10 +73,46 @@
           "body": "Dust motes float in shafts of grey light. A lantern sits on a table."
         },
         {
+          "id": "archives",
+          "type": "scene",
+          "title": "Dusty Archives",
+          "body": "Towering shelves hold forgotten lore. A glowing elixir sits on a pedestal."
+        },
+        {
           "id": "dark-chapter",
           "type": "scene",
           "title": "Dark Chapter",
-          "body": "A narrow passage drops into darkness."
+          "body": "A narrow passage drops into darkness. You hear the crackle of ancient magic."
+        },
+        {
+          "id": "chamber-of-runes",
+          "type": "scene",
+          "title": "Chamber of Runes",
+          "body": "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key."
+        },
+        {
+          "id": "collapsed-bridge",
+          "type": "scene",
+          "title": "Collapsed Bridge",
+          "body": "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere."
+        },
+        {
+          "id": "forgotten-crypt",
+          "type": "scene",
+          "title": "Forgotten Crypt",
+          "body": "An ancient crypt, smelling of age. A massive iron casket lies in the center."
+        },
+        {
+          "id": "victory",
+          "type": "scene",
+          "title": "Victory!",
+          "body": "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!"
+        },
+        {
+          "id": "death",
+          "type": "scene",
+          "title": "Defeat",
+          "body": "The dark forces of the passage overwhelm you. Your journey ends here."
         }
       ],
       "edges": [
@@ -90,8 +126,46 @@
             {
               "type": "grantEntity",
               "entityId": "lantern"
+            },
+            {
+              "type": "addResource",
+              "key": "health",
+              "amount": 100
             }
           ]
+        },
+        {
+          "id": "explore-archives",
+          "type": "choice",
+          "source": "main-hall",
+          "target": "archives",
+          "text": "Explore the Dusty Archives",
+          "conditions": [
+            {
+              "type": "notVisited",
+              "nodeId": "archives"
+            }
+          ]
+        },
+        {
+          "id": "take-elixir",
+          "type": "choice",
+          "source": "archives",
+          "target": "main-hall",
+          "text": "Take the elixir and return to the Main Hall",
+          "effects": [
+            {
+              "type": "grantEntity",
+              "entityId": "elixir"
+            }
+          ]
+        },
+        {
+          "id": "return-from-archives",
+          "type": "choice",
+          "source": "archives",
+          "target": "main-hall",
+          "text": "Leave the elixir and return to the Main Hall"
         },
         {
           "id": "descend",
@@ -105,13 +179,147 @@
               "entityId": "lantern"
             }
           ]
+        },
+        {
+          "id": "examine-glyphs",
+          "type": "choice",
+          "source": "dark-chapter",
+          "target": "chamber-of-runes",
+          "text": "Examine the glowing glyphs"
+        },
+        {
+          "id": "cross-bridge",
+          "type": "choice",
+          "source": "dark-chapter",
+          "target": "collapsed-bridge",
+          "text": "Cross the crumbling bridge",
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "health",
+              "amount": 40
+            }
+          ]
+        },
+        {
+          "id": "translate-runes",
+          "type": "choice",
+          "source": "chamber-of-runes",
+          "target": "forgotten-crypt",
+          "text": "Translate the runes using the lantern",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "lantern"
+            }
+          ],
+          "effects": [
+            {
+              "type": "grantEntity",
+              "entityId": "key"
+            }
+          ]
+        },
+        {
+          "id": "touch-pedestal",
+          "type": "choice",
+          "source": "chamber-of-runes",
+          "target": "chamber-of-runes",
+          "text": "Touch the central pedestal",
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "health",
+              "amount": 30
+            }
+          ]
+        },
+        {
+          "id": "return-to-chapter",
+          "type": "choice",
+          "source": "chamber-of-runes",
+          "target": "dark-chapter",
+          "text": "Return to the Dark Chapter"
+        },
+        {
+          "id": "heal-with-elixir",
+          "type": "choice",
+          "source": "collapsed-bridge",
+          "target": "collapsed-bridge",
+          "text": "Drink the healing elixir (+50 HP)",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "elixir"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addResource",
+              "key": "health",
+              "amount": 50
+            },
+            {
+              "type": "revokeEntity",
+              "entityId": "elixir"
+            }
+          ]
+        },
+        {
+          "id": "climb-rubble",
+          "type": "choice",
+          "source": "collapsed-bridge",
+          "target": "forgotten-crypt",
+          "text": "Climb through the rubble (-20 HP)",
+          "conditions": [
+            {
+              "type": "resourceAtLeast",
+              "key": "health",
+              "value": 30
+            }
+          ],
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "health",
+              "amount": 20
+            }
+          ]
+        },
+        {
+          "id": "succumb-to-injuries",
+          "type": "choice",
+          "source": "collapsed-bridge",
+          "target": "death",
+          "text": "Succumb to your injuries"
+        },
+        {
+          "id": "unlock-casket",
+          "type": "choice",
+          "source": "forgotten-crypt",
+          "target": "victory",
+          "text": "Unlock the iron casket",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "key"
+            }
+          ]
+        },
+        {
+          "id": "die-at-crypt",
+          "type": "choice",
+          "source": "forgotten-crypt",
+          "target": "death",
+          "text": "Succumb to your wounds in the crypt"
         }
       ],
-      "nodeCount": 3,
-      "edgeCount": 2,
-      "maxDepth": 2,
+      "nodeCount": 9,
+      "edgeCount": 15,
+      "maxDepth": 5,
       "endings": [
-        "dark-chapter"
+        "victory",
+        "death"
       ],
       "nodeTypesUsed": [
         "scene"
@@ -120,10 +328,15 @@
         "choice"
       ],
       "conditionsUsed": [
-        "hasEntity"
+        "notVisited",
+        "hasEntity",
+        "resourceAtLeast"
       ],
       "effectsUsed": [
-        "grantEntity"
+        "grantEntity",
+        "addResource",
+        "spendResource",
+        "revokeEntity"
       ],
       "errors": [],
       "warnings": []
