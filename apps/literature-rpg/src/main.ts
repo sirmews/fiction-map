@@ -23,7 +23,7 @@ registerBuiltins(registry);
 export const runtime = createRuntimeFromGraph(story);
 
 export async function playInteractive() {
-  let state = createInitialState(runtime.parsed.startNodeId);
+  let state = createInitialState(runtime.startNodeId);
   
   console.clear();
   intro(pc.bgMagenta(pc.black(" FICTION MAP : LITERATURE RPG ")));
@@ -33,7 +33,7 @@ export async function playInteractive() {
     const context = { derivedState: deriveEntityState(world, state) };
 
     // 2. Locate the current node
-    const currentNode = runtime.parsed.nodes.get(state.currentNodeId);
+    const currentNode = story.nodes.find((n) => n.id === state.currentNodeId);
     if (!currentNode) {
       outro(pc.red(`❌ Error: Node '${state.currentNodeId}' not found.`));
       break;

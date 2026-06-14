@@ -19,7 +19,7 @@ describe("literature-rpg consumer app", () => {
   });
 
   it("builds runtime transitions with the lantern grant effect", () => {
-    expect(runtime.parsed.transitions).toContainEqual(
+    expect(runtime.transitions).toContainEqual(
       expect.objectContaining({
         id: "enter-hall",
         effects: [{ type: "grantEntity", entityId: "lantern" }],
@@ -28,10 +28,10 @@ describe("literature-rpg consumer app", () => {
   });
 
   it("walks from the entrance through the gated descent", () => {
-    const visited: string[] = [runtime.parsed.startNodeId];
+    const visited: string[] = [runtime.startNodeId];
     
     const steps = runtime.walkWithContext(
-      createInitialState(runtime.parsed.startNodeId), 
+      createInitialState(runtime.startNodeId), 
       (currentState) => ({ derivedState: deriveEntityState(world, currentState) })
     );
 
