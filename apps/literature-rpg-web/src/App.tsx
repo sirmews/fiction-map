@@ -31,6 +31,21 @@ function App() {
   // Figure out what we have active from the derived state (e.g. 'lantern')
   const inventory = Array.from(context.derivedState.ownedEntityIds);
 
+  // Group choices by anchorBlockId
+  const anchoredChoices = new Map<string, typeof availableChoices>();
+  const unanchoredChoices: typeof availableChoices = [];
+
+  for (const choice of availableChoices) {
+    const anchorId = choice.anchorBlockId;
+    if (anchorId) {
+      const existing = anchoredChoices.get(anchorId) ?? [];
+      existing.push(choice);
+      anchoredChoices.set(anchorId, existing);
+    } else {
+      unanchoredChoices.push(choice);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-100">
       
@@ -101,49 +116,91 @@ function App() {
         </div>
       )}
 
-      <Card className="w-full max-w-lg bg-slate-900 border-slate-800 text-slate-100 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-2xl text-slate-200">
-            {currentNode.id.toUpperCase()}
+      <Card className="w-full max-w-lg bg-slate-900 border-slate-800 text-slate-100 shadow-xl overflow-hidden">
+        <CardHeader className="border-b border-slate-800/60 pb-3">
+          <CardTitle className="text-xl text-slate-200">
+            {isDead ? "💀 Defeat!" : isVictory ? "🎉 VICTORY!" : (currentNode.properties as any)?.title ?? currentNode.id}
           </CardTitle>
         </CardHeader>
         
-        <CardContent className="space-y-4">
-          {(currentNode.blocks || []).map((block: any) => {
-            if (block.type === "paragraph") {
+        <CardContent className="pt-4 flex flex-col gap-4">
+          {isDead ? (
+            <p className="text-slate-400 leading-relaxed text-md">
+              You have succumbed to your wounds inside the library passage. Your vision fades into cold darkness...
+            </p>
+          ) : currentNode.blocks && currentNode.blocks.length > 0 ? (
+            currentNode.blocks.map((block: any) => {
+              const blockChoices = anchoredChoices.get(block.id) ?? [];
               return (
-                <p key={block.id} className="text-slate-400 leading-relaxed text-lg">
-                  {block.text}
-                </p>
+                <div key={block.id} className="flex flex-col gap-2 p-2 rounded hover:bg-slate-800/40 transition">
+                  {block.type === "header" && (
+                    <h3 className="text-lg font-bold text-slate-200">{block.text}</h3>
+                  )}
+                  {block.type === "paragraph" && (
+                    <p className="text-slate-400 leading-relaxed text-md">{block.text}</p>
+                  )}
+                  {block.type === "image" && (
+                    <div className="rounded overflow-hidden border border-slate-800">
+                      <img src={block.url} alt={block.caption} className="w-full h-auto object-cover max-h-48" />
+                      {block.caption && <p className="text-xs text-slate-500 p-1 bg-slate-950/40">{block.caption}</p>}
+                    </div>
+                  )}
+
+                  {/* Render Choices anchored to this block inline */}
+                  {blockChoices.length > 0 && (
+                    <div className="flex flex-col gap-1.5 pt-2 border-t border-dashed border-slate-800/80 mt-1">
+                      {blockChoices.map((choice) => {
+                        const label = choice.label ?? (choice.metadata as any)?.text ?? choice.id;
+                        return (
+                          <Button 
+                            key={choice.id} 
+                            onClick={() => step(choice)}
+                            className="w-full justify-start text-left h-auto py-2 px-3 text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/40 rounded transition"
+                          >
+                            <span className="mr-1.5 text-slate-500">➤</span> {label}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
-            }
-            return null;
-          })}
+            })
+          ) : (
+            // Fallback for flat body nodes
+            <p className="text-slate-400 leading-relaxed text-md">
+              {(currentNode.properties as any)?.body as string}
+            </p>
+          )}
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-3 pt-6 border-t border-slate-800 mt-4">
+        <CardFooter className="flex flex-col gap-3 pt-4 border-t border-slate-800 bg-slate-950/20">
           {isDead || isVictory || availableChoices.length === 0 ? (
-            <div className="w-full text-center space-y-4">
-              <div className="text-emerald-400 text-lg font-semibold">
-                {isDead ? "💥 GAME OVER 💥" : isVictory ? "🎉 VICTORY! 🎉" : "✨ You have reached the end. ✨"}
+            <div className="w-full text-center space-y-3 py-2">
+              <div className="text-emerald-400 text-md font-semibold">
+                {isDead ? "💥 GAME OVER 💥" : isVictory ? "🏆 ADVENTURE COMPLETE 🏆" : "✨ You have reached the end. ✨"}
               </div>
-              <Button onClick={reset} className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-3">
+              <Button onClick={reset} className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 text-sm font-semibold rounded">
                 Play Again
               </Button>
             </div>
-          ) : (
-            availableChoices.map((choice) => {
+          ) : unanchoredChoices.length > 0 ? (
+            // Render unanchored choices in the footer as fallback
+            unanchoredChoices.map((choice) => {
               const label = choice.label ?? (choice.metadata as any)?.text ?? choice.id;
               return (
                 <Button 
                   key={choice.id} 
                   onClick={() => step(choice)}
-                  className="w-full justify-start text-left h-auto py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-800 hover:border-slate-700 transition"
+                  className="w-full justify-start text-left h-auto py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-800 hover:border-slate-700 rounded transition text-sm"
                 >
                   <span className="mr-2 text-slate-500">➤</span> {label}
                 </Button>
               );
             })
+          ) : (
+            // If all choices were anchored and rendered inline
+            <span className="text-[10px] text-slate-500 text-center w-full italic py-1">Use the inline action prompts above to proceed.</span>
           )}
         </CardFooter>
       </Card>

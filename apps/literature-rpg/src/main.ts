@@ -71,13 +71,30 @@ export async function playInteractive() {
       break;
     }
 
-    // 3. Display the scene
-    const title = pc.cyan(pc.bold(currentNode.id.toUpperCase()));
-    const body = (currentNode.blocks || [])
-      .filter((b: any) => b.type === "paragraph" && b.text)
-      .map((b: any) => b.text)
-      .join("\n\n");
-    
+    // 3. Render blocks sequentially
+    if (currentNode.blocks && currentNode.blocks.length > 0) {
+      for (const block of currentNode.blocks) {
+        let blockText = String(block.text || "");
+        
+        // Output block title/headers
+        if (block.type === "header") {
+          console.log(`\n${pc.bold(pc.underline(blockText))}\n`);
+        } else if (block.type === "paragraph") {
+          console.log(`\n${blockText}`);
+        }
+
+        // Pacing delay from generic metadata
+        const delay = (block.metadata as any)?.delayAfterMs;
+        if (typeof delay === "number" && delay > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      }
+    } else {
+      // Fallback for simple nodes
+      const body = String((currentNode as any).body || "");
+      console.log(`\n${body}`);
+    }
+
     const hp = state.entityState?.resources?.health ?? 0;
     const mp = state.entityState?.resources?.mana ?? 0;
     const gold = state.entityState?.resources?.gold ?? 0;
@@ -95,8 +112,8 @@ export async function playInteractive() {
     if (inventory.length > 0) {
       hudText += `\n🎒 Spells/Items: ${inventory.join(", ")}`;
     }
-
-    note(body + `\n\n${pc.dim(hudText)}`, title);
+    
+    console.log(`\n${pc.dim("─".repeat(50))}\n${pc.cyan(hudText)}\n${pc.dim("─".repeat(50))}\n`);
 
     // 4. Find available choices
     const available = runtime.getAvailable(state, context);
