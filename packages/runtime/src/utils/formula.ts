@@ -21,7 +21,7 @@ export function evaluateFormula(formula: string, state: GraphRuntimeState): numb
         return String(resourceVal);
       }
       // Check global variables
-      const globalVal = state.variables[token];
+      const globalVal = state.variables?.[token];
       if (typeof globalVal === "number") {
         return String(globalVal);
       }
@@ -79,9 +79,17 @@ export function evaluateFormula(formula: string, state: GraphRuntimeState): numb
     return result;
   }
 
-  // Factor = Number | "(" Expression ")"
+  // Factor = Number | "(" Expression ")" | "-" Factor | "+" Factor
   function parseFactor(): number {
     const token = peek();
+    if (token === "-") {
+      consume(); // consume "-"
+      return -parseFactor();
+    }
+    if (token === "+") {
+      consume(); // consume "+"
+      return parseFactor();
+    }
     if (token === "(") {
       consume(); // consume "("
       const result = parseExpression();

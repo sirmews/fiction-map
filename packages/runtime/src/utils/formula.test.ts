@@ -41,4 +41,10 @@ describe("Formula Evaluator", () => {
   it("defaults unresolved variables to 0 safely", () => {
     expect(evaluateFormula("nonexistent_stat + 5", dummyState)).toBe(5);
   });
+
+  it("evaluates unary operators and negative multipliers correctly", () => {
+    expect(evaluateFormula("-5", dummyState)).toBe(-5);
+    expect(evaluateFormula("intelligence * -2", dummyState)).toBe(-30);
+    expect(evaluateFormula("100 + -level", dummyState)).toBe(98);
+  });
 });
