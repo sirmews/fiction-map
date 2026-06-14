@@ -167,5 +167,38 @@ describe("@fiction-map/core", () => {
       
       expect(graph.endings).toContain("end")
     })
+
+    it("should warn about unprotected resource spending", () => {
+      defineNodeType(registry, { id: "scene" })
+      defineEdgeType(registry, { id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
+      defineEffect(registry, {
+        id: "spendResource",
+        parameters: {
+          key: { type: "string", required: true },
+          amount: { type: "number", required: true },
+        },
+      })
+
+      const graph = defineGraph(registry, {
+        id: "test-story",
+        nodes: [
+          { id: "start", type: "scene" },
+          { id: "end", type: "scene" },
+        ],
+        edges: [
+          {
+            id: "c1",
+            type: "choice",
+            source: "start",
+            target: "end",
+            effects: [{ type: "spendResource", key: "health", amount: 10 }],
+          },
+        ],
+      })
+
+      expect(graph.warnings).toContainEqual(
+        expect.objectContaining({ code: "UNPROTECTED_RESOURCE_SPEND" })
+      )
+    })
   })
 })
