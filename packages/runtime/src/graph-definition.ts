@@ -13,6 +13,7 @@ const EDGE_RUNTIME_KEYS = new Set([
   "conditions",
   "effects",
   "text",
+  "anchorBlockId",
 ])
 
 function edgeMetadata(edge: EdgeInstance): Record<string, unknown> | undefined {
@@ -32,6 +33,10 @@ function graphEdgeToBlueprint(edge: EdgeInstance): EdgeBlueprint {
     id: edge.id,
     source: edge.source,
     target: edge.target,
+  }
+
+  if (edge.anchorBlockId) {
+    blueprint.anchorBlockId = edge.anchorBlockId
   }
 
   if (edge.conditions?.length) {
@@ -69,8 +74,8 @@ function graphEdgeToBlueprint(edge: EdgeInstance): EdgeBlueprint {
 export function graphDefinitionToBlueprint(graph: GraphDefinition): GraphBlueprint {
   return {
     nodes: graph.nodes.map((node) => {
-      const { id, type, ...properties } = node as any
-      return { id, type, ...properties }
+      const { id, type, blocks, ...properties } = node as any
+      return { id, type, blocks, ...properties }
     }),
     edges: graph.edges.map(graphEdgeToBlueprint),
     endings: graph.endings,

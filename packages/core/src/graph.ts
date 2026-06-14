@@ -147,6 +147,22 @@ export function validateGraph(
       }
     }
     
+    // Validate edge anchor block exists in source node
+    if (edge.anchorBlockId) {
+      const sourceNode = nodeIndex.get(edge.source)
+      if (sourceNode) {
+        const hasBlock = sourceNode.blocks?.some((block: any) => block.id === edge.anchorBlockId)
+        if (!hasBlock) {
+          errors.push({
+            code: "UNKNOWN_ANCHOR_BLOCK_ID",
+            message: `Edge "${edge.id}" specifies anchorBlockId "${edge.anchorBlockId}" but source node "${edge.source}" does not contain a content block with that ID.`,
+            edgeId: edge.id,
+            nodeId: edge.source,
+          })
+        }
+      }
+    }
+    
     // Validate conditions
     if (edge.conditions) {
       for (const condition of edge.conditions) {

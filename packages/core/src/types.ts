@@ -148,9 +148,20 @@ export interface EffectInstance {
 // Nodes and Edges (Instances)
 // ============================================================================
 
+export interface ContentBlock {
+  id: string
+  type: "paragraph" | "header" | "image" | "video"
+  text?: string
+  url?: string
+  level?: number
+  caption?: string
+  metadata?: Record<string, unknown>
+}
+
 export interface NodeInstance {
   id: string
   type: string
+  blocks?: ContentBlock[]
   [property: string]: unknown
 }
 
@@ -159,6 +170,7 @@ export interface EdgeInstance {
   type: string
   source: string
   target: string
+  anchorBlockId?: string
   conditions?: ConditionInstance[]
   effects?: EffectInstance[]
   [property: string]: unknown

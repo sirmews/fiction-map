@@ -1,9 +1,10 @@
-import type { Transition, NodeDefinition, Effect, Condition } from "./types"
+import type { Transition, NodeDefinition, Effect, Condition, ContentBlock } from "./types"
 
 export interface EdgeBlueprint {
   id: string
   source: string
   target?: string
+  anchorBlockId?: string
   conditions?: Condition[]
   visibility?: Condition[]
   effects?: Effect[]
@@ -16,6 +17,7 @@ export interface EdgeBlueprint {
 export interface NodeBlueprint {
   id: string
   type?: string
+  blocks?: ContentBlock[]
   [key: string]: unknown
 }
 
@@ -38,6 +40,7 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
     id: e.id,
     sourceNodeId: e.source,
     targetNodeId: e.target,
+    anchorBlockId: e.anchorBlockId,
     label: e.label,
     requirements: e.conditions?.length ? { all: e.conditions } : undefined,
     visibility: e.visibility?.length ? { all: e.visibility } : undefined,
@@ -56,8 +59,8 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
 
   const nodes = new Map<string, NodeDefinition>(
     blueprint.nodes.map((n) => {
-      const { id, type, ...properties } = n
-      return [id, { id, type, properties }]
+      const { id, type, blocks, ...properties } = n
+      return [id, { id, type, blocks, properties }]
     })
   )
 

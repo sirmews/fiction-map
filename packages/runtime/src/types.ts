@@ -91,6 +91,7 @@ export interface Transition {
   id: string
   sourceNodeId: string
   targetNodeId?: string
+  anchorBlockId?: string
   requirements?: ConditionSet
   visibility?: ConditionSet
   effects?: Effect[]
@@ -148,9 +149,20 @@ export interface TransitionResult {
 // GRAPH VALIDATION
 // ============================================================================
 
+export interface ContentBlock {
+  id: string
+  type: "paragraph" | "header" | "image" | "video"
+  text?: string
+  url?: string
+  level?: number
+  caption?: string
+  metadata?: Record<string, unknown>
+}
+
 export interface NodeDefinition {
   id: string
   type?: string
+  blocks?: ContentBlock[]
   properties?: Record<string, unknown>
 }
 
