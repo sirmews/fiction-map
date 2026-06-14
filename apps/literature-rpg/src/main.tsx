@@ -54,6 +54,18 @@ runtime.addTrigger({
 });
 
 export async function playInteractive() {
+  if (!process.stdin.isTTY) {
+    console.error(`
+❌ Error: Interactive TUI requires a direct TTY terminal input (Raw Mode).
+When running via "bun run --filter", standard input is redirected, which breaks keyboard navigation.
+
+👉 Please run the game directly using either:
+   1. bun --cwd apps/literature-rpg start
+   2. cd apps/literature-rpg && bun run start
+`);
+    process.exit(1);
+  }
+
   const { waitUntilExit } = render(<GameController />);
   await waitUntilExit();
 }
