@@ -51,6 +51,11 @@ Query Options:
   --to              Filter edges by target node id
   --json            Print machine-readable JSON
 
+Ascii Options:
+  --root-dir        Root directory (default: current directory)
+  --output-dir      Output directory containing .fiction-map/metadata.json
+  --format, -f      Output format: terminal, llm, mermaid (default: terminal)
+
 Examples:
   fiction-map generate
   fiction-map generate --check
@@ -80,6 +85,7 @@ async function main(): Promise<void> {
       from: { type: "string" },
       to: { type: "string" },
       json: { type: "boolean" },
+      format: { type: "string", short: "f" },
     },
   })
 
@@ -172,6 +178,7 @@ async function main(): Promise<void> {
       await ascii(positionals[1], {
         rootDir: values["root-dir"],
         outputDir: values["output-dir"],
+        format: values.format,
       })
       break
 
