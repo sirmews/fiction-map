@@ -9,6 +9,7 @@ import { generate } from "./commands/generate"
 import { validate } from "./commands/validate"
 import { installHooks } from "./commands/hooks"
 import { explain, query, showGraph } from "./commands/query"
+import { ascii } from "./commands/ascii"
 
 const VERSION = "0.1.0"
 
@@ -26,6 +27,7 @@ Commands:
   query       Read nodes, edges, or static paths from metadata.json
   graph       Show graph-level metadata and topology
   explain     Explain a graph, node, or edge by id
+  ascii       Draw a beautiful ASCII map of the story graph
 
 Options:
   --help, -h        Show this help
@@ -161,6 +163,15 @@ async function main(): Promise<void> {
         outputDir: values["output-dir"],
         graph: values.graph,
         json: values.json,
+      })
+      break
+
+    case "ascii":
+    case "map":
+    case "draw":
+      await ascii(positionals[1], {
+        rootDir: values["root-dir"],
+        outputDir: values["output-dir"],
       })
       break
 
