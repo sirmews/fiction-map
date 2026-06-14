@@ -1,4 +1,3 @@
-import { join } from "path"
 import { GraphDefinition, NodeInstance, EdgeInstance } from "@fiction-map/core"
 import { loadMetadata, selectGraphs } from "./query"
 
@@ -46,11 +45,11 @@ export function generateAsciiMap(graph: GraphDefinition): string {
     const title = typeof node.title === "string" ? node.title : ""
     const body = typeof node.body === "string" ? node.body : ""
     const titleLine = title ? ` "${title}"` : ""
-    const bodyLine = body ? `  ${body.length > 40 ? body.slice(0, 37) + "..." : body}` : ""
+    const bodyLine = body ? `  ${body.length > 34 ? body.slice(0, 31) + "..." : body}` : ""
 
     const lines = [
       `┌──────────────────────────────────────┐`,
-      `│ ${node.id}${typeLabel}${titleLine.padStart(38 - node.id.length - typeLabel.length)} │`,
+      `│ ${node.id}${typeLabel}${titleLine.padStart(36 - node.id.length - typeLabel.length)} │`,
     ]
     if (bodyLine) {
       lines.push(`│ ${bodyLine.padEnd(36)} │`)
@@ -60,17 +59,17 @@ export function generateAsciiMap(graph: GraphDefinition): string {
     return lines.map((l) => prefix + l).join("\n") + "\n"
   }
 
-  function traverse(nodeId: string, prefix: string, isLast: boolean) {
-    const node = nodesMap.get(nodeId)
-    if (!node) return
-
-    output += drawNodeBlock(node, prefix)
-
+  function traverse(nodeId: string, prefix: string, _isLast: boolean) {
     if (visited.has(nodeId)) {
       output += `${prefix}   └───► [see ${nodeId} above]\n`
       return
     }
     visited.add(nodeId)
+
+    const node = nodesMap.get(nodeId)
+    if (!node) return
+
+    output += drawNodeBlock(node, prefix)
 
     const edges = outgoing.get(nodeId) ?? []
     if (edges.length === 0) {
@@ -87,13 +86,13 @@ export function generateAsciiMap(graph: GraphDefinition): string {
       output += `${prefix}${edgeLabel}\n`
 
       if (edge.conditions && edge.conditions.length > 0) {
-        output += `${prefix}${lastEdge ? " " : "   │"}     ❓ conditions: ${formatInstances(edge.conditions)}\n`
+        output += `${prefix}${lastEdge ? "    " : "   │"}     ❓ conditions: ${formatInstances(edge.conditions)}\n`
       }
       if (edge.effects && edge.effects.length > 0) {
-        output += `${prefix}${lastEdge ? " " : "   │"}     ⚡ effects: ${formatInstances(edge.effects)}\n`
+        output += `${prefix}${lastEdge ? "    " : "   │"}     ⚡ effects: ${formatInstances(edge.effects)}\n`
       }
 
-      output += `${prefix}${lastEdge ? " " : "   │"}     ▼\n`
+      output += `${prefix}${lastEdge ? "    " : "   │"}     ▼\n`
       traverse(edge.target, nextPrefix, lastEdge)
     })
   }
