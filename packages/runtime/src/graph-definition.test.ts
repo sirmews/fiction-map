@@ -54,9 +54,9 @@ describe("graphDefinitionToBlueprint", () => {
 
     expect(blueprint).toEqual({
       nodes: [
-        { id: "entrance", type: "scene" },
-        { id: "main-hall", type: "scene" },
-        { id: "dark-chapter", type: "scene" },
+        { id: "entrance", type: "scene", title: "Entrance" },
+        { id: "main-hall", type: "scene", title: "Main Hall" },
+        { id: "dark-chapter", type: "scene", title: "Dark Chapter" },
       ],
       edges: [
         {
