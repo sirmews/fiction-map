@@ -57,7 +57,7 @@ export function generateAsciiMap(graph: GraphDefinition): string {
     }
     lines.push(`└──────────────────────────────────────┘`)
 
-    return lines.map((l, i) => i === 0 ? l : prefix + l).join("\n") + "\n"
+    return lines.map((l) => prefix + l).join("\n") + "\n"
   }
 
   function traverse(nodeId: string, prefix: string, isLast: boolean) {
