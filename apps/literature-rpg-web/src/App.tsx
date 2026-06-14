@@ -104,14 +104,21 @@ function App() {
       <Card className="w-full max-w-lg bg-slate-900 border-slate-800 text-slate-100 shadow-xl">
         <CardHeader>
           <CardTitle className="text-2xl text-slate-200">
-            {((currentNode.properties as any)?.title ?? currentNode.id)}
+            {currentNode.id.toUpperCase()}
           </CardTitle>
         </CardHeader>
         
-        <CardContent>
-          <p className="text-slate-400 leading-relaxed text-lg">
-            {((currentNode.properties as any)?.body as string)}
-          </p>
+        <CardContent className="space-y-4">
+          {(currentNode.blocks || []).map((block: any) => {
+            if (block.type === "paragraph") {
+              return (
+                <p key={block.id} className="text-slate-400 leading-relaxed text-lg">
+                  {block.text}
+                </p>
+              );
+            }
+            return null;
+          })}
         </CardContent>
 
         <CardFooter className="flex flex-col gap-3 pt-6 border-t border-slate-800 mt-4">

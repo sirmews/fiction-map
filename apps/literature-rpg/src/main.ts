@@ -72,8 +72,11 @@ export async function playInteractive() {
     }
 
     // 3. Display the scene
-    const title = currentNode.title ? pc.cyan(pc.bold(String(currentNode.title))) : pc.cyan(currentNode.id);
-    const body = String(currentNode.body || "");
+    const title = pc.cyan(pc.bold(currentNode.id.toUpperCase()));
+    const body = (currentNode.blocks || [])
+      .filter((b: any) => b.type === "paragraph" && b.text)
+      .map((b: any) => b.text)
+      .join("\n\n");
     
     const hp = state.entityState?.resources?.health ?? 0;
     const mp = state.entityState?.resources?.mana ?? 0;

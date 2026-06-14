@@ -4,15 +4,74 @@ import { registry } from "../project";
 export const story = defineGraph(registry, {
   id: "library-mystery",
   nodes: [
-    { id: "entrance", type: "scene", title: "Entrance", body: "You stand at the entrance to the old library." },
-    { id: "main-hall", type: "scene", title: "Main Hall", body: "Dust motes float in shafts of grey light. A lantern sits on a table." },
-    { id: "archives", type: "scene", title: "Dusty Archives", body: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby." },
-    { id: "dark-chapter", type: "scene", title: "Dark Chapter", body: "A narrow passage drops into darkness. You hear the crackle of ancient magic." },
-    { id: "chamber-of-runes", type: "scene", title: "Chamber of Runes", body: "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key." },
-    { id: "collapsed-bridge", type: "scene", title: "Collapsed Bridge", body: "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere." },
-    { id: "forgotten-crypt", type: "scene", title: "Forgotten Crypt", body: "An ancient crypt, smelling of age. A massive iron casket lies in the center." },
-    { id: "victory", type: "scene", title: "Victory!", body: "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!" },
-    { id: "death", type: "scene", title: "Defeat", body: "The dark forces of the passage overwhelm you. Your journey ends here." },
+    { 
+      id: "entrance", 
+      type: "scene", 
+      blocks: [
+        { id: "entrance-desc", type: "paragraph", text: "You stand at the entrance to the old library." }
+      ] 
+    },
+    { 
+      id: "main-hall", 
+      type: "scene", 
+      blocks: [
+        { id: "hall-desc", type: "paragraph", text: "Dust motes float in shafts of grey light. A lantern sits on a table." },
+        { id: "hall-passage", type: "paragraph", text: "In the center of the hall, a yawning dark chasm drops into the earth." },
+        { id: "hall-archives", type: "paragraph", text: "To your left, the heavy iron-reinforced doors of the archives loom." }
+      ] 
+    },
+    { 
+      id: "archives", 
+      type: "scene", 
+      blocks: [
+        { id: "archives-desc", type: "paragraph", text: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby.", metadata: { delayAfterMs: 400 } },
+        { id: "archives-heal-tome", type: "paragraph", text: "On a brass stand rests the glowing 'Tome of Heal Spell'." },
+        { id: "archives-light-tome", type: "paragraph", text: "On a nearby desk rests the 'Tome of Mage Light Spell'." },
+        { id: "archives-librarian", type: "paragraph", text: "The spectral librarian gazes at you, offering lockpicks for trade." }
+      ] 
+    },
+    { 
+      id: "dark-chapter", 
+      type: "scene", 
+      blocks: [
+        { id: "chapter-desc", type: "paragraph", text: "A narrow passage drops into darkness. You hear the crackle of ancient magic." }
+      ] 
+    },
+    { 
+      id: "chamber-of-runes", 
+      type: "scene", 
+      blocks: [
+        { id: "runes-desc", type: "paragraph", text: "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key." }
+      ] 
+    },
+    { 
+      id: "collapsed-bridge", 
+      type: "scene", 
+      blocks: [
+        { id: "bridge-desc", type: "paragraph", text: "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere." }
+      ] 
+    },
+    { 
+      id: "forgotten-crypt", 
+      type: "scene", 
+      blocks: [
+        { id: "crypt-desc", type: "paragraph", text: "An ancient crypt, smelling of age. A massive iron casket lies in the center." }
+      ] 
+    },
+    { 
+      id: "victory", 
+      type: "scene", 
+      blocks: [
+        { id: "victory-desc", type: "paragraph", text: "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!" }
+      ] 
+    },
+    { 
+      id: "death", 
+      type: "scene", 
+      blocks: [
+        { id: "death-desc", type: "paragraph", text: "The dark forces of the passage overwhelm you. Your journey ends here." }
+      ] 
+    },
   ],
   edges: [
     {
@@ -28,6 +87,7 @@ export const story = defineGraph(registry, {
         { type: "addResource", key: "gold", amount: 30 },
         { type: "addResource", key: "turns", amount: 0 },
       ],
+      anchorBlockId: "entrance-desc",
     },
     {
       id: "explore-archives",
@@ -36,6 +96,7 @@ export const story = defineGraph(registry, {
       target: "archives",
       text: "Explore the Dusty Archives",
       conditions: [{ type: "notVisited", nodeId: "archives" }],
+      anchorBlockId: "hall-archives",
     },
     {
       id: "study-heal",
@@ -44,10 +105,8 @@ export const story = defineGraph(registry, {
       target: "archives",
       text: "Study the Tome of Heal Spell",
       conditions: [{ type: "notVisited", nodeId: "study-heal" }],
-      effects: [
-        { type: "grantEntity", entityId: "heal-spell" },
-        { type: "markVisited", nodeId: "study-heal" },
-      ],
+      effects: [{ type: "grantEntity", entityId: "heal-spell" }, { type: "markVisited", nodeId: "study-heal" }],
+      anchorBlockId: "archives-heal-tome",
     },
     {
       id: "study-mage-light",
@@ -56,17 +115,8 @@ export const story = defineGraph(registry, {
       target: "archives",
       text: "Study the Tome of Mage Light Spell",
       conditions: [{ type: "notVisited", nodeId: "study-mage-light" }],
-      effects: [
-        { type: "grantEntity", entityId: "mage-light" },
-        { type: "markVisited", nodeId: "study-mage-light" },
-      ],
-    },
-    {
-      id: "return-from-archives",
-      type: "choice",
-      source: "archives",
-      target: "main-hall",
-      text: "Return to the Main Hall",
+      effects: [{ type: "grantEntity", entityId: "mage-light" }, { type: "markVisited", nodeId: "study-mage-light" }],
+      anchorBlockId: "archives-light-tome",
     },
     {
       id: "buy-lockpick",
@@ -83,6 +133,15 @@ export const story = defineGraph(registry, {
         { type: "grantEntity", entityId: "lockpick" },
         { type: "markVisited", nodeId: "buy-lockpick" },
       ],
+      anchorBlockId: "archives-librarian",
+    },
+    {
+      id: "return-from-archives",
+      type: "choice",
+      source: "archives",
+      target: "main-hall",
+      text: "Return to the Main Hall",
+      anchorBlockId: "archives-desc",
     },
     {
       id: "descend",
@@ -91,6 +150,7 @@ export const story = defineGraph(registry, {
       target: "dark-chapter",
       text: "Descend into the passage using the lantern",
       conditions: [{ type: "hasEntity", entityId: "lantern" }],
+      anchorBlockId: "hall-passage",
     },
     {
       id: "examine-glyphs",
@@ -98,6 +158,7 @@ export const story = defineGraph(registry, {
       source: "dark-chapter",
       target: "chamber-of-runes",
       text: "Examine the glowing glyphs",
+      anchorBlockId: "chapter-desc",
     },
     {
       id: "cast-mage-light",
@@ -112,6 +173,7 @@ export const story = defineGraph(registry, {
       effects: [
         { type: "spendResource", key: "mana", amount: 15, clampToZero: true },
       ],
+      anchorBlockId: "chapter-desc",
     },
     {
       id: "cross-bridge",
@@ -120,6 +182,7 @@ export const story = defineGraph(registry, {
       target: "collapsed-bridge",
       text: "Cross the crumbling bridge",
       effects: [{ type: "spendResource", key: "health", amount: 40, clampToZero: true }],
+      anchorBlockId: "chapter-desc",
     },
     {
       id: "translate-runes",
@@ -129,6 +192,7 @@ export const story = defineGraph(registry, {
       text: "Translate the runes using the lantern",
       conditions: [{ type: "hasEntity", entityId: "lantern" }],
       effects: [{ type: "grantEntity", entityId: "key" }],
+      anchorBlockId: "runes-desc",
     },
     {
       id: "touch-pedestal",
@@ -137,6 +201,7 @@ export const story = defineGraph(registry, {
       target: "chamber-of-runes",
       text: "Touch the central pedestal",
       effects: [{ type: "spendResource", key: "health", amount: 30, clampToZero: true }],
+      anchorBlockId: "runes-desc",
     },
     {
       id: "return-to-chapter",
@@ -144,6 +209,7 @@ export const story = defineGraph(registry, {
       source: "chamber-of-runes",
       target: "dark-chapter",
       text: "Return to the Dark Chapter",
+      anchorBlockId: "runes-desc",
     },
     {
       id: "heal-with-elixir",
@@ -156,6 +222,7 @@ export const story = defineGraph(registry, {
         { type: "addResource", key: "health", amount: 50 },
         { type: "revokeEntity", entityId: "elixir" },
       ],
+      anchorBlockId: "bridge-desc",
     },
     {
       id: "cast-heal",
@@ -173,6 +240,7 @@ export const story = defineGraph(registry, {
         { type: "spendResource", key: "mana", amount: 20, clampToZero: true },
         { type: "addResource", key: "heal_cooldown", amount: 3 },
       ],
+      anchorBlockId: "bridge-desc",
     },
     {
       id: "climb-rubble",
@@ -182,6 +250,7 @@ export const story = defineGraph(registry, {
       text: "Climb through the rubble (-20 HP)",
       conditions: [{ type: "resourceAtLeast", key: "health", value: 30 }],
       effects: [{ type: "spendResource", key: "health", amount: 20, clampToZero: true }],
+      anchorBlockId: "bridge-desc",
     },
     {
       id: "succumb-to-injuries",
@@ -189,6 +258,7 @@ export const story = defineGraph(registry, {
       source: "collapsed-bridge",
       target: "death",
       text: "Succumb to your injuries",
+      anchorBlockId: "bridge-desc",
     },
     {
       id: "unlock-casket",
@@ -197,6 +267,7 @@ export const story = defineGraph(registry, {
       target: "victory",
       text: "Unlock the iron casket",
       conditions: [{ type: "hasEntity", entityId: "key" }],
+      anchorBlockId: "crypt-desc",
     },
     {
       id: "lockpick-casket",
@@ -205,6 +276,7 @@ export const story = defineGraph(registry, {
       target: "victory",
       text: "Lockpick the iron casket",
       conditions: [{ type: "hasEntity", entityId: "lockpick" }],
+      anchorBlockId: "crypt-desc",
     },
     {
       id: "die-at-crypt",
@@ -212,6 +284,7 @@ export const story = defineGraph(registry, {
       source: "forgotten-crypt",
       target: "death",
       text: "Succumb to your wounds in the crypt",
+      anchorBlockId: "crypt-desc",
     },
   ],
 });

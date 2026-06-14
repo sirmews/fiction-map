@@ -29,6 +29,7 @@ describe("literature-rpg consumer app", () => {
       "archives",
       "archives", // Studies Tome of Heal
       "archives", // Studies Tome of Mage Light
+      "archives", // Buys lockpick
       "main-hall",
       "dark-chapter",
       "chamber-of-runes",
