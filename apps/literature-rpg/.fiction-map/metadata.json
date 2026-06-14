@@ -76,7 +76,7 @@
           "id": "archives",
           "type": "scene",
           "title": "Dusty Archives",
-          "body": "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals."
+          "body": "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby."
         },
         {
           "id": "dark-chapter",
@@ -136,6 +136,16 @@
               "type": "addResource",
               "key": "mana",
               "amount": 50
+            },
+            {
+              "type": "addResource",
+              "key": "gold",
+              "amount": 30
+            },
+            {
+              "type": "addResource",
+              "key": "turns",
+              "amount": 0
             }
           ]
         },
@@ -204,6 +214,40 @@
           "source": "archives",
           "target": "main-hall",
           "text": "Return to the Main Hall"
+        },
+        {
+          "id": "buy-lockpick",
+          "type": "choice",
+          "source": "archives",
+          "target": "archives",
+          "text": "Buy a lockpick from the spectral librarian (-15 gold)",
+          "conditions": [
+            {
+              "type": "notVisited",
+              "nodeId": "buy-lockpick"
+            },
+            {
+              "type": "resourceAtLeast",
+              "key": "gold",
+              "value": 15
+            }
+          ],
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "gold",
+              "amount": 15,
+              "clampToZero": true
+            },
+            {
+              "type": "grantEntity",
+              "entityId": "lockpick"
+            },
+            {
+              "type": "markVisited",
+              "nodeId": "buy-lockpick"
+            }
+          ]
         },
         {
           "id": "descend",
@@ -415,6 +459,19 @@
           ]
         },
         {
+          "id": "lockpick-casket",
+          "type": "choice",
+          "source": "forgotten-crypt",
+          "target": "victory",
+          "text": "Lockpick the iron casket",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "lockpick"
+            }
+          ]
+        },
+        {
           "id": "die-at-crypt",
           "type": "choice",
           "source": "forgotten-crypt",
@@ -423,7 +480,7 @@
         }
       ],
       "nodeCount": 9,
-      "edgeCount": 18,
+      "edgeCount": 20,
       "maxDepth": 5,
       "endings": [
         "victory",
@@ -437,8 +494,8 @@
       ],
       "conditionsUsed": [
         "notVisited",
-        "hasEntity",
         "resourceAtLeast",
+        "hasEntity",
         "resourceLessThan"
       ],
       "effectsUsed": [

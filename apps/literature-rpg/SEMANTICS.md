@@ -57,20 +57,21 @@ Source: `edges/choice.edge.ts:4`
 
 ### `library-mystery`
 
-- 9 nodes, 18 edges, max depth: 5
+- 9 nodes, 20 edges, max depth: 5
 - Endings: `victory`, `death`
-- Conditions used: `notVisited`, `hasEntity`, `resourceAtLeast`, `resourceLessThan`
+- Conditions used: `notVisited`, `resourceAtLeast`, `hasEntity`, `resourceLessThan`
 - Effects used: `grantEntity`, `addResource`, `markVisited`, `spendResource`, `revokeEntity`
 
 **Topology:**
 
 | Source | Edge | Target | Conditions | Effects |
 |---|---|---|---|---|
-| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="lantern")`<br>`addResource(key="health", amount=100)`<br>`addResource(key="mana", amount=50)` |
+| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="lantern")`<br>`addResource(key="health", amount=100)`<br>`addResource(key="mana", amount=50)`<br>`addResource(key="gold", amount=30)`<br>`addResource(key="turns", amount=0)` |
 | `main-hall` (scene) | `explore-archives` (choice) | `archives` (scene) | `notVisited(nodeId="archives")` | — |
 | `archives` (scene) | `study-heal` (choice) | `archives` (scene) | `notVisited(nodeId="study-heal")` | `grantEntity(entityId="heal-spell")`<br>`markVisited(nodeId="study-heal")` |
 | `archives` (scene) | `study-mage-light` (choice) | `archives` (scene) | `notVisited(nodeId="study-mage-light")` | `grantEntity(entityId="mage-light")`<br>`markVisited(nodeId="study-mage-light")` |
 | `archives` (scene) | `return-from-archives` (choice) | `main-hall` (scene) | — | — |
+| `archives` (scene) | `buy-lockpick` (choice) | `archives` (scene) | `notVisited(nodeId="buy-lockpick")`<br>`resourceAtLeast(key="gold", value=15)` | `spendResource(key="gold", amount=15, clampToZero=true)`<br>`grantEntity(entityId="lockpick")`<br>`markVisited(nodeId="buy-lockpick")` |
 | `main-hall` (scene) | `descend` (choice) | `dark-chapter` (scene) | `hasEntity(entityId="lantern")` | — |
 | `dark-chapter` (scene) | `examine-glyphs` (choice) | `chamber-of-runes` (scene) | — | — |
 | `dark-chapter` (scene) | `cast-mage-light` (choice) | `chamber-of-runes` (scene) | `hasEntity(entityId="mage-light")`<br>`resourceAtLeast(key="mana", value=15)` | `spendResource(key="mana", amount=15, clampToZero=true)` |
@@ -83,6 +84,7 @@ Source: `edges/choice.edge.ts:4`
 | `collapsed-bridge` (scene) | `climb-rubble` (choice) | `forgotten-crypt` (scene) | `resourceAtLeast(key="health", value=30)` | `spendResource(key="health", amount=20, clampToZero=true)` |
 | `collapsed-bridge` (scene) | `succumb-to-injuries` (choice) | `death` (scene) | — | — |
 | `forgotten-crypt` (scene) | `unlock-casket` (choice) | `victory` (scene) | `hasEntity(entityId="key")` | — |
+| `forgotten-crypt` (scene) | `lockpick-casket` (choice) | `victory` (scene) | `hasEntity(entityId="lockpick")` | — |
 | `forgotten-crypt` (scene) | `die-at-crypt` (choice) | `death` (scene) | — | — |
 
 Source: `graphs/story.graph.ts:4`
