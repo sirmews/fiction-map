@@ -8,6 +8,7 @@ import type {
   ValidationResult,
   EvaluationContext,
   EffectContext,
+  StateTrigger,
 } from "./types"
 import {
   createInitialState,
@@ -51,6 +52,7 @@ export class GraphRuntime {
   private parsed: ParsedGraph
   private evaluators: Map<string, ConditionEvaluator>
   private handlers: Map<string, EffectHandler>
+  public triggers: StateTrigger[] = []
 
   constructor(
     blueprint: GraphBlueprint,
@@ -60,6 +62,10 @@ export class GraphRuntime {
     this.parsed = parseGraph(blueprint)
     this.evaluators = evaluators ?? builtinEvaluators
     this.handlers = handlers ?? builtinHandlers
+  }
+
+  addTrigger(trigger: StateTrigger): void {
+    this.triggers.push(trigger)
   }
 
   get transitions(): Transition[] {
@@ -122,13 +128,57 @@ export class GraphRuntime {
     transition: Transition,
     context?: EvaluationContext & EffectContext
   ): TransitionResult {
-    return applyTransition(
+    const result = applyTransition(
       state,
       transition,
       this.evaluators,
       this.handlers,
       context
     )
+
+    if (!result.success || !result.state) {
+      return result
+    }
+
+    let updatedState = result.state
+    const maxIterations = 5
+    let iterations = 0
+    let triggerFired = false
+
+    do {
+      triggerFired = false
+      const currentContext = context ? { ...context, derivedState: context.derivedState } : undefined
+
+      for (const trigger of this.triggers) {
+        let passed = true
+        for (const cond of trigger.conditions) {
+          const condEvaluator = this.evaluators.get(cond.type)
+          if (!condEvaluator || !condEvaluator(updatedState, cond, currentContext)) {
+            passed = false
+            break
+          }
+        }
+
+        if (passed) {
+          for (const effect of trigger.effects) {
+            const effectHandler = this.handlers.get(effect.type)
+            if (effectHandler) {
+              updatedState = effectHandler(updatedState, effect, currentContext)
+            }
+          }
+          triggerFired = true
+          break
+        }
+      }
+
+      iterations++
+    } while (triggerFired && iterations < maxIterations)
+
+    return {
+      ...result,
+      state: updatedState,
+      nextNodeId: updatedState.currentNodeId,
+    }
   }
 
   /**

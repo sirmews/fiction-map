@@ -22,6 +22,12 @@ registerBuiltins(registry);
 
 export const runtime = createRuntimeFromGraph(story);
 
+runtime.addTrigger({
+  id: "death-trigger",
+  conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
+  effects: [{ type: "navigate", nodeId: "death" }],
+});
+
 export async function playInteractive() {
   let state = createInitialState(runtime.startNodeId);
   
@@ -51,11 +57,6 @@ export async function playInteractive() {
     }
 
     note(body + `\n\n${pc.dim(hudText)}`, title);
-
-    if (hp <= 0 && state.currentNodeId !== "entrance") {
-      outro(pc.red("💀 Defeat! You have succumbed to your injuries inside the library passage. Your vision fades into cold darkness... (Game Over)"));
-      break;
-    }
 
     // 4. Find available choices
     const available = runtime.getAvailable(state, context);

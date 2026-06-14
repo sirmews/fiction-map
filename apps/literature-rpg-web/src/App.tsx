@@ -21,7 +21,8 @@ function App() {
 
   // Get dynamic state variables
   const health = state.entityState?.resources?.health ?? 0;
-  const isDead = health <= 0 && state.currentNodeId !== "entrance";
+  const isDead = state.currentNodeId === "death";
+  const isVictory = state.currentNodeId === "victory";
 
   // Figure out what we have active from the derived state (e.g. 'lantern')
   const inventory = Array.from(context.derivedState.ownedEntityIds);
@@ -61,23 +62,21 @@ function App() {
       <Card className="w-full max-w-lg bg-slate-900 border-slate-800 text-slate-100 shadow-xl">
         <CardHeader>
           <CardTitle className="text-2xl text-slate-200">
-            {isDead ? "💀 Defeat!" : ((currentNode.properties as any)?.title ?? currentNode.id)}
+            {((currentNode.properties as any)?.title ?? currentNode.id)}
           </CardTitle>
         </CardHeader>
         
         <CardContent>
           <p className="text-slate-400 leading-relaxed text-lg">
-            {isDead 
-              ? "You have succumbed to your wounds inside the library passage. Your vision fades into cold darkness..." 
-              : ((currentNode.properties as any)?.body as string)}
+            {((currentNode.properties as any)?.body as string)}
           </p>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-3 pt-6 border-t border-slate-800 mt-4">
-          {isDead || availableChoices.length === 0 ? (
+          {isDead || isVictory || availableChoices.length === 0 ? (
             <div className="w-full text-center space-y-4">
               <div className="text-emerald-400 text-lg font-semibold">
-                {isDead ? "💥 GAME OVER 💥" : "✨ You have reached the end. ✨"}
+                {isDead ? "💥 GAME OVER 💥" : isVictory ? "🎉 VICTORY! 🎉" : "✨ You have reached the end. ✨"}
               </div>
               <Button onClick={reset} className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-3">
                 Play Again

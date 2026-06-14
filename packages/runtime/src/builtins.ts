@@ -17,6 +17,7 @@ export const builtinConditionConfigs: ConditionConfig[] = [
   { id: "entityActive", parameters: { entityId: { type: "string", required: true } } },
   { id: "entityUnlocked", parameters: { entityId: { type: "string", required: true } } },
   { id: "resourceAtLeast", parameters: { key: { type: "string", required: true }, value: { type: "number", required: true } } },
+  { id: "resourceLessThan", parameters: { key: { type: "string", required: true }, value: { type: "number", required: true } } },
 ]
 
 export const builtinEffectConfigs: EffectConfig[] = [

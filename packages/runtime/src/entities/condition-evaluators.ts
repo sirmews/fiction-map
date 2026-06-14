@@ -72,9 +72,22 @@ export const resourceAtLeastEvaluator: ConditionEvaluator = (
   )
 }
 
+export const resourceLessThanEvaluator: ConditionEvaluator = (
+  state,
+  condition
+): boolean => {
+  const { key, value } = condition as NumericCondition
+  return (
+    typeof key === "string" &&
+    typeof value === "number" &&
+    getResource(state, key) < value
+  )
+}
+
 export const entityBuiltinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["hasEntity", hasEntityEvaluator],
   ["entityActive", entityActiveEvaluator],
   ["entityUnlocked", entityUnlockedEvaluator],
   ["resourceAtLeast", resourceAtLeastEvaluator],
+  ["resourceLessThan", resourceLessThanEvaluator],
 ])
