@@ -193,6 +193,48 @@ describe("literature RPG example", () => {
       })
     );
   });
+
+  it("executes state triggers reactively during traversal", () => {
+    const runtime = new GraphRuntime({
+      startNode: "forest-edge",
+      nodes: [
+        { id: "forest-edge", type: "location" },
+        { id: "dark-cave", type: "location" },
+      ],
+      edges: [
+        {
+          id: "enter-dark-cave",
+          source: "forest-edge",
+          target: "dark-cave",
+          effects: [
+            { type: "spendResource", key: "stamina", amount: 3 },
+          ],
+        },
+      ],
+    });
+
+    // Add a trigger: if stamina is less than 5, regenerate 1 stamina
+    runtime.addTrigger({
+      id: "stamina-regen",
+      conditions: [{ type: "resourceLessThan", key: "stamina", value: 5 }],
+      effects: [{ type: "addResource", key: "stamina", amount: 1 }],
+    });
+
+    let state = createInitialState("forest-edge");
+    state = addResource(state, "stamina", 5);
+
+    // Initial stamina is 5
+    expect(getResource(state, "stamina")).toBe(5);
+
+    // Step: spends 3 stamina (leaves 2).
+    // The trigger fires because 2 < 5, adding +1 stamina (final 3)!
+    const transition = runtime.transitions.find((t) => t.id === "enter-dark-cave")!;
+    const result = runtime.step(state, transition);
+
+    expect(result.success).toBe(true);
+    expect(result.state.currentNodeId).toBe("dark-cave");
+    expect(getResource(result.state, "stamina")).toBe(3); // 5 - 3 + 1 = 3!
+  });
 });
 
 

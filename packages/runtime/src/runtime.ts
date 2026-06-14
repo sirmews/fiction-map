@@ -144,12 +144,17 @@ export class GraphRuntime {
     const maxIterations = 5
     let iterations = 0
     let triggerFired = false
+    const firedTriggerIds = new Set<string>()
 
     do {
       triggerFired = false
       const currentContext = context ? { ...context, derivedState: context.derivedState } : undefined
 
       for (const trigger of this.triggers) {
+        if (firedTriggerIds.has(trigger.id)) {
+          continue
+        }
+
         let passed = true
         for (const cond of trigger.conditions) {
           const condEvaluator = this.evaluators.get(cond.type)
@@ -160,6 +165,7 @@ export class GraphRuntime {
         }
 
         if (passed) {
+          firedTriggerIds.add(trigger.id)
           for (const effect of trigger.effects) {
             const effectHandler = this.handlers.get(effect.type)
             if (effectHandler) {
