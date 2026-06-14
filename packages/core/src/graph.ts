@@ -175,6 +175,19 @@ export function validateGraph(
               formatKnownValues(Array.from(registry.effects.keys()), "effects"),
             edgeId: edge.id,
           })
+        } else if (effect.type === "spendResource") {
+          const hasAtLeastCondition = edge.conditions?.some(
+            (c) => c.type === "resourceAtLeast" && c.key === effect.key
+          )
+          const isSafeOverspend = effect.clampToZero === true || effect.allowNegative === true
+
+          if (!hasAtLeastCondition && !isSafeOverspend) {
+            warnings.push({
+              code: "UNPROTECTED_RESOURCE_SPEND",
+              message: `Edge "${edge.id}" has a "spendResource" effect on "${effect.key}" but does not configure "clampToZero" or "allowNegative" and is not gated by a "resourceAtLeast" condition. This may result in the transaction silently failing at runtime.`,
+              edgeId: edge.id,
+            })
+          }
         }
       }
     }
