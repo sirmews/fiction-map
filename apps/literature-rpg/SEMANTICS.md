@@ -72,12 +72,12 @@ Source: `edges/choice.edge.ts:4`
 | `archives` (scene) | `return-from-archives` (choice) | `main-hall` (scene) | — | — |
 | `main-hall` (scene) | `descend` (choice) | `dark-chapter` (scene) | `hasEntity(entityId="lantern")` | — |
 | `dark-chapter` (scene) | `examine-glyphs` (choice) | `chamber-of-runes` (scene) | — | — |
-| `dark-chapter` (scene) | `cross-bridge` (choice) | `collapsed-bridge` (scene) | — | `spendResource(key="health", amount=40)` |
+| `dark-chapter` (scene) | `cross-bridge` (choice) | `collapsed-bridge` (scene) | — | `spendResource(key="health", amount=40, clampToZero=true)` |
 | `chamber-of-runes` (scene) | `translate-runes` (choice) | `forgotten-crypt` (scene) | `hasEntity(entityId="lantern")` | `grantEntity(entityId="key")` |
-| `chamber-of-runes` (scene) | `touch-pedestal` (choice) | `chamber-of-runes` (scene) | — | `spendResource(key="health", amount=30)` |
+| `chamber-of-runes` (scene) | `touch-pedestal` (choice) | `chamber-of-runes` (scene) | — | `spendResource(key="health", amount=30, clampToZero=true)` |
 | `chamber-of-runes` (scene) | `return-to-chapter` (choice) | `dark-chapter` (scene) | — | — |
 | `collapsed-bridge` (scene) | `heal-with-elixir` (choice) | `collapsed-bridge` (scene) | `hasEntity(entityId="elixir")` | `addResource(key="health", amount=50)`<br>`revokeEntity(entityId="elixir")` |
-| `collapsed-bridge` (scene) | `climb-rubble` (choice) | `forgotten-crypt` (scene) | `resourceAtLeast(key="health", value=30)` | `spendResource(key="health", amount=20)` |
+| `collapsed-bridge` (scene) | `climb-rubble` (choice) | `forgotten-crypt` (scene) | `resourceAtLeast(key="health", value=30)` | `spendResource(key="health", amount=20, clampToZero=true)` |
 | `collapsed-bridge` (scene) | `succumb-to-injuries` (choice) | `death` (scene) | — | — |
 | `forgotten-crypt` (scene) | `unlock-casket` (choice) | `victory` (scene) | `hasEntity(entityId="key")` | — |
 | `forgotten-crypt` (scene) | `die-at-crypt` (choice) | `death` (scene) | — | — |

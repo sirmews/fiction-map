@@ -193,6 +193,21 @@ describe("entity-aware runtime state", () => {
     expect(unchanged).toBe(state);
     expect(getResource(unchanged, "gold")).toBe(6);
   });
+
+  it("supports spending with allowNegative and clampToZero options", () => {
+    let state = createInitialState("scene-1");
+
+    state = addResource(state, "health", 10);
+    expect(getResource(state, "health")).toBe(10);
+
+    // Using clampToZero should reduce HP to 0 rather than noop
+    let stateClamped = spendResource(state, "health", 30, { clampToZero: true });
+    expect(getResource(stateClamped, "health")).toBe(0);
+
+    // Using allowNegative should reduce HP to -20 rather than noop
+    let stateNegative = spendResource(state, "health", 30, { allowNegative: true });
+    expect(getResource(stateNegative, "health")).toBe(-20);
+  });
 });
 
 describe("serialization", () => {

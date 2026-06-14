@@ -39,7 +39,7 @@ export const builtinEffectConfigs: EffectConfig[] = [
   { id: "unlockEntity", parameters: { entityId: { type: "string", required: true } } },
   { id: "lockEntity", parameters: { entityId: { type: "string", required: true } } },
   { id: "addResource", parameters: { key: { type: "string", required: true }, amount: { type: "number", required: true } } },
-  { id: "spendResource", parameters: { key: { type: "string", required: true }, amount: { type: "number", required: true } } },
+  { id: "spendResource", parameters: { key: { type: "string", required: true }, amount: { type: "number", required: true }, allowNegative: { type: "boolean" }, clampToZero: { type: "boolean" } } },
 ]
 
 /**

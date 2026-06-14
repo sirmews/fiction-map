@@ -333,16 +333,25 @@ export function addResource(
 export function spendResource(
   state: GraphRuntimeState,
   key: string,
-  amount: number
+  amount: number,
+  options?: { allowNegative?: boolean; clampToZero?: boolean }
 ): GraphRuntimeState {
   const current = getResource(state, key);
 
-  if (!Number.isFinite(amount) || amount < 0 || current < amount) {
+  if (!Number.isFinite(amount) || amount < 0) {
+    return state;
+  }
+
+  const allowNegative = options?.allowNegative ?? false;
+  const clampToZero = options?.clampToZero ?? false;
+
+  if (current < amount && !allowNegative && !clampToZero) {
     return state;
   }
 
   const cloned = cloneStateWithEntityState(state);
-  cloned.entityState!.resources[key] = current - amount;
+  const newValue = current - amount;
+  cloned.entityState!.resources[key] = clampToZero ? Math.max(0, newValue) : newValue;
   return cloned;
 }
 
