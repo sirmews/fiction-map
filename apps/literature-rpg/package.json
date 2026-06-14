@@ -6,7 +6,7 @@
   "scripts": {
     "build:deps": "bun run --filter @fiction-map/core build && bun run --filter @fiction-map/entities build && bun run --filter @fiction-map/runtime build && bun run --filter fiction-map build",
     "prestart": "bun run build:deps",
-    "start": "bun run src/main.ts",
+    "start": "bun run src/main.tsx",
     "pregenerate": "bun run build:deps",
     "generate": "bun node_modules/fiction-map/dist/cli.js generate --root-dir src",
     "prevalidate": "bun run build:deps",
@@ -17,7 +17,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@clack/prompts": "^1.5.1",
     "@fiction-map/core": "workspace:*",
     "@fiction-map/entities": "workspace:*",
     "@fiction-map/runtime": "workspace:*",
