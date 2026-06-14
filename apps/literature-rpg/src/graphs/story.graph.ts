@@ -6,7 +6,7 @@ export const story = defineGraph(registry, {
   nodes: [
     { id: "entrance", type: "scene", title: "Entrance", body: "You stand at the entrance to the old library." },
     { id: "main-hall", type: "scene", title: "Main Hall", body: "Dust motes float in shafts of grey light. A lantern sits on a table." },
-    { id: "archives", type: "scene", title: "Dusty Archives", body: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals." },
+    { id: "archives", type: "scene", title: "Dusty Archives", body: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby." },
     { id: "dark-chapter", type: "scene", title: "Dark Chapter", body: "A narrow passage drops into darkness. You hear the crackle of ancient magic." },
     { id: "chamber-of-runes", type: "scene", title: "Chamber of Runes", body: "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key." },
     { id: "collapsed-bridge", type: "scene", title: "Collapsed Bridge", body: "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere." },
@@ -25,6 +25,8 @@ export const story = defineGraph(registry, {
         { type: "grantEntity", entityId: "lantern" },
         { type: "addResource", key: "health", amount: 100 },
         { type: "addResource", key: "mana", amount: 50 },
+        { type: "addResource", key: "gold", amount: 30 },
+        { type: "addResource", key: "turns", amount: 0 },
       ],
     },
     {
@@ -65,6 +67,22 @@ export const story = defineGraph(registry, {
       source: "archives",
       target: "main-hall",
       text: "Return to the Main Hall",
+    },
+    {
+      id: "buy-lockpick",
+      type: "choice",
+      source: "archives",
+      target: "archives",
+      text: "Buy a lockpick from the spectral librarian (-15 gold)",
+      conditions: [
+        { type: "notVisited", nodeId: "buy-lockpick" },
+        { type: "resourceAtLeast", key: "gold", value: 15 },
+      ],
+      effects: [
+        { type: "spendResource", key: "gold", amount: 15, clampToZero: true },
+        { type: "grantEntity", entityId: "lockpick" },
+        { type: "markVisited", nodeId: "buy-lockpick" },
+      ],
     },
     {
       id: "descend",
@@ -179,6 +197,14 @@ export const story = defineGraph(registry, {
       target: "victory",
       text: "Unlock the iron casket",
       conditions: [{ type: "hasEntity", entityId: "key" }],
+    },
+    {
+      id: "lockpick-casket",
+      type: "choice",
+      source: "forgotten-crypt",
+      target: "victory",
+      text: "Lockpick the iron casket",
+      conditions: [{ type: "hasEntity", entityId: "lockpick" }],
     },
     {
       id: "die-at-crypt",

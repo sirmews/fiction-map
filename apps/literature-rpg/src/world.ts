@@ -22,6 +22,7 @@ export const world = defineWorld(registry, {
     { id: "lantern", type: "item", label: "Brass Lantern" },
     { id: "elixir", type: "item", label: "Healing Elixir" },
     { id: "key", type: "item", label: "Casket Key" },
+    { id: "lockpick", type: "item", label: "Lockpick" },
     { id: "heal-spell", type: "spell", label: "Heal", manaCost: 20 },
     { id: "mage-light", type: "spell", label: "Mage Light", manaCost: 15 },
   ],
