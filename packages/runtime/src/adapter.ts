@@ -16,6 +16,7 @@ export interface EdgeBlueprint {
 export interface NodeBlueprint {
   id: string
   type?: string
+  [key: string]: unknown
 }
 
 export interface GraphBlueprint {
@@ -53,8 +54,11 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
     blueprint.endings ?? findTerminalNodes(blueprint.nodes, transitions)
   )
 
-  const nodes = new Map(
-    blueprint.nodes.map((n) => [n.id, { id: n.id, type: n.type }])
+  const nodes = new Map<string, NodeDefinition>(
+    blueprint.nodes.map((n) => {
+      const { id, type, ...properties } = n
+      return [id, { id, type, properties }]
+    })
   )
 
   return { transitions, nodes, startNodeId, endingNodeIds }

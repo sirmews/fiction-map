@@ -68,10 +68,10 @@ function graphEdgeToBlueprint(edge: EdgeInstance): EdgeBlueprint {
 
 export function graphDefinitionToBlueprint(graph: GraphDefinition): GraphBlueprint {
   return {
-    nodes: graph.nodes.map((node) => ({
-      id: node.id,
-      type: node.type,
-    })),
+    nodes: graph.nodes.map((node) => {
+      const { id, type, ...properties } = node as any
+      return { id, type, ...properties }
+    }),
     edges: graph.edges.map(graphEdgeToBlueprint),
     endings: graph.endings,
   }
