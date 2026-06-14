@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Box, Text, useInput, useApp } from "ink";
-import pc from "picocolors";
 import {
   createInitialState,
   deriveEntityState,
+  Transition,
 } from "@fiction-map/runtime";
 import { story } from "../graphs/story.graph";
 import { world } from "../world";
@@ -21,6 +21,14 @@ export function GameController() {
   const [state, setState] = useState(() => createInitialState(runtime.startNodeId));
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [pacingIndex, setPacingIndex] = useState(0);
+  const [prevNodeId, setPrevNodeId] = useState(state.currentNodeId);
+
+  // Synchronously reset state during render if transition occurred
+  if (state.currentNodeId !== prevNodeId) {
+    setPrevNodeId(state.currentNodeId);
+    setSelectedIndex(0);
+    setPacingIndex(0);
+  }
 
   // Re-compute runtime context
   const context = { derivedState: deriveEntityState(world, state) };
@@ -29,17 +37,11 @@ export function GameController() {
   // Available choices at the current node
   const availableChoices = runtime.getAvailable(state, context);
 
-  // Auto-pace content blocks
-  useEffect(() => {
-    setPacingIndex(0);
-    setSelectedIndex(0);
-  }, [state.currentNodeId]);
-
   useEffect(() => {
     if (!currentNode || !currentNode.blocks) return;
     if (pacingIndex < currentNode.blocks.length - 1) {
       const currentBlock = currentNode.blocks[pacingIndex];
-      const delay = (currentBlock.metadata as any)?.delayAfterMs;
+      const delay = currentBlock.metadata?.["delayAfterMs"] as number | undefined;
       if (typeof delay === "number" && delay > 0) {
         const timer = setTimeout(() => {
           setPacingIndex((prev) => prev + 1);
@@ -73,7 +75,7 @@ export function GameController() {
     }
   });
 
-  function handleChoiceSelection(choice: any) {
+  function handleChoiceSelection(choice: Transition) {
     const result = runtime.step(state, choice, context);
     if (result.success) {
       setState(result.state);
@@ -120,7 +122,7 @@ export function GameController() {
               </Box>
             ))
           ) : (
-            <Text color="white">{String((currentNode as any).body || "")}</Text>
+            <Text color="white">{String(currentNode["body"] ?? "")}</Text>
           )}
         </Box>
 
@@ -171,7 +173,7 @@ export function GameController() {
             <Text bold color="yellow">What do you do?</Text>
             <Box flexDirection="column" marginTop={1} marginBottom={1}>
               {availableChoices.map((choice, i) => {
-                const label = choice.label ?? (choice.metadata as any)?.text ?? choice.id;
+                const label = choice.label ?? choice.metadata?.["text"] ?? choice.id;
                 const isSelected = i === selectedIndex;
                 return (
                   <Text key={choice.id} color={isSelected ? "cyan" : "white"}>
