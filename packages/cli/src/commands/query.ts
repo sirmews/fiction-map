@@ -7,7 +7,7 @@ import type {
   NodeInstance,
 } from "@fiction-map/core"
 
-interface MetadataCommandOptions {
+export interface MetadataCommandOptions {
   rootDir?: string
   outputDir?: string
 }
@@ -20,7 +20,7 @@ export interface QueryOptions extends MetadataCommandOptions {
   json?: boolean
 }
 
-interface LoadedMetadata {
+export interface LoadedMetadata {
   metadata: GraphMetadata
   rootDir: string
 }
@@ -48,7 +48,7 @@ function fail(message: string): never {
   process.exit(1)
 }
 
-async function loadMetadata(options: MetadataCommandOptions = {}): Promise<LoadedMetadata> {
+export async function loadMetadata(options: MetadataCommandOptions = {}): Promise<LoadedMetadata> {
   const rootDir = resolve(options.rootDir || process.cwd())
   const outputDir = options.outputDir 
     ? resolve(options.outputDir) 
@@ -73,7 +73,7 @@ async function loadMetadata(options: MetadataCommandOptions = {}): Promise<Loade
   }
 }
 
-function selectGraphs(metadata: GraphMetadata, graphId?: string): GraphDefinition[] {
+export function selectGraphs(metadata: GraphMetadata, graphId?: string): GraphDefinition[] {
   if (!graphId) return metadata.graphs
   const graph = metadata.graphs.find((item) => item.id === graphId)
   if (!graph) {
