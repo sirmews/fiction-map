@@ -49,8 +49,13 @@ export async function playInteractive() {
     if (inventory.length > 0) {
       hudText += ` | 🎒 Items: ${inventory.join(", ")}`;
     }
-    
+
     note(body + `\n\n${pc.dim(hudText)}`, title);
+
+    if (hp <= 0 && state.currentNodeId !== "entrance") {
+      outro(pc.red("💀 Defeat! You have succumbed to your injuries inside the library passage. Your vision fades into cold darkness... (Game Over)"));
+      break;
+    }
 
     // 4. Find available choices
     const available = runtime.getAvailable(state, context);
