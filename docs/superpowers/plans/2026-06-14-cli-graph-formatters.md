@@ -1,368 +1,491 @@
-# CLI Graph Formatters Implementation Plan
+# RPG Spells, Mana, and Turn-Based Cooldowns Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Extend the `fiction-map ascii` (or `map`, `draw`) CLI command with a `--format <mode>` / `-f <mode>` parameter supporting `terminal`, `llm`, and `mermaid` formats.
+**Goal:** Expand the reference story with spells (`heal-spell`, `mage-light`), a regenerating `mana` pool (recovers 5 MP per turn), and a 3-turn `heal_cooldown` countdown—all designed purely using generic declarative triggers (reusing `addResource` and `spendResource` with zero custom code).
 
-**Architecture:** We will implement `generateLlmMap` and `generateMermaidMap` formatters in `packages/cli/src/commands/ascii.ts` and rename `generateAsciiMap` to `generateTerminalMap`. We will update the CLI argument parser in `cli.ts` to support `--format` and `-f` flags.
+**Architecture:** We will declare the spells in `world.ts`, write the casting choices in `story.graph.ts`, register the generic triggers in our clients (`main.ts` and `useStoryRuntime.ts`), and update our HUD interfaces to display MP and cooldowns dynamically.
 
-**Tech Stack:** TypeScript, Bun, Bun Test
+**Tech Stack:** TypeScript, Bun, Bun Test, React, Tailwind CSS
 
 ---
 
-### Task 1: Implement LLM and Mermaid Formatters
+### Task 1: Declare Spells and Gated Casting Choices
 
 **Files:**
-- Create/Modify: `packages/cli/src/commands/ascii.ts` (implement formatters, export them, rename current function to `generateTerminalMap`).
-- Create/Modify: `packages/cli/src/commands/ascii.test.ts` (write unit tests for `llm` and `mermaid` formats).
+- Modify: `apps/literature-rpg/src/world.ts` (register the `spell` type and specific spell instances).
+- Modify: `apps/literature-rpg/src/graphs/story.graph.ts` (write the study choices, mana/cooldown gating, and spell effects).
+- Modify: `apps/literature-rpg/src/main.test.ts` (update tests to initialize mana and assert the magic traversal path).
 
-- [ ] **Step 1: Write formatters inside ascii.ts**
+- [ ] **Step 1: Declare Spells inside world.ts**
 
-Update `packages/cli/src/commands/ascii.ts` to include the three formatters and update the `ascii` entry point:
+Read `apps/literature-rpg/src/world.ts` and add the `spell` entity type and instances:
 
 ```typescript
-import { GraphDefinition, NodeInstance, EdgeInstance } from "@fiction-map/core"
-import { loadMetadata, selectGraphs } from "./query"
+import { defineEntityType, defineWorld } from "@fiction-map/entities";
+import { registry } from "./project";
 
-function formatInstanceValue(value: unknown): string {
-  return typeof value === "string" ? JSON.stringify(value) : String(value)
-}
+defineEntityType(registry, {
+  id: "item",
+  properties: {
+    label: { type: "string", required: true },
+  },
+});
 
-function formatInstances(items: Array<{ type: string; [key: string]: unknown }> | undefined): string {
-  if (!items || items.length === 0) return ""
-  return items
-    .map((item) => {
-      const args = Object.entries(item)
-        .filter(([key]) => key !== "type")
-        .map(([key, value]) => `${key}=${formatInstanceValue(value)}`)
-      return args.length > 0 ? `${item.type}(${args.join(", ")})` : item.type
-    })
-    .join(", ")
-}
+defineEntityType(registry, {
+  id: "spell",
+  properties: {
+    label: { type: "string", required: true },
+    manaCost: { type: "number", required: true },
+  },
+});
 
-// 1. TERMINAL FORMATTER (Polished box tree)
-export function generateTerminalMap(graph: GraphDefinition): string {
-  const outgoing = new Map<string, EdgeInstance[]>()
-  for (const edge of graph.edges) {
-    const bucket = outgoing.get(edge.source)
-    if (bucket) {
-      bucket.push(edge)
-    } else {
-      outgoing.set(edge.source, [edge])
-    }
-  }
-
-  const nodesMap = new Map<string, NodeInstance>()
-  for (const node of graph.nodes) {
-    nodesMap.set(node.id, node)
-  }
-
-  const targeted = new Set(graph.edges.map((e) => e.target))
-  const roots = graph.nodes.filter((n) => !targeted.has(n.id)).map((n) => n.id)
-  const startNodes = roots.length > 0 ? roots : (graph.nodes.length > 0 ? [graph.nodes[0].id] : [])
-
-  let output = ""
-  const visited = new Set<string>()
-
-  function drawNodeBlock(node: NodeInstance, prefix: string): string {
-    const typeLabel = ` (${node.type})`
-    const title = typeof node.title === "string" ? node.title : ""
-    const body = typeof node.body === "string" ? node.body : ""
-    const titleLine = title ? ` "${title}"` : ""
-    const bodyLine = body ? `  ${body.length > 34 ? body.slice(0, 31) + "..." : body}` : ""
-
-    const lines = [
-      `┌──────────────────────────────────────┐`,
-      `│ ${node.id}${typeLabel}${titleLine.padStart(36 - node.id.length - typeLabel.length)} │`,
-    ]
-    if (bodyLine) {
-      lines.push(`│ ${bodyLine.padEnd(36)} │`)
-    }
-    lines.push(`└──────────────────────────────────────┘`)
-
-    return lines.map((l) => prefix + l).join("\n") + "\n"
-  }
-
-  function traverse(nodeId: string, prefix: string, _isLast: boolean) {
-    if (visited.has(nodeId)) {
-      output += `${prefix}   └───► [see ${nodeId} above]\n`
-      return
-    }
-    visited.add(nodeId)
-
-    const node = nodesMap.get(nodeId)
-    if (!node) return
-
-    output += drawNodeBlock(node, prefix)
-
-    const edges = outgoing.get(nodeId) ?? []
-    if (edges.length === 0) {
-      return
-    }
-
-    edges.forEach((edge, index) => {
-      const lastEdge = index === edges.length - 1
-      const branchPrefix = lastEdge ? "   └───► " : "   ├───► "
-      const nextPrefix = prefix + (lastEdge ? "         " : "   │     ")
-
-      output += `${prefix}   │\n`
-      const edgeLabel = `${branchPrefix}[${edge.id}] "${edge.text ?? (edge.metadata as any)?.text ?? edge.id}"`
-      output += `${prefix}${edgeLabel}\n`
-
-      if (edge.conditions && edge.conditions.length > 0) {
-        output += `${prefix}${lastEdge ? "    " : "   │"}     ❓ conditions: ${formatInstances(edge.conditions)}\n`
-      }
-      if (edge.effects && edge.effects.length > 0) {
-        output += `${prefix}${lastEdge ? "    " : "   │"}     ⚡ effects: ${formatInstances(edge.effects)}\n`
-      }
-
-      output += `${prefix}${lastEdge ? "    " : "   │"}     ▼\n`
-      traverse(edge.target, nextPrefix, lastEdge)
-    })
-  }
-
-  for (let i = 0; i < startNodes.length; i++) {
-    traverse(startNodes[i], "", i === startNodes.length - 1)
-    if (i < startNodes.length - 1) {
-      output += "\n========================================\n\n"
-    }
-  }
-
-  return output
-}
-
-// 2. LLM FORMATTER (Compact Markdown Adjacency List)
-export function generateLlmMap(graph: GraphDefinition): string {
-  let output = `# Graph: ${graph.id}\n\n`
-  const endings = new Set(graph.endings)
-
-  for (const node of graph.nodes) {
-    const isEnding = endings.has(node.id) ? " [Ending]" : ""
-    output += `* **${node.id}** (${node.type})${isEnding}\n`
-    if (node.title) output += `  * Title: "${node.title}"\n`
-    if (node.body) {
-      const bodyClean = node.body.replace(/\n/g, " ")
-      output += `  * Body: "${bodyClean.length > 60 ? bodyClean.slice(0, 57) + "..." : bodyClean}"\n`
-    }
-
-    const nodeEdges = graph.edges.filter((e) => e.source === node.id)
-    if (nodeEdges.length > 0) {
-      output += "  * Choices:\n"
-      for (const edge of nodeEdges) {
-        const textLabel = edge.text ?? (edge.metadata as any)?.text ?? edge.id
-        output += `    * \`${edge.id}\` ──► **${edge.target}** ("${textLabel}")\n`
-        if (edge.conditions && edge.conditions.length > 0) {
-          output += `      * ❓ conditions: ${formatInstances(edge.conditions)}\n`
-        }
-        if (edge.effects && edge.effects.length > 0) {
-          output += `      * ⚡ effects: ${formatInstances(edge.effects)}\n`
-        }
-      }
-    }
-    output += "\n"
-  }
-
-  return output.trim() + "\n"
-}
-
-// 3. MERMAID FORMATTER (Standard Flowchart)
-export function generateMermaidMap(graph: GraphDefinition): string {
-  const lines: string[] = ["flowchart TD"]
-
-  for (const node of graph.nodes) {
-    const typeLabel = node.type
-    const titleLabel = node.title ? `<br/>${node.title}` : ""
-    // Escape quotes for mermaid double-quoted node labels
-    const sanitizedLabel = `${node.id} (${typeLabel})${titleLabel}`.replace(/"/g, "'")
-    lines.push(`  ${node.id}["${sanitizedLabel}"]`)
-  }
-
-  for (const edge of graph.edges) {
-    const textLabel = edge.text ?? (edge.metadata as any)?.text ?? edge.id
-    const conds = edge.conditions && edge.conditions.length > 0 ? ` [requires: ${formatInstances(edge.conditions)}]` : ""
-    const effs = edge.effects && edge.effects.length > 0 ? ` [grants: ${formatInstances(edge.effects)}]` : ""
-    const label = `${edge.id}: "${textLabel}"${conds}${effs}`.replace(/"/g, "'")
-    lines.push(`  ${edge.source} -->|"${label}"| ${edge.target}`)
-  }
-
-  return "```mermaid\n" + lines.join("\n") + "\n```\n"
-}
-
-export interface AsciiOptions {
-  rootDir?: string
-  outputDir?: string
-  format?: string
-}
-
-export async function ascii(graphId: string | undefined, options: AsciiOptions = {}): Promise<void> {
-  if (!graphId) {
-    console.error("❌ Missing graph id. Usage: `fiction-map ascii <graph-id>`")
-    process.exit(1)
-  }
-
-  const { metadata } = await loadMetadata(options)
-  const graphs = selectGraphs(metadata, graphId)
-  if (graphs.length === 0) {
-    console.error(`❌ Graph ${graphId} not found in metadata.`)
-    process.exit(1)
-  }
-
-  const mode = options.format || "terminal"
-  let output = ""
-
-  if (mode === "mermaid") {
-    output = generateMermaidMap(graphs[0])
-  } else if (mode === "llm") {
-    output = generateLlmMap(graphs[0])
-  } else {
-    output = `Graph: ${graphId}\n` + "=".repeat(graphId.length + 7) + "\n\n" + generateTerminalMap(graphs[0])
-  }
-
-  console.log(output)
-}
+export const world = defineWorld(registry, {
+  id: "library",
+  entities: [
+    { id: "lantern", type: "item", label: "Brass Lantern" },
+    { id: "elixir", type: "item", label: "Healing Elixir" },
+    { id: "key", type: "item", label: "Casket Key" },
+    { id: "heal-spell", type: "spell", label: "Heal", manaCost: 20 },
+    { id: "mage-light", type: "spell", label: "Mage Light", manaCost: 15 },
+  ],
+});
 ```
 
-- [ ] **Step 2: Add tests for LLM and Mermaid formats**
+- [ ] **Step 2: Update story.graph.ts with spell learning and casting**
 
-Modify `packages/cli/src/commands/ascii.test.ts` to include assertions for LLM and Mermaid generation:
+Read `apps/literature-rpg/src/graphs/story.graph.ts` and update it to:
+1. Initialize `health` to `100` and `mana` to `50` when stepping inside.
+2. In the `archives`, add a choice `study-heal` to learn the Heal Spell.
+3. In the `archives`, add a choice `study-mage-light` to learn the Mage Light Spell.
+4. In the `dark-chapter`, add a choice `cast-mage-light` to navigate safely to the `chamber-of-runes` using magic instead of the lantern.
+5. In `collapsed-bridge`, add a choice `cast-heal` (requires the spell, 20 mana, and `heal_cooldown < 1`) that restores `40 HP`, spends `20 MP`, and adds `3 heal_cooldown`.
 
 ```typescript
-import { expect, test, describe } from "bun:test"
-import { generateTerminalMap, generateLlmMap, generateMermaidMap } from "./ascii"
-import { GraphDefinition } from "@fiction-map/core"
+import { defineGraph } from "@fiction-map/core";
+import { registry } from "../project";
 
-const sampleGraph: GraphDefinition = {
-  id: "test-graph",
-  name: "testGraph",
-  location: { file: "test.ts", line: 1, column: 1 },
+export const story = defineGraph(registry, {
+  id: "library-mystery",
   nodes: [
-    { id: "node-a", type: "scene", title: "Node A", body: "First node" },
-    { id: "node-b", type: "scene", title: "Node B", body: "Second node" },
+    { id: "entrance", type: "scene", title: "Entrance", body: "You stand at the entrance to the old library." },
+    { id: "main-hall", type: "scene", title: "Main Hall", body: "Dust motes float in shafts of grey light. A lantern sits on a table." },
+    { id: "archives", type: "scene", title: "Dusty Archives", body: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals." },
+    { id: "dark-chapter", type: "scene", title: "Dark Chapter", body: "A narrow passage drops into darkness. You hear the crackle of ancient magic." },
+    { id: "chamber-of-runes", type: "scene", title: "Chamber of Runes", body: "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key." },
+    { id: "collapsed-bridge", type: "scene", title: "Collapsed Bridge", body: "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere." },
+    { id: "forgotten-crypt", type: "scene", title: "Forgotten Crypt", body: "An ancient crypt, smelling of age. A massive iron casket lies in the center." },
+    { id: "victory", type: "scene", title: "Victory!", body: "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!" },
+    { id: "death", type: "scene", title: "Defeat", body: "The dark forces of the passage overwhelm you. Your journey ends here." },
   ],
   edges: [
     {
-      id: "edge-ab",
+      id: "enter-hall",
       type: "choice",
-      source: "node-a",
-      target: "node-b",
-      text: "Go to B",
+      source: "entrance",
+      target: "main-hall",
+      text: "Step inside",
+      effects: [
+        { type: "grantEntity", entityId: "lantern" },
+        { type: "addResource", key: "health", amount: 100 },
+        { type: "addResource", key: "mana", amount: 50 },
+      ],
+    },
+    {
+      id: "explore-archives",
+      type: "choice",
+      source: "main-hall",
+      target: "archives",
+      text: "Explore the Dusty Archives",
+      conditions: [{ type: "notVisited", nodeId: "archives" }],
+    },
+    {
+      id: "study-heal",
+      type: "choice",
+      source: "archives",
+      target: "archives",
+      text: "Study the Tome of Heal Spell",
+      conditions: [{ type: "notVisited", nodeId: "study-heal" }],
+      effects: [{ type: "grantEntity", entityId: "heal-spell" }],
+    },
+    {
+      id: "study-mage-light",
+      type: "choice",
+      source: "archives",
+      target: "archives",
+      text: "Study the Tome of Mage Light Spell",
+      conditions: [{ type: "notVisited", nodeId: "study-mage-light" }],
+      effects: [{ type: "grantEntity", entityId: "mage-light" }],
+    },
+    {
+      id: "return-from-archives",
+      type: "choice",
+      source: "archives",
+      target: "main-hall",
+      text: "Return to the Main Hall",
+    },
+    {
+      id: "descend",
+      type: "choice",
+      source: "main-hall",
+      target: "dark-chapter",
+      text: "Descend into the passage using the lantern",
+      conditions: [{ type: "hasEntity", entityId: "lantern" }],
+    },
+    {
+      id: "examine-glyphs",
+      type: "choice",
+      source: "dark-chapter",
+      target: "chamber-of-runes",
+      text: "Examine the glowing glyphs",
+    },
+    {
+      id: "cast-mage-light",
+      type: "choice",
+      source: "dark-chapter",
+      target: "chamber-of-runes",
+      text: "Cast Mage Light Spell and proceed safely (-15 MP)",
+      conditions: [
+        { type: "hasEntity", entityId: "mage-light" },
+        { type: "resourceAtLeast", key: "mana", value: 15 },
+      ],
+      effects: [
+        { type: "spendResource", key: "mana", amount: 15, clampToZero: true },
+      ],
+    },
+    {
+      id: "cross-bridge",
+      type: "choice",
+      source: "dark-chapter",
+      target: "collapsed-bridge",
+      text: "Cross the crumbling bridge",
+      effects: [{ type: "spendResource", key: "health", amount: 40, clampToZero: true }],
+    },
+    {
+      id: "translate-runes",
+      type: "choice",
+      source: "chamber-of-runes",
+      target: "forgotten-crypt",
+      text: "Translate the runes using the lantern",
       conditions: [{ type: "hasEntity", entityId: "lantern" }],
       effects: [{ type: "grantEntity", entityId: "key" }],
     },
+    {
+      id: "touch-pedestal",
+      type: "choice",
+      source: "chamber-of-runes",
+      target: "chamber-of-runes",
+      text: "Touch the central pedestal",
+      effects: [{ type: "spendResource", key: "health", amount: 30, clampToZero: true }],
+    },
+    {
+      id: "return-to-chapter",
+      type: "choice",
+      source: "chamber-of-runes",
+      target: "dark-chapter",
+      text: "Return to the Dark Chapter",
+    },
+    {
+      id: "heal-with-elixir",
+      type: "choice",
+      source: "collapsed-bridge",
+      target: "collapsed-bridge",
+      text: "Drink the healing elixir (+50 HP)",
+      conditions: [{ type: "hasEntity", entityId: "elixir" }],
+      effects: [
+        { type: "addResource", key: "health", amount: 50 },
+        { type: "revokeEntity", entityId: "elixir" },
+      ],
+    },
+    {
+      id: "cast-heal",
+      type: "choice",
+      source: "collapsed-bridge",
+      target: "collapsed-bridge",
+      text: "Cast Heal Spell (+40 HP, -20 MP, 3t CD)",
+      conditions: [
+        { type: "hasEntity", entityId: "heal-spell" },
+        { type: "resourceAtLeast", key: "mana", value: 20 },
+        { type: "resourceLessThan", key: "heal_cooldown", value: 1 },
+      ],
+      effects: [
+        { type: "addResource", key: "health", amount: 40 },
+        { type: "spendResource", key: "mana", amount: 20, clampToZero: true },
+        { type: "addResource", key: "heal_cooldown", amount: 3 },
+      ],
+    },
+    {
+      id: "climb-rubble",
+      type: "choice",
+      source: "collapsed-bridge",
+      target: "forgotten-crypt",
+      text: "Climb through the rubble (-20 HP)",
+      conditions: [{ type: "resourceAtLeast", key: "health", value: 30 }],
+      effects: [{ type: "spendResource", key: "health", amount: 20, clampToZero: true }],
+    },
+    {
+      id: "succumb-to-injuries",
+      type: "choice",
+      source: "collapsed-bridge",
+      target: "death",
+      text: "Succumb to your injuries",
+    },
+    {
+      id: "unlock-casket",
+      type: "choice",
+      source: "forgotten-crypt",
+      target: "victory",
+      text: "Unlock the iron casket",
+      conditions: [{ type: "hasEntity", entityId: "key" }],
+    },
+    {
+      id: "die-at-crypt",
+      type: "choice",
+      source: "forgotten-crypt",
+      target: "death",
+      text: "Succumb to your wounds in the crypt",
+    },
   ],
-  nodeCount: 2,
-  edgeCount: 1,
-  maxDepth: 1,
-  endings: ["node-b"],
-  nodeTypesUsed: ["scene"],
-  edgeTypesUsed: ["choice"],
-  conditionsUsed: ["hasEntity"],
-  effectsUsed: ["grantEntity"],
-  errors: [],
-  warnings: [],
-}
-
-describe("generateTerminalMap", () => {
-  test("renders simple linear graph correctly", () => {
-    const output = generateTerminalMap(sampleGraph)
-    expect(output).toContain("node-a (scene)")
-    expect(output).toContain("node-b (scene)")
-    expect(output).toContain('[edge-ab] "Go to B"')
-  })
-})
-
-describe("generateLlmMap", () => {
-  test("renders highly token-efficient flat markdown outline", () => {
-    const output = generateLlmMap(sampleGraph)
-    expect(output).toContain("# Graph: test-graph")
-    expect(output).toContain("* **node-a** (scene)")
-    expect(output).toContain('  * Title: "Node A"')
-    expect(output).toContain('  * Body: "First node"')
-    expect(output).toContain('    * `edge-ab` ──► **node-b** ("Go to B")')
-    expect(output).toContain("      * ❓ conditions: hasEntity(entityId=\"lantern\")")
-    expect(output).toContain("      * ⚡ effects: grantEntity(entityId=\"key\")")
-    expect(output).toContain("* **node-b** (scene) [Ending]")
-  })
-})
-
-describe("generateMermaidMap", () => {
-  test("renders valid mermaid.js diagram", () => {
-    const output = generateMermaidMap(sampleGraph)
-    expect(output).toContain("```mermaid")
-    expect(output).toContain("flowchart TD")
-    expect(output).toContain('  node-a["node-a (scene)<br/>Node A"]')
-    expect(output).toContain('  node-b["node-b (scene)<br/>Node B"]')
-    expect(output).toContain('  node-a -->|"edge-ab: \'Go to B\' [requires: hasEntity(entityId=\'lantern\')] [grants: grantEntity(entityId=\'key\')]"| node-b')
-    expect(output).toContain("```")
-  })
-})
+});
 ```
 
-- [ ] **Step 3: Run the new tests**
+- [ ] **Step 3: Update main.test.ts to initialize resources and test new path**
 
-Run: `bun test packages/cli/src/commands/ascii.test.ts`
-Expected: All tests pass successfully
-
-- [ ] **Step 4: Commit changes**
-
-```bash
-git add packages/cli/src/commands/ascii.ts packages/cli/src/commands/ascii.test.ts
-git commit -m "feat(cli): implement llm and mermaid diagram formatters with unit tests"
-```
-
----
-
-### Task 2: Register formatting arguments in CLI
-
-**Files:**
-- Modify: `packages/cli/src/cli.ts` (wire up the `--format` and `-f` command-line flags).
-
-- [ ] **Step 1: Wire up CLI command arguments**
-
-Read `packages/cli/src/cli.ts` and modify `parseArgs` options and the `ascii` switch command to support options `format` and `f`:
+Modify `apps/literature-rpg/src/main.test.ts` to assert the new dynamic walk, ensuring it successfully explores and studies the tomes:
 
 ```typescript
-// In main() parseArgs options:
-      format: { type: "string", short: "f" },
+import { describe, expect, it } from "vitest";
+import { runtime } from "./main";
+import { story } from "./graphs/story.graph";
+import { world } from "./world";
+import { createInitialState, deriveEntityState } from "@fiction-map/runtime";
 
-// In printHelp() help menu output:
-// Under Options or Ascii help:
-//   --format, -f      Output format: terminal, llm, mermaid (default: terminal)
+describe("literature-rpg consumer app", () => {
+  it("world has no definition errors", () => {
+    expect(world.errors).toEqual([]);
+  });
 
-// In main() switch:
-    case "ascii":
-    case "map":
-    case "draw":
-      await ascii(positionals[1], {
-        rootDir: values["root-dir"],
-        outputDir: values["output-dir"],
-        format: values.format,
-      })
-      break
+  it("walks from the entrance to victory learning spells along the way", () => {
+    const visited: string[] = [runtime.startNodeId];
+    
+    const steps = runtime.walkWithContext(
+      createInitialState(runtime.startNodeId), 
+      (currentState) => ({ derivedState: deriveEntityState(world, currentState) })
+    );
+
+    for (const step of steps) {
+      if (step.applied) {
+        visited.push(step.state.currentNodeId);
+      }
+    }
+
+    expect(visited).toEqual([
+      "entrance",
+      "main-hall",
+      "archives",
+      "archives", // Studies Tome of Heal
+      "archives", // Studies Tome of Mage Light
+      "main-hall",
+      "dark-chapter",
+      "chamber-of-runes",
+      "forgotten-crypt",
+      "victory",
+    ]);
+  });
+});
 ```
 
-- [ ] **Step 2: Build workspace packages**
+- [ ] **Step 4: Regenerate metadata, build and run tests**
 
-Run: `bun run build`
-Expected: Success
-
-- [ ] **Step 3: Verify the formatters on library-mystery**
-
-Run and inspect outputs:
-1. `bun packages/cli/src/cli.ts ascii library-mystery --root-dir apps/literature-rpg/src --format terminal`
-2. `bun packages/cli/src/cli.ts ascii library-mystery --root-dir apps/literature-rpg/src --format llm`
-3. `bun packages/cli/src/cli.ts ascii library-mystery --root-dir apps/literature-rpg/src --format mermaid`
-
-Expected: Outputs correspond perfectly to target designs.
-
-- [ ] **Step 4: Run typecheck and full test suite**
-
-Run: `bun run typecheck && bun test`
-Expected: Clean pass (126/126 green tests)
+Run: `bun packages/cli/src/cli.ts generate --root-dir apps/literature-rpg/src && bun run build && bun test`
+Expected: Metadata compiles, and all tests pass perfectly.
 
 - [ ] **Step 5: Commit changes**
 
 ```bash
-git add packages/cli/src/cli.ts
-git commit -m "feat(cli): wire up format/f parameter to CLI command parser"
+git add apps/literature-rpg/src/world.ts apps/literature-rpg/src/graphs/story.graph.ts apps/literature-rpg/src/main.test.ts
+git commit -m "feat(rpg): add spells, initial mana pools, and learning paths with updated tests"
+```
+
+---
+
+### Task 2: Register Reactive Triggers inside Clients
+
+**Files:**
+- Modify: `apps/literature-rpg/src/main.ts` (register generic mana regen and cooldown countdown triggers, update HUD printout).
+- Modify: `apps/literature-rpg-web/src/hooks/useStoryRuntime.ts` (register identical generic triggers on the Web client).
+
+- [ ] **Step 1: Add triggers and update HUD in main.ts**
+
+Read `apps/literature-rpg/src/main.ts` and update it to:
+1. Register **Mana Regen Trigger**: If `mana < 50`, `addResource: mana, amount: 5`.
+2. Register **Cooldown Tick Trigger**: If `heal_cooldown >= 1`, `spendResource: heal_cooldown, amount: 1, clampToZero: true`.
+3. Update the TUI HUD notes to print HP, MP, and active Cooldowns neatly.
+
+```typescript
+// Register triggers right after creating runtime:
+export const runtime = createRuntimeFromGraph(story);
+
+runtime.addTrigger({
+  id: "death-trigger",
+  conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
+  effects: [{ type: "navigate", nodeId: "death" }],
+});
+
+runtime.addTrigger({
+  id: "mana-regen-trigger",
+  conditions: [{ type: "resourceLessThan", key: "mana", value: 50 }],
+  effects: [{ type: "addResource", key: "mana", amount: 5 }],
+});
+
+runtime.addTrigger({
+  id: "cooldown-tick-trigger",
+  conditions: [{ type: "resourceAtLeast", key: "heal_cooldown", value: 1 }],
+  effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
+});
+
+// Inside main.ts playInteractive loop, replace lines 45-51 with:
+    const hp = state.entityState?.resources?.health ?? 0;
+    const mp = state.entityState?.resources?.mana ?? 0;
+    const cooldown = state.entityState?.resources?.heal_cooldown ?? 0;
+    const inventory = Array.from(context.derivedState.ownedEntityIds);
+    
+    let hudText = `❤️ HP: ${hp} | 🧪 MP: ${mp}`;
+    if (cooldown > 0) {
+      hudText += ` | ⏳ CD: ${cooldown} turns`;
+    }
+    if (inventory.length > 0) {
+      hudText += `\n🎒 Spells/Items: ${inventory.join(", ")}`;
+    }
+```
+
+- [ ] **Step 2: Add identical triggers to useStoryRuntime.ts**
+
+Read `apps/literature-rpg-web/src/hooks/useStoryRuntime.ts` and add the same generic triggers right after runtime instantiation:
+
+```typescript
+export const runtime = createRuntimeFromGraph(story);
+
+runtime.addTrigger({
+  id: "death-trigger",
+  conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
+  effects: [{ type: "navigate", nodeId: "death" }],
+});
+
+runtime.addTrigger({
+  id: "mana-regen-trigger",
+  conditions: [{ type: "resourceLessThan", key: "mana", value: 50 }],
+  effects: [{ type: "addResource", key: "mana", amount: 5 }],
+});
+
+runtime.addTrigger({
+  id: "cooldown-tick-trigger",
+  conditions: [{ type: "resourceAtLeast", key: "heal_cooldown", value: 1 }],
+  effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
+});
+```
+
+- [ ] **Step 3: Run typecheck and test suite**
+
+Run: `bun run build && bun run typecheck && bun test`
+Expected: Everything is 100% green and error-free.
+
+- [ ] **Step 4: Commit changes**
+
+```bash
+git add apps/literature-rpg/src/main.ts apps/literature-rpg-web/src/hooks/useStoryRuntime.ts
+git commit -m "feat(rpg): register generic mana-regen and cooldown triggers in both clients"
+```
+
+---
+
+### Task 3: Enhance Web RPG Interface with Dual Stat Progress Bars
+
+**Files:**
+- Modify: `apps/literature-rpg-web/src/App.tsx` (render both HP and MP bars, plus cooldown badges).
+
+- [ ] **Step 1: Update visual HUD and badges in App.tsx**
+
+Read `apps/literature-rpg-web/src/App.tsx` and integrate the dual-bar progress bars and cooldown statuses:
+
+```typescript
+// Replace lines 20-59 (where inventory and stats are rendered) with:
+  // Get dynamic state variables
+  const health = state.entityState?.resources?.health ?? 0;
+  const mana = state.entityState?.resources?.mana ?? 0;
+  const cooldown = state.entityState?.resources?.heal_cooldown ?? 0;
+  const isDead = state.currentNodeId === "death";
+  const isVictory = state.currentNodeId === "victory";
+
+  // Figure out what we have active from the derived state (e.g. 'lantern')
+  const inventory = Array.from(context.derivedState.ownedEntityIds);
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-100">
+      
+      {/* Dynamic RPG HUD Status Bar */}
+      {state.currentNodeId !== "entrance" && (
+        <div className="w-full max-w-lg mb-4 flex flex-col gap-3 bg-slate-900 border border-slate-800 rounded-lg p-3">
+          <div className="flex justify-between items-center gap-4">
+            {/* HP Bar */}
+            <div className="flex items-center gap-2 w-1/2">
+              <span className="text-red-500 font-bold shrink-0 text-sm">❤️ {health} HP</span>
+              <div className="w-full bg-slate-800 rounded-full h-2">
+                <div 
+                  className="bg-red-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${Math.min(100, Math.max(0, health))}%` }}
+                ></div>
+              </div>
+            </div>
+            {/* MP Bar */}
+            <div className="flex items-center gap-2 w-1/2">
+              <span className="text-cyan-500 font-bold shrink-0 text-sm">🧪 {mana} MP</span>
+              <div className="w-full bg-slate-800 rounded-full h-2">
+                <div 
+                  className="bg-cyan-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${Math.min(100, Math.max(0, mana * 2))}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-2 border-t border-slate-800/60">
+            {/* Cooldown State */}
+            <div>
+              {cooldown > 0 ? (
+                <span className="text-xs text-amber-500 font-medium">⏳ Heal Cooldown: {cooldown} turns</span>
+              ) : (
+                <span className="text-xs text-emerald-500 font-medium">✨ Spell Cast Ready</span>
+              )}
+            </div>
+            {/* Badges */}
+            <div className="flex gap-1 flex-wrap justify-end">
+              {inventory.length === 0 ? (
+                <span className="text-xs text-slate-500 italic">Inventory empty</span>
+              ) : (
+                inventory.map(item => {
+                  const icon = item.includes("spell") ? "✨" : item === "lantern" ? "🔦" : item === "elixir" ? "🧪" : "🔑";
+                  return (
+                    <Badge key={item} variant="secondary" className="bg-amber-900/60 text-amber-100 hover:bg-amber-800 shrink-0 border border-amber-800/40 text-[10px] px-1.5 py-0.5">
+                      {icon} {item}
+                    </Badge>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+```
+
+- [ ] **Step 2: Build the web bundle**
+
+Run: `bun run build`
+Expected: Success
+
+- [ ] **Step 3: Commit changes**
+
+```bash
+git add apps/literature-rpg-web/src/App.tsx
+git commit -m "feat(web): update Web interface with dual HP/MP status bars and cooldown trackers"
 ```
