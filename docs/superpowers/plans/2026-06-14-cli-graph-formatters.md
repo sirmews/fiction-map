@@ -1,3 +1,26 @@
+# CLI Graph Formatters Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Extend the `fiction-map ascii` (or `map`, `draw`) CLI command with a `--format <mode>` / `-f <mode>` parameter supporting `terminal`, `llm`, and `mermaid` formats.
+
+**Architecture:** We will implement `generateLlmMap` and `generateMermaidMap` formatters in `packages/cli/src/commands/ascii.ts` and rename `generateAsciiMap` to `generateTerminalMap`. We will update the CLI argument parser in `cli.ts` to support `--format` and `-f` flags.
+
+**Tech Stack:** TypeScript, Bun, Bun Test
+
+---
+
+### Task 1: Implement LLM and Mermaid Formatters
+
+**Files:**
+- Create/Modify: `packages/cli/src/commands/ascii.ts` (implement formatters, export them, rename current function to `generateTerminalMap`).
+- Create/Modify: `packages/cli/src/commands/ascii.test.ts` (write unit tests for `llm` and `mermaid` formats).
+
+- [ ] **Step 1: Write formatters inside ascii.ts**
+
+Update `packages/cli/src/commands/ascii.ts` to include the three formatters and update the `ascii` entry point:
+
+```typescript
 import { GraphDefinition, NodeInstance, EdgeInstance } from "@fiction-map/core"
 import { loadMetadata, selectGraphs } from "./query"
 
@@ -116,10 +139,8 @@ export function generateLlmMap(graph: GraphDefinition): string {
   for (const node of graph.nodes) {
     const isEnding = endings.has(node.id) ? " [Ending]" : ""
     output += `* **${node.id}** (${node.type})${isEnding}\n`
-    if (typeof node.title === "string" && node.title) {
-      output += `  * Title: "${node.title}"\n`
-    }
-    if (typeof node.body === "string" && node.body) {
+    if (node.title) output += `  * Title: "${node.title}"\n`
+    if (node.body) {
       const bodyClean = node.body.replace(/\n/g, " ")
       output += `  * Body: "${bodyClean.length > 60 ? bodyClean.slice(0, 57) + "..." : bodyClean}"\n`
     }
@@ -150,7 +171,7 @@ export function generateMermaidMap(graph: GraphDefinition): string {
 
   for (const node of graph.nodes) {
     const typeLabel = node.type
-    const titleLabel = typeof node.title === "string" && node.title ? `<br/>${node.title}` : ""
+    const titleLabel = node.title ? `<br/>${node.title}` : ""
     // Escape quotes for mermaid double-quoted node labels
     const sanitizedLabel = `${node.id} (${typeLabel})${titleLabel}`.replace(/"/g, "'")
     lines.push(`  ${node.id}["${sanitizedLabel}"]`)
@@ -199,3 +220,149 @@ export async function ascii(graphId: string | undefined, options: AsciiOptions =
 
   console.log(output)
 }
+```
+
+- [ ] **Step 2: Add tests for LLM and Mermaid formats**
+
+Modify `packages/cli/src/commands/ascii.test.ts` to include assertions for LLM and Mermaid generation:
+
+```typescript
+import { expect, test, describe } from "bun:test"
+import { generateTerminalMap, generateLlmMap, generateMermaidMap } from "./ascii"
+import { GraphDefinition } from "@fiction-map/core"
+
+const sampleGraph: GraphDefinition = {
+  id: "test-graph",
+  name: "testGraph",
+  location: { file: "test.ts", line: 1, column: 1 },
+  nodes: [
+    { id: "node-a", type: "scene", title: "Node A", body: "First node" },
+    { id: "node-b", type: "scene", title: "Node B", body: "Second node" },
+  ],
+  edges: [
+    {
+      id: "edge-ab",
+      type: "choice",
+      source: "node-a",
+      target: "node-b",
+      text: "Go to B",
+      conditions: [{ type: "hasEntity", entityId: "lantern" }],
+      effects: [{ type: "grantEntity", entityId: "key" }],
+    },
+  ],
+  nodeCount: 2,
+  edgeCount: 1,
+  maxDepth: 1,
+  endings: ["node-b"],
+  nodeTypesUsed: ["scene"],
+  edgeTypesUsed: ["choice"],
+  conditionsUsed: ["hasEntity"],
+  effectsUsed: ["grantEntity"],
+  errors: [],
+  warnings: [],
+}
+
+describe("generateTerminalMap", () => {
+  test("renders simple linear graph correctly", () => {
+    const output = generateTerminalMap(sampleGraph)
+    expect(output).toContain("node-a (scene)")
+    expect(output).toContain("node-b (scene)")
+    expect(output).toContain('[edge-ab] "Go to B"')
+  })
+})
+
+describe("generateLlmMap", () => {
+  test("renders highly token-efficient flat markdown outline", () => {
+    const output = generateLlmMap(sampleGraph)
+    expect(output).toContain("# Graph: test-graph")
+    expect(output).toContain("* **node-a** (scene)")
+    expect(output).toContain('  * Title: "Node A"')
+    expect(output).toContain('  * Body: "First node"')
+    expect(output).toContain('    * `edge-ab` ──► **node-b** ("Go to B")')
+    expect(output).toContain("      * ❓ conditions: hasEntity(entityId=\"lantern\")")
+    expect(output).toContain("      * ⚡ effects: grantEntity(entityId=\"key\")")
+    expect(output).toContain("* **node-b** (scene) [Ending]")
+  })
+})
+
+describe("generateMermaidMap", () => {
+  test("renders valid mermaid.js diagram", () => {
+    const output = generateMermaidMap(sampleGraph)
+    expect(output).toContain("```mermaid")
+    expect(output).toContain("flowchart TD")
+    expect(output).toContain('  node-a["node-a (scene)<br/>Node A"]')
+    expect(output).toContain('  node-b["node-b (scene)<br/>Node B"]')
+    expect(output).toContain('  node-a -->|"edge-ab: \'Go to B\' [requires: hasEntity(entityId=\'lantern\')] [grants: grantEntity(entityId=\'key\')]"| node-b')
+    expect(output).toContain("```")
+  })
+})
+```
+
+- [ ] **Step 3: Run the new tests**
+
+Run: `bun test packages/cli/src/commands/ascii.test.ts`
+Expected: All tests pass successfully
+
+- [ ] **Step 4: Commit changes**
+
+```bash
+git add packages/cli/src/commands/ascii.ts packages/cli/src/commands/ascii.test.ts
+git commit -m "feat(cli): implement llm and mermaid diagram formatters with unit tests"
+```
+
+---
+
+### Task 2: Register formatting arguments in CLI
+
+**Files:**
+- Modify: `packages/cli/src/cli.ts` (wire up the `--format` and `-f` command-line flags).
+
+- [ ] **Step 1: Wire up CLI command arguments**
+
+Read `packages/cli/src/cli.ts` and modify `parseArgs` options and the `ascii` switch command to support options `format` and `f`:
+
+```typescript
+// In main() parseArgs options:
+      format: { type: "string", short: "f" },
+
+// In printHelp() help menu output:
+// Under Options or Ascii help:
+//   --format, -f      Output format: terminal, llm, mermaid (default: terminal)
+
+// In main() switch:
+    case "ascii":
+    case "map":
+    case "draw":
+      await ascii(positionals[1], {
+        rootDir: values["root-dir"],
+        outputDir: values["output-dir"],
+        format: values.format,
+      })
+      break
+```
+
+- [ ] **Step 2: Build workspace packages**
+
+Run: `bun run build`
+Expected: Success
+
+- [ ] **Step 3: Verify the formatters on library-mystery**
+
+Run and inspect outputs:
+1. `bun packages/cli/src/cli.ts ascii library-mystery --root-dir apps/literature-rpg/src --format terminal`
+2. `bun packages/cli/src/cli.ts ascii library-mystery --root-dir apps/literature-rpg/src --format llm`
+3. `bun packages/cli/src/cli.ts ascii library-mystery --root-dir apps/literature-rpg/src --format mermaid`
+
+Expected: Outputs correspond perfectly to target designs.
+
+- [ ] **Step 4: Run typecheck and full test suite**
+
+Run: `bun run typecheck && bun test`
+Expected: Clean pass (126/126 green tests)
+
+- [ ] **Step 5: Commit changes**
+
+```bash
+git add packages/cli/src/cli.ts
+git commit -m "feat(cli): wire up format/f parameter to CLI command parser"
+```
