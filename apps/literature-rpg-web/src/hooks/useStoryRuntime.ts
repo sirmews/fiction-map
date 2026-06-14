@@ -21,6 +21,18 @@ runtime.addTrigger({
   effects: [{ type: "navigate", nodeId: "death" }],
 });
 
+runtime.addTrigger({
+  id: "mana-regen-trigger",
+  conditions: [{ type: "resourceLessThan", key: "mana", value: 50 }],
+  effects: [{ type: "addResource", key: "mana", amount: 5 }],
+});
+
+runtime.addTrigger({
+  id: "cooldown-tick-trigger",
+  conditions: [{ type: "resourceAtLeast", key: "heal_cooldown", value: 1 }],
+  effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
+});
+
 export function useStoryRuntime() {
   const [state, setState] = useState<GraphRuntimeState>(() => 
     createInitialState(runtime.startNodeId)
