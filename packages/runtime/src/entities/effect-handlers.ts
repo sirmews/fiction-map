@@ -7,7 +7,7 @@
  * that want a non-entity runtime can use `coreBuiltinHandlers` alone.
  */
 
-import type { GraphRuntimeState, Effect, EffectHandler } from "../types"
+import type { GraphRuntimeState, Effect, EffectHandler, ResourceEffect } from "../types"
 import {
   grantEntity,
   revokeEntity,
@@ -18,9 +18,9 @@ import {
   addResource,
   spendResource,
 } from "../core/state"
+import { evaluateFormula } from "../utils/formula"
 
 type EntityEffect = Effect & { entityId: string }
-type ResourceEffect = Effect & { key: string; amount: number; allowNegative?: boolean; clampToZero?: boolean }
 
 export const grantEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
@@ -74,9 +74,17 @@ export const addResourceHandler: EffectHandler = (
   state: GraphRuntimeState,
   effect: Effect
 ): GraphRuntimeState => {
-  const { key, amount } = effect as ResourceEffect
-  return typeof key === "string" && typeof amount === "number"
-    ? addResource(state, key, amount)
+  const resourceEffect = effect as ResourceEffect
+  const { key, amount, formula } = resourceEffect
+  
+  if (typeof key !== "string") return state
+
+  const resolvedAmount = typeof formula === "string" 
+    ? evaluateFormula(formula, state) 
+    : amount
+
+  return typeof resolvedAmount === "number"
+    ? addResource(state, key, resolvedAmount)
     : state
 }
 
@@ -84,9 +92,17 @@ export const spendResourceHandler: EffectHandler = (
   state: GraphRuntimeState,
   effect: Effect
 ): GraphRuntimeState => {
-  const { key, amount, allowNegative, clampToZero } = effect as ResourceEffect
-  return typeof key === "string" && typeof amount === "number"
-    ? spendResource(state, key, amount, { allowNegative, clampToZero })
+  const resourceEffect = effect as ResourceEffect
+  const { key, amount, formula, allowNegative, clampToZero } = resourceEffect
+  
+  if (typeof key !== "string") return state
+
+  const resolvedAmount = typeof formula === "string" 
+    ? evaluateFormula(formula, state) 
+    : amount
+
+  return typeof resolvedAmount === "number"
+    ? spendResource(state, key, resolvedAmount, { allowNegative, clampToZero })
     : state
 }
 

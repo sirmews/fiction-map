@@ -83,6 +83,14 @@ export type EffectHandler = (
   context?: EffectContext
 ) => GraphRuntimeState
 
+export interface ResourceEffect extends Effect {
+  key: string
+  amount?: number
+  formula?: string
+  allowNegative?: boolean
+  clampToZero?: boolean
+}
+
 // ============================================================================
 // TRANSITIONS
 // ============================================================================

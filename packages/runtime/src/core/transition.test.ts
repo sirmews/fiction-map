@@ -230,6 +230,21 @@ describe("effect application", () => {
 
     expect(getResource(newState, "gold")).toBe(3);
   });
+
+  it("applies resource effects using formulas", () => {
+    let state = createInitialState("scene-1", { multiplier: 2 });
+    state = addResource(state, "gold", 10);
+
+    // addResource with formula (gold * multiplier -> 10 * 2 = 20 added to 10 -> 30)
+    const addEffect = { type: "addResource", key: "gold", formula: "gold * multiplier" };
+    let newState = applyEffect(state, addEffect, builtinHandlers);
+    expect(getResource(newState, "gold")).toBe(30);
+
+    // spendResource with formula (multiplier * 5 -> 2 * 5 = 10 spent from 30 -> 20)
+    const spendEffect = { type: "spendResource", key: "gold", formula: "multiplier * 5" };
+    newState = applyEffect(newState, spendEffect, builtinHandlers);
+    expect(getResource(newState, "gold")).toBe(20);
+  });
 });
 
 describe("transition engine", () => {

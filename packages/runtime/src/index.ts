@@ -11,6 +11,7 @@ export type {
   ConditionEvaluator,
   EvaluationContext,
   Effect,
+  ResourceEffect,
   EffectHandler,
   EffectContext,
   Transition,
