@@ -133,12 +133,34 @@ export function GameController() {
           </Box>
           
           <Box flexDirection="column" marginBottom={1}>
-            <Text color="red">❤️ HP {renderProgressBar(hp, 100)} {hp}%</Text>
-            <Text color="blue">🧪 MP {renderProgressBar(mp, 50)} {mp}/50</Text>
+            <Box flexDirection="row">
+              <Box width={8}>
+                <Text color="red">❤️ HP</Text>
+              </Box>
+              <Text color="red">{renderProgressBar(hp, 100)} {hp}%</Text>
+            </Box>
+            
+            <Box flexDirection="row">
+              <Box width={8}>
+                <Text color="blue">🧪 MP</Text>
+              </Box>
+              <Text color="blue">{renderProgressBar(mp, 50)} {mp}/50</Text>
+            </Box>
           </Box>
 
-          <Text color="yellow">🪙 Gold: {gold}g</Text>
-          <Text color="white">🕒 Turn: {turns}</Text>
+          <Box flexDirection="row">
+            <Box width={8}>
+              <Text color="yellow">🪙 Gold</Text>
+            </Box>
+            <Text color="yellow">: {gold}g</Text>
+          </Box>
+
+          <Box flexDirection="row">
+            <Box width={8}>
+              <Text color="white">🕒 Turn</Text>
+            </Box>
+            <Text color="white">: {turns}</Text>
+          </Box>
           
           {turns > 10 && (
             <Box marginTop={1}>
