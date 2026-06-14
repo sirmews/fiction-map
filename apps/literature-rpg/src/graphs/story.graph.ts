@@ -77,7 +77,7 @@ export const story = defineGraph(registry, {
       source: "dark-chapter",
       target: "collapsed-bridge",
       text: "Cross the crumbling bridge",
-      effects: [{ type: "spendResource", key: "health", amount: 40 }],
+      effects: [{ type: "spendResource", key: "health", amount: 40, clampToZero: true }],
     },
     {
       id: "translate-runes",
@@ -94,7 +94,7 @@ export const story = defineGraph(registry, {
       source: "chamber-of-runes",
       target: "chamber-of-runes",
       text: "Touch the central pedestal",
-      effects: [{ type: "spendResource", key: "health", amount: 30 }],
+      effects: [{ type: "spendResource", key: "health", amount: 30, clampToZero: true }],
     },
     {
       id: "return-to-chapter",
@@ -122,7 +122,7 @@ export const story = defineGraph(registry, {
       target: "forgotten-crypt",
       text: "Climb through the rubble (-20 HP)",
       conditions: [{ type: "resourceAtLeast", key: "health", value: 30 }],
-      effects: [{ type: "spendResource", key: "health", amount: 20 }],
+      effects: [{ type: "spendResource", key: "health", amount: 20, clampToZero: true }],
     },
     {
       id: "succumb-to-injuries",

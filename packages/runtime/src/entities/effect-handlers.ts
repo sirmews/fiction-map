@@ -20,7 +20,7 @@ import {
 } from "../core/state"
 
 type EntityEffect = Effect & { entityId: string }
-type ResourceEffect = Effect & { key: string; amount: number }
+type ResourceEffect = Effect & { key: string; amount: number; allowNegative?: boolean; clampToZero?: boolean }
 
 export const grantEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
@@ -84,9 +84,9 @@ export const spendResourceHandler: EffectHandler = (
   state: GraphRuntimeState,
   effect: Effect
 ): GraphRuntimeState => {
-  const { key, amount } = effect as ResourceEffect
+  const { key, amount, allowNegative, clampToZero } = effect as ResourceEffect
   return typeof key === "string" && typeof amount === "number"
-    ? spendResource(state, key, amount)
+    ? spendResource(state, key, amount, { allowNegative, clampToZero })
     : state
 }
 
