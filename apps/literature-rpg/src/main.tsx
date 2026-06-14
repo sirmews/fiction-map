@@ -66,7 +66,7 @@ When running via "bun run --filter", standard input is redirected, which breaks 
     process.exit(1);
   }
 
-  const { waitUntilExit } = render(<GameController />);
+  const { waitUntilExit } = render(<GameController runtime={runtime} />);
   await waitUntilExit();
 }
 

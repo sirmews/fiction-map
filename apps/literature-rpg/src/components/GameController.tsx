@@ -4,19 +4,20 @@ import {
   createInitialState,
   deriveEntityState,
   Transition,
+  GraphRuntime,
 } from "@fiction-map/runtime";
 import { story } from "../graphs/story.graph";
 import { world } from "../world";
-import { runtime } from "../main";
 
 function renderProgressBar(current: number, max: number, fillChar = "█", emptyChar = "░", length = 10): string {
+  if (max <= 0) return `[${emptyChar.repeat(length)}]`;
   const clampedCurrent = Math.max(0, Math.min(max, current));
   const filledLength = Math.round((clampedCurrent / max) * length);
   const emptyLength = length - filledLength;
   return `[${fillChar.repeat(filledLength)}${emptyChar.repeat(emptyLength)}]`;
 }
 
-export function GameController() {
+export function GameController({ runtime }: { runtime: GraphRuntime }) {
   const { exit } = useApp();
   const [state, setState] = useState(() => createInitialState(runtime.startNodeId));
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -37,6 +38,8 @@ export function GameController() {
   // Available choices at the current node
   const availableChoices = runtime.getAvailable(state, context);
 
+  const isPacingComplete = !currentNode || !currentNode.blocks || pacingIndex >= currentNode.blocks.length - 1;
+
   useEffect(() => {
     if (!currentNode || !currentNode.blocks) return;
     if (pacingIndex < currentNode.blocks.length - 1) {
@@ -55,6 +58,14 @@ export function GameController() {
 
   // Handle keyboard inputs
   useInput((input, key) => {
+    if (!isPacingComplete) {
+      if (key.return) {
+        // Skip pacing reveal on Enter press
+        setPacingIndex(currentNode?.blocks ? currentNode.blocks.length - 1 : 0);
+      }
+      return;
+    }
+
     if (key.upArrow) {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : availableChoices.length - 1));
     } else if (key.downArrow) {
@@ -76,6 +87,7 @@ export function GameController() {
   });
 
   function handleChoiceSelection(choice: Transition) {
+    if (!choice) return;
     const result = runtime.step(state, choice, context);
     if (result.success) {
       setState(result.state);
