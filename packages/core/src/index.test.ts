@@ -200,5 +200,35 @@ describe("@fiction-map/core", () => {
         expect.objectContaining({ code: "UNPROTECTED_RESOURCE_SPEND" })
       )
     })
+
+    it("should fail validation if anchorBlockId does not exist on source node", () => {
+      defineNodeType(registry, { id: "scene", outgoingEdges: ["choice"], incomingEdges: ["choice"] })
+      defineEdgeType(registry, { id: "choice", sourceTypes: ["scene"], targetTypes: ["scene"] })
+
+      const graph = defineGraph(registry, {
+        id: "test-story",
+        nodes: [
+          { 
+            id: "start", 
+            type: "scene", 
+            blocks: [{ id: "intro", type: "paragraph", text: "Hello" }] 
+          },
+          { id: "end", type: "scene" },
+        ],
+        edges: [
+          { 
+            id: "c1", 
+            type: "choice", 
+            source: "start", 
+            target: "end", 
+            anchorBlockId: "non-existent-block-id" 
+          },
+        ],
+      })
+
+      expect(graph.errors).toContainEqual(
+        expect.objectContaining({ code: "UNKNOWN_ANCHOR_BLOCK_ID" })
+      )
+    })
   })
 })

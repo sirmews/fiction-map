@@ -63,56 +63,129 @@
         {
           "id": "entrance",
           "type": "scene",
-          "title": "Entrance",
-          "body": "You stand at the entrance to the old library."
+          "blocks": [
+            {
+              "id": "entrance-desc",
+              "type": "paragraph",
+              "text": "You stand at the entrance to the old library."
+            }
+          ]
         },
         {
           "id": "main-hall",
           "type": "scene",
-          "title": "Main Hall",
-          "body": "Dust motes float in shafts of grey light. A lantern sits on a table."
+          "blocks": [
+            {
+              "id": "hall-desc",
+              "type": "paragraph",
+              "text": "Dust motes float in shafts of grey light. A lantern sits on a table."
+            },
+            {
+              "id": "hall-passage",
+              "type": "paragraph",
+              "text": "In the center of the hall, a yawning dark chasm drops into the earth."
+            },
+            {
+              "id": "hall-archives",
+              "type": "paragraph",
+              "text": "To your left, the heavy iron-reinforced doors of the archives loom."
+            }
+          ]
         },
         {
           "id": "archives",
           "type": "scene",
-          "title": "Dusty Archives",
-          "body": "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby."
+          "blocks": [
+            {
+              "id": "archives-desc",
+              "type": "paragraph",
+              "text": "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby.",
+              "metadata": {
+                "delayAfterMs": 400
+              }
+            },
+            {
+              "id": "archives-heal-tome",
+              "type": "paragraph",
+              "text": "On a brass stand rests the glowing 'Tome of Heal Spell'."
+            },
+            {
+              "id": "archives-light-tome",
+              "type": "paragraph",
+              "text": "On a nearby desk rests the 'Tome of Mage Light Spell'."
+            },
+            {
+              "id": "archives-librarian",
+              "type": "paragraph",
+              "text": "The spectral librarian gazes at you, offering lockpicks for trade."
+            }
+          ]
         },
         {
           "id": "dark-chapter",
           "type": "scene",
-          "title": "Dark Chapter",
-          "body": "A narrow passage drops into darkness. You hear the crackle of ancient magic."
+          "blocks": [
+            {
+              "id": "chapter-desc",
+              "type": "paragraph",
+              "text": "A narrow passage drops into darkness. You hear the crackle of ancient magic."
+            }
+          ]
         },
         {
           "id": "chamber-of-runes",
           "type": "scene",
-          "title": "Chamber of Runes",
-          "body": "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key."
+          "blocks": [
+            {
+              "id": "runes-desc",
+              "type": "paragraph",
+              "text": "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key."
+            }
+          ]
         },
         {
           "id": "collapsed-bridge",
           "type": "scene",
-          "title": "Collapsed Bridge",
-          "body": "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere."
+          "blocks": [
+            {
+              "id": "bridge-desc",
+              "type": "paragraph",
+              "text": "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere."
+            }
+          ]
         },
         {
           "id": "forgotten-crypt",
           "type": "scene",
-          "title": "Forgotten Crypt",
-          "body": "An ancient crypt, smelling of age. A massive iron casket lies in the center."
+          "blocks": [
+            {
+              "id": "crypt-desc",
+              "type": "paragraph",
+              "text": "An ancient crypt, smelling of age. A massive iron casket lies in the center."
+            }
+          ]
         },
         {
           "id": "victory",
           "type": "scene",
-          "title": "Victory!",
-          "body": "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!"
+          "blocks": [
+            {
+              "id": "victory-desc",
+              "type": "paragraph",
+              "text": "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!"
+            }
+          ]
         },
         {
           "id": "death",
           "type": "scene",
-          "title": "Defeat",
-          "body": "The dark forces of the passage overwhelm you. Your journey ends here."
+          "blocks": [
+            {
+              "id": "death-desc",
+              "type": "paragraph",
+              "text": "The dark forces of the passage overwhelm you. Your journey ends here."
+            }
+          ]
         }
       ],
       "edges": [
@@ -147,7 +220,8 @@
               "key": "turns",
               "amount": 0
             }
-          ]
+          ],
+          "anchorBlockId": "entrance-desc"
         },
         {
           "id": "explore-archives",
@@ -160,7 +234,8 @@
               "type": "notVisited",
               "nodeId": "archives"
             }
-          ]
+          ],
+          "anchorBlockId": "hall-archives"
         },
         {
           "id": "study-heal",
@@ -183,7 +258,8 @@
               "type": "markVisited",
               "nodeId": "study-heal"
             }
-          ]
+          ],
+          "anchorBlockId": "archives-heal-tome"
         },
         {
           "id": "study-mage-light",
@@ -206,14 +282,8 @@
               "type": "markVisited",
               "nodeId": "study-mage-light"
             }
-          ]
-        },
-        {
-          "id": "return-from-archives",
-          "type": "choice",
-          "source": "archives",
-          "target": "main-hall",
-          "text": "Return to the Main Hall"
+          ],
+          "anchorBlockId": "archives-light-tome"
         },
         {
           "id": "buy-lockpick",
@@ -247,7 +317,16 @@
               "type": "markVisited",
               "nodeId": "buy-lockpick"
             }
-          ]
+          ],
+          "anchorBlockId": "archives-librarian"
+        },
+        {
+          "id": "return-from-archives",
+          "type": "choice",
+          "source": "archives",
+          "target": "main-hall",
+          "text": "Return to the Main Hall",
+          "anchorBlockId": "archives-desc"
         },
         {
           "id": "descend",
@@ -260,14 +339,16 @@
               "type": "hasEntity",
               "entityId": "lantern"
             }
-          ]
+          ],
+          "anchorBlockId": "hall-passage"
         },
         {
           "id": "examine-glyphs",
           "type": "choice",
           "source": "dark-chapter",
           "target": "chamber-of-runes",
-          "text": "Examine the glowing glyphs"
+          "text": "Examine the glowing glyphs",
+          "anchorBlockId": "chapter-desc"
         },
         {
           "id": "cast-mage-light",
@@ -293,7 +374,8 @@
               "amount": 15,
               "clampToZero": true
             }
-          ]
+          ],
+          "anchorBlockId": "chapter-desc"
         },
         {
           "id": "cross-bridge",
@@ -308,7 +390,8 @@
               "amount": 40,
               "clampToZero": true
             }
-          ]
+          ],
+          "anchorBlockId": "chapter-desc"
         },
         {
           "id": "translate-runes",
@@ -327,7 +410,8 @@
               "type": "grantEntity",
               "entityId": "key"
             }
-          ]
+          ],
+          "anchorBlockId": "runes-desc"
         },
         {
           "id": "touch-pedestal",
@@ -342,14 +426,16 @@
               "amount": 30,
               "clampToZero": true
             }
-          ]
+          ],
+          "anchorBlockId": "runes-desc"
         },
         {
           "id": "return-to-chapter",
           "type": "choice",
           "source": "chamber-of-runes",
           "target": "dark-chapter",
-          "text": "Return to the Dark Chapter"
+          "text": "Return to the Dark Chapter",
+          "anchorBlockId": "runes-desc"
         },
         {
           "id": "heal-with-elixir",
@@ -373,7 +459,8 @@
               "type": "revokeEntity",
               "entityId": "elixir"
             }
-          ]
+          ],
+          "anchorBlockId": "bridge-desc"
         },
         {
           "id": "cast-heal",
@@ -414,7 +501,8 @@
               "key": "heal_cooldown",
               "amount": 3
             }
-          ]
+          ],
+          "anchorBlockId": "bridge-desc"
         },
         {
           "id": "climb-rubble",
@@ -436,14 +524,16 @@
               "amount": 20,
               "clampToZero": true
             }
-          ]
+          ],
+          "anchorBlockId": "bridge-desc"
         },
         {
           "id": "succumb-to-injuries",
           "type": "choice",
           "source": "collapsed-bridge",
           "target": "death",
-          "text": "Succumb to your injuries"
+          "text": "Succumb to your injuries",
+          "anchorBlockId": "bridge-desc"
         },
         {
           "id": "unlock-casket",
@@ -456,7 +546,8 @@
               "type": "hasEntity",
               "entityId": "key"
             }
-          ]
+          ],
+          "anchorBlockId": "crypt-desc"
         },
         {
           "id": "lockpick-casket",
@@ -469,14 +560,16 @@
               "type": "hasEntity",
               "entityId": "lockpick"
             }
-          ]
+          ],
+          "anchorBlockId": "crypt-desc"
         },
         {
           "id": "die-at-crypt",
           "type": "choice",
           "source": "forgotten-crypt",
           "target": "death",
-          "text": "Succumb to your wounds in the crypt"
+          "text": "Succumb to your wounds in the crypt",
+          "anchorBlockId": "crypt-desc"
         }
       ],
       "nodeCount": 9,
