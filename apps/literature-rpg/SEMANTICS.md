@@ -70,8 +70,8 @@ Source: `edges/choice.edge.ts:4`
 | `main-hall` (scene) | `explore-archives` (choice) | `archives` (scene) | `notVisited(nodeId="archives")` | — |
 | `archives` (scene) | `study-heal` (choice) | `archives` (scene) | `notVisited(nodeId="study-heal")` | `grantEntity(entityId="heal-spell")`<br>`markVisited(nodeId="study-heal")` |
 | `archives` (scene) | `study-mage-light` (choice) | `archives` (scene) | `notVisited(nodeId="study-mage-light")` | `grantEntity(entityId="mage-light")`<br>`markVisited(nodeId="study-mage-light")` |
-| `archives` (scene) | `return-from-archives` (choice) | `main-hall` (scene) | — | — |
 | `archives` (scene) | `buy-lockpick` (choice) | `archives` (scene) | `notVisited(nodeId="buy-lockpick")`<br>`resourceAtLeast(key="gold", value=15)` | `spendResource(key="gold", amount=15, clampToZero=true)`<br>`grantEntity(entityId="lockpick")`<br>`markVisited(nodeId="buy-lockpick")` |
+| `archives` (scene) | `return-from-archives` (choice) | `main-hall` (scene) | — | — |
 | `main-hall` (scene) | `descend` (choice) | `dark-chapter` (scene) | `hasEntity(entityId="lantern")` | — |
 | `dark-chapter` (scene) | `examine-glyphs` (choice) | `chamber-of-runes` (scene) | — | — |
 | `dark-chapter` (scene) | `cast-mage-light` (choice) | `chamber-of-runes` (scene) | `hasEntity(entityId="mage-light")`<br>`resourceAtLeast(key="mana", value=15)` | `spendResource(key="mana", amount=15, clampToZero=true)` |
