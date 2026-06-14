@@ -15,6 +15,12 @@ registerBuiltins(registry);
 
 export const runtime = createRuntimeFromGraph(story);
 
+runtime.addTrigger({
+  id: "death-trigger",
+  conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
+  effects: [{ type: "navigate", nodeId: "death" }],
+});
+
 export function useStoryRuntime() {
   const [state, setState] = useState<GraphRuntimeState>(() => 
     createInitialState(runtime.startNodeId)

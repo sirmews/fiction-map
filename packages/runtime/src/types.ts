@@ -43,6 +43,12 @@ export interface ConditionSet {
   none?: Condition[]
 }
 
+export interface StateTrigger {
+  id: string
+  conditions: Condition[]
+  effects: Effect[]
+}
+
 export interface EvaluationContext {
   registry?: unknown
   scope?: string
