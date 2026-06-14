@@ -23,6 +23,20 @@ registerBuiltins(registry);
 export const runtime = createRuntimeFromGraph(story);
 
 runtime.addTrigger({
+  id: "turn-counter-trigger",
+  conditions: [],
+  effects: [{ type: "addResource", key: "turns", amount: 1 }],
+});
+
+runtime.addTrigger({
+  id: "cavern-collapse-trigger",
+  conditions: [
+    { type: "resourceAtLeast", key: "turns", value: 11 },
+  ],
+  effects: [{ type: "spendResource", key: "health", amount: 25, clampToZero: true }],
+});
+
+runtime.addTrigger({
   id: "death-trigger",
   conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
   effects: [{ type: "navigate", nodeId: "death" }],
@@ -63,10 +77,15 @@ export async function playInteractive() {
     
     const hp = state.entityState?.resources?.health ?? 0;
     const mp = state.entityState?.resources?.mana ?? 0;
+    const gold = state.entityState?.resources?.gold ?? 0;
+    const turns = state.entityState?.resources?.turns ?? 0;
     const cooldown = state.entityState?.resources?.heal_cooldown ?? 0;
     const inventory = Array.from(context.derivedState.ownedEntityIds);
     
-    let hudText = `❤️ HP: ${hp} | 🧪 MP: ${mp}`;
+    let hudText = `❤️ HP: ${hp} | 🧪 MP: ${mp} | 🪙 Gold: ${gold}g | 🕒 Turn: ${turns}`;
+    if (turns > 10) {
+      hudText += `\n⚠️ WARNING: THE CAVERN IS COLLAPSING! (-25 HP/t)`;
+    }
     if (cooldown > 0) {
       hudText += ` | ⏳ CD: ${cooldown} turns`;
     }

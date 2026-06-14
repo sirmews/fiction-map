@@ -16,6 +16,20 @@ registerBuiltins(registry);
 export const runtime = createRuntimeFromGraph(story);
 
 runtime.addTrigger({
+  id: "turn-counter-trigger",
+  conditions: [],
+  effects: [{ type: "addResource", key: "turns", amount: 1 }],
+});
+
+runtime.addTrigger({
+  id: "cavern-collapse-trigger",
+  conditions: [
+    { type: "resourceAtLeast", key: "turns", value: 11 },
+  ],
+  effects: [{ type: "spendResource", key: "health", amount: 25, clampToZero: true }],
+});
+
+runtime.addTrigger({
   id: "death-trigger",
   conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
   effects: [{ type: "navigate", nodeId: "death" }],
