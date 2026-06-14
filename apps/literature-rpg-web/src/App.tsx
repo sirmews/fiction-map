@@ -21,6 +21,8 @@ function App() {
 
   // Get dynamic state variables
   const health = state.entityState?.resources?.health ?? 0;
+  const mana = state.entityState?.resources?.mana ?? 0;
+  const cooldown = state.entityState?.resources?.heal_cooldown ?? 0;
   const isDead = state.currentNodeId === "death";
   const isVictory = state.currentNodeId === "victory";
 
@@ -32,29 +34,54 @@ function App() {
       
       {/* Dynamic RPG HUD Status Bar */}
       {state.currentNodeId !== "entrance" && (
-        <div className="w-full max-w-lg mb-4 flex justify-between items-center bg-slate-900 border border-slate-800 rounded-lg p-3">
-          <div className="flex items-center gap-3 w-1/2">
-            <span className="text-red-500 font-bold shrink-0">❤️ {health} HP</span>
-            <div className="w-full bg-slate-800 rounded-full h-2">
-              <div 
-                className="bg-red-600 h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${Math.min(100, Math.max(0, health))}%` }}
-              ></div>
+        <div className="w-full max-w-lg mb-4 flex flex-col gap-3 bg-slate-900 border border-slate-800 rounded-lg p-3">
+          <div className="flex justify-between items-center gap-4">
+            {/* HP Bar */}
+            <div className="flex items-center gap-2 w-1/2">
+              <span className="text-red-500 font-bold shrink-0 text-sm">❤️ {health} HP</span>
+              <div className="w-full bg-slate-800 rounded-full h-2">
+                <div 
+                  className="bg-red-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${Math.min(100, Math.max(0, health))}%` }}
+                ></div>
+              </div>
+            </div>
+            {/* MP Bar */}
+            <div className="flex items-center gap-2 w-1/2">
+              <span className="text-cyan-500 font-bold shrink-0 text-sm">🧪 {mana} MP</span>
+              <div className="w-full bg-slate-800 rounded-full h-2">
+                <div 
+                  className="bg-cyan-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${Math.min(100, Math.max(0, mana * 2))}%` }}
+                ></div>
+              </div>
             </div>
           </div>
-          <div className="flex gap-1.5 flex-wrap justify-end">
-            {inventory.length === 0 ? (
-              <span className="text-xs text-slate-500 italic">Inventory empty</span>
-            ) : (
-              inventory.map(item => {
-                const icon = item === "lantern" ? "🔦" : item === "elixir" ? "🧪" : "🔑";
-                return (
-                  <Badge key={item} variant="secondary" className="bg-amber-900/60 text-amber-100 hover:bg-amber-800 shrink-0 border border-amber-800/40">
-                    {icon} {item}
-                  </Badge>
-                );
-              })
-            )}
+
+          <div className="flex justify-between items-center pt-2 border-t border-slate-800/60">
+            {/* Cooldown State */}
+            <div>
+              {cooldown > 0 ? (
+                <span className="text-xs text-amber-500 font-medium">⏳ Heal Cooldown: {cooldown} turns</span>
+              ) : (
+                <span className="text-xs text-emerald-500 font-medium">✨ Spell Cast Ready</span>
+              )}
+            </div>
+            {/* Badges */}
+            <div className="flex gap-1 flex-wrap justify-end">
+              {inventory.length === 0 ? (
+                <span className="text-xs text-slate-500 italic">Inventory empty</span>
+              ) : (
+                inventory.map(item => {
+                  const icon = item.includes("spell") ? "✨" : item === "lantern" ? "🔦" : item === "elixir" ? "🧪" : "🔑";
+                  return (
+                    <Badge key={item} variant="secondary" className="bg-amber-900/60 text-amber-100 hover:bg-amber-800 shrink-0 border border-amber-800/40 text-[10px] px-1.5 py-0.5">
+                      {icon} {item}
+                    </Badge>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       )}

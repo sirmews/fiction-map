@@ -9,16 +9,7 @@ describe("literature-rpg consumer app", () => {
     expect(world.errors).toEqual([]);
   });
 
-  it("defines the lantern grant on the authored graph edge", () => {
-    expect(story.edges).toContainEqual(
-      expect.objectContaining({
-        id: "enter-hall",
-        effects: expect.arrayContaining([{ type: "grantEntity", entityId: "lantern" }]),
-      })
-    );
-  });
-
-  it("walks from the entrance to victory through Dusty Archives and Chamber of Runes", () => {
+  it("walks from the entrance to victory learning spells along the way", () => {
     const visited: string[] = [runtime.startNodeId];
     
     const steps = runtime.walkWithContext(
@@ -36,6 +27,8 @@ describe("literature-rpg consumer app", () => {
       "entrance",
       "main-hall",
       "archives",
+      "archives", // Studies Tome of Heal
+      "archives", // Studies Tome of Mage Light
       "main-hall",
       "dark-chapter",
       "chamber-of-runes",

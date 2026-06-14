@@ -28,6 +28,18 @@ runtime.addTrigger({
   effects: [{ type: "navigate", nodeId: "death" }],
 });
 
+runtime.addTrigger({
+  id: "mana-regen-trigger",
+  conditions: [{ type: "resourceLessThan", key: "mana", value: 50 }],
+  effects: [{ type: "addResource", key: "mana", amount: 5 }],
+});
+
+runtime.addTrigger({
+  id: "cooldown-tick-trigger",
+  conditions: [{ type: "resourceAtLeast", key: "heal_cooldown", value: 1 }],
+  effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
+});
+
 export async function playInteractive() {
   let state = createInitialState(runtime.startNodeId);
   
@@ -50,10 +62,16 @@ export async function playInteractive() {
     const body = String(currentNode.body || "");
     
     const hp = state.entityState?.resources?.health ?? 0;
+    const mp = state.entityState?.resources?.mana ?? 0;
+    const cooldown = state.entityState?.resources?.heal_cooldown ?? 0;
     const inventory = Array.from(context.derivedState.ownedEntityIds);
-    let hudText = `❤️ Health: ${hp} HP`;
+    
+    let hudText = `❤️ HP: ${hp} | 🧪 MP: ${mp}`;
+    if (cooldown > 0) {
+      hudText += ` | ⏳ CD: ${cooldown} turns`;
+    }
     if (inventory.length > 0) {
-      hudText += ` | 🎒 Items: ${inventory.join(", ")}`;
+      hudText += `\n🎒 Spells/Items: ${inventory.join(", ")}`;
     }
 
     note(body + `\n\n${pc.dim(hudText)}`, title);
