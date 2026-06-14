@@ -16,3 +16,9 @@ Welcome to the `fiction-map` repository. As an AI agent working in this codebase
 *   **The Engine is Headless:** The packages (`@fiction-map/core`, `@fiction-map/entities`, `@fiction-map/runtime`) own the logic, schemas, and state derivation. They **do not** own the UI.
 *   **The Consumer App owns the UI:** Consumer applications (like `apps/literature-rpg` and `apps/literature-rpg-web`) are completely responsible for styling, rendering, and gameplay loops. Keep engine concerns completely separated from the UI logic.
 *   **Singletons are Banned:** Always use `ProjectRegistry` or `EntityRegistry` instances. Do not rely on global mutable state for schema definitions.
+
+## 4. Git Workflow (PRS ONLY)
+*   **NEVER push directly to `main`.**
+*   All changes must be made on a new branch (e.g., `feature/xyz`, `fix/abc`, `docs/123`).
+*   When work is complete, push the branch and use the `gh` CLI to create a Pull Request.
+*   Always provide the user with the PR link when finished.
