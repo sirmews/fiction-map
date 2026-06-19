@@ -5,13 +5,24 @@ export const story = defineGraph(registry, {
   id: "library-mystery",
   nodes: [
     {
+      id: "courtyard",
+      type: "scene",
+      blocks: [
+        {
+          id: "courtyard-desc",
+          type: "paragraph",
+          text: "A ruined stone courtyard overgrown with ivy. Rain drizzles down from the dark sky, splashing against the ancient cobblestones.",
+        },
+      ],
+    },
+    {
       id: "entrance",
       type: "scene",
       blocks: [
         {
           id: "entrance-desc",
           type: "paragraph",
-          text: "You stand at the entrance to the old library.",
+          text: "The grand obsidian doors of the Whispering Library loom before you, covered in glowing green moss.",
         },
       ],
     },
@@ -22,7 +33,7 @@ export const story = defineGraph(registry, {
         {
           id: "hall-desc",
           type: "paragraph",
-          text: "Dust motes float in shafts of grey light. A lantern sits on a table.",
+          text: "Dust motes float in shafts of grey light. A brass lantern sits on a central table.",
         },
         {
           id: "hall-passage",
@@ -34,6 +45,81 @@ export const story = defineGraph(registry, {
           type: "paragraph",
           text: "To your left, the heavy iron-reinforced doors of the archives loom.",
         },
+        {
+          id: "hall-stairs",
+          type: "paragraph",
+          text: "To your right, a sweeping marble staircase leads up to the higher wings.",
+        },
+      ],
+    },
+    {
+      id: "grand-staircase",
+      type: "scene",
+      blocks: [
+        {
+          id: "stairs-desc",
+          type: "paragraph",
+          text: "The grand staircase splits into two directions. The West Wing leads toward the Observatory, while the East Wing leads toward the Gallery of Kings.",
+        },
+      ],
+    },
+    {
+      id: "observatory",
+      type: "scene",
+      blocks: [
+        {
+          id: "observatory-desc",
+          type: "paragraph",
+          text: "A high tower dome open to the night sky. A massive brass telescope points at a glowing constellation.",
+        },
+        {
+          id: "observatory-switch-desc",
+          type: "paragraph",
+          text: "Aligning the telescope reveals a hidden constellation, and you hear a heavy stone click echoing from the Alchemist's Lab below.",
+        },
+      ],
+    },
+    {
+      id: "gallery-of-kings",
+      type: "scene",
+      blocks: [
+        {
+          id: "gallery-desc",
+          type: "paragraph",
+          text: "A long, silent hall lined with towering stone statues of ancient kings. Their hollow eyes seem to watch your every move.",
+        },
+        {
+          id: "gallery-statues-active",
+          type: "paragraph",
+          text: "The statues hold heavy stone swords, ready to strike down any unauthorized intruders.",
+        },
+        {
+          id: "gallery-statues-deactivated",
+          type: "paragraph",
+          text: "With the Silver Shield placed on the pedestal, the statues lower their weapons, granting safe passage.",
+        },
+      ],
+    },
+    {
+      id: "armory",
+      type: "scene",
+      blocks: [
+        {
+          id: "armory-desc",
+          type: "paragraph",
+          text: "A dusty, long-abandoned armory. Racks of rusted weapons line the walls, but a pristine Silver Shield hangs on a central plaque.",
+        },
+      ],
+    },
+    {
+      id: "riddle-chamber",
+      type: "scene",
+      blocks: [
+        {
+          id: "riddle-desc",
+          type: "paragraph",
+          text: "A circular room with a giant stone face carved into the wall. As you step inside, the stone eyes open and a booming voice asks: 'I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?'",
+        },
       ],
     },
     {
@@ -44,7 +130,6 @@ export const story = defineGraph(registry, {
           id: "archives-desc",
           type: "paragraph",
           text: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby.",
-          metadata: { delayAfterMs: 400 },
         },
         {
           id: "archives-heal-tome",
@@ -60,6 +145,60 @@ export const story = defineGraph(registry, {
           id: "archives-librarian",
           type: "paragraph",
           text: "The spectral librarian gazes at you, offering lockpicks for trade.",
+        },
+      ],
+    },
+    {
+      id: "alchemists-lab",
+      type: "scene",
+      blocks: [
+        {
+          id: "lab-desc",
+          type: "paragraph",
+          text: "A cluttered laboratory smelling of sulfur and ozone. Beakers bubble with colorful liquids, and a heavy stone mortar sits on the table.",
+        },
+        {
+          id: "lab-brewing",
+          type: "paragraph",
+          text: "An alchemical brewing stand is active, containing ingredients for a powerful Elixir of Healing.",
+        },
+        {
+          id: "lab-hidden-passage",
+          type: "paragraph",
+          text: "A dusty trapdoor in the corner leads down into a damp, flooded tunnel.",
+        },
+      ],
+    },
+    {
+      id: "secret-study",
+      type: "scene",
+      blocks: [
+        {
+          id: "study-desc",
+          type: "paragraph",
+          text: "The private study of the head alchemist. A massive desk is covered in scrolls, and a glowing chest sits in the corner.",
+        },
+      ],
+    },
+    {
+      id: "sunken-passage",
+      type: "scene",
+      blocks: [
+        {
+          id: "sunken-desc",
+          type: "paragraph",
+          text: "A flooded stone tunnel. The water is freezing cold, and you can see glowing moss growing on the submerged walls.",
+        },
+      ],
+    },
+    {
+      id: "submerged-shrine",
+      type: "scene",
+      blocks: [
+        {
+          id: "shrine-desc",
+          type: "paragraph",
+          text: "A beautiful, air-filled dome hidden beneath the flooded passage. Glowing blue crystals illuminate an altar holding a water-infused rune.",
         },
       ],
     },
@@ -108,38 +247,6 @@ export const story = defineGraph(registry, {
       ],
     },
     {
-      id: "alchemists-lab",
-      type: "scene",
-      blocks: [
-        {
-          id: "lab-desc",
-          type: "paragraph",
-          text: "A cluttered laboratory smelling of sulfur and ozone. Beakers bubble with colorful liquids, and a heavy stone mortar sits on the table.",
-        },
-        {
-          id: "lab-brewing",
-          type: "paragraph",
-          text: "An alchemical brewing stand is active, containing ingredients for a powerful Elixir of Healing.",
-        },
-        {
-          id: "lab-hidden-passage",
-          type: "paragraph",
-          text: "A dusty trapdoor in the corner leads down into a damp, flooded tunnel.",
-        },
-      ],
-    },
-    {
-      id: "sunken-passage",
-      type: "scene",
-      blocks: [
-        {
-          id: "sunken-desc",
-          type: "paragraph",
-          text: "A flooded stone tunnel. The water is freezing cold, and you can see glowing moss growing on the submerged walls.",
-        },
-      ],
-    },
-    {
       id: "victory",
       type: "scene",
       blocks: [
@@ -164,18 +271,26 @@ export const story = defineGraph(registry, {
   ],
   edges: [
     {
-      id: "enter-hall",
+      id: "enter-entrance",
       type: "choice",
-      source: "entrance",
-      target: "main-hall",
-      text: "Step inside",
+      source: "courtyard",
+      target: "entrance",
+      text: "Approach the grand obsidian doors",
       effects: [
-        { type: "grantEntity", entityId: "lantern" },
         { type: "addResource", key: "health", amount: 100 },
         { type: "addResource", key: "mana", amount: 50 },
         { type: "addResource", key: "gold", amount: 30 },
         { type: "addResource", key: "turns", amount: 0 },
       ],
+      anchorBlockId: "courtyard-desc",
+    },
+    {
+      id: "enter-hall",
+      type: "choice",
+      source: "entrance",
+      target: "main-hall",
+      text: "Step inside",
+      effects: [{ type: "grantEntity", entityId: "lantern" }],
       anchorBlockId: "entrance-desc",
     },
     {
@@ -186,6 +301,180 @@ export const story = defineGraph(registry, {
       text: "Explore the Dusty Archives",
       conditions: [{ type: "notVisited", nodeId: "archives" }],
       anchorBlockId: "hall-archives",
+    },
+    {
+      id: "climb-staircase",
+      type: "choice",
+      source: "main-hall",
+      target: "grand-staircase",
+      text: "Climb the marble staircase",
+      anchorBlockId: "hall-stairs",
+    },
+    {
+      id: "go-west",
+      type: "choice",
+      source: "grand-staircase",
+      target: "observatory",
+      text: "Head West toward the Observatory",
+      anchorBlockId: "stairs-desc",
+    },
+    {
+      id: "go-east",
+      type: "choice",
+      source: "grand-staircase",
+      target: "gallery-of-kings",
+      text: "Head East toward the Gallery of Kings",
+      anchorBlockId: "stairs-desc",
+    },
+    {
+      id: "return-to-hall-from-stairs",
+      type: "choice",
+      source: "grand-staircase",
+      target: "main-hall",
+      text: "Go back down to the Main Hall",
+      anchorBlockId: "stairs-desc",
+    },
+    {
+      id: "align-telescope",
+      type: "choice",
+      source: "observatory",
+      target: "observatory",
+      text: "Align the telescope to the glowing constellation",
+      conditions: [{ type: "notVisited", nodeId: "align-telescope" }],
+      effects: [
+        { type: "setFlag", key: "observatory-switch", value: true },
+        { type: "grantEntity", entityId: "spirit-elixir" },
+        { type: "markVisited", nodeId: "align-telescope" },
+      ],
+      anchorBlockId: "observatory-desc",
+    },
+    {
+      id: "return-to-stairs-from-observatory",
+      type: "choice",
+      source: "observatory",
+      target: "grand-staircase",
+      text: "Return to the Grand Staircase",
+      anchorBlockId: "observatory-desc",
+    },
+    {
+      id: "go-to-armory",
+      type: "choice",
+      source: "gallery-of-kings",
+      target: "armory",
+      text: "Enter the dusty Armory",
+      anchorBlockId: "gallery-desc",
+    },
+    {
+      id: "place-shield",
+      type: "choice",
+      source: "gallery-of-kings",
+      target: "gallery-of-kings",
+      text: "Place the Silver Shield on the pedestal",
+      conditions: [
+        { type: "hasEntity", entityId: "silver-shield" },
+        { type: "notVisited", nodeId: "place-shield" },
+      ],
+      effects: [
+        { type: "setFlag", key: "statues-deactivated", value: true },
+        { type: "revokeEntity", entityId: "silver-shield" },
+        { type: "markVisited", nodeId: "place-shield" },
+      ],
+      anchorBlockId: "gallery-desc",
+    },
+    {
+      id: "run-past-statues",
+      type: "choice",
+      source: "gallery-of-kings",
+      target: "riddle-chamber",
+      text: "Run past the stone statues",
+      conditions: [{ type: "notFlag", key: "statues-deactivated" }],
+      effects: [{ type: "spendResource", key: "health", amount: 40, clampToZero: true }],
+      anchorBlockId: "gallery-desc",
+    },
+    {
+      id: "walk-past-statues-safely",
+      type: "choice",
+      source: "gallery-of-kings",
+      target: "riddle-chamber",
+      text: "Walk past the deactivated statues safely",
+      conditions: [{ type: "hasFlag", key: "statues-deactivated" }],
+      anchorBlockId: "gallery-desc",
+    },
+    {
+      id: "return-to-stairs-from-gallery",
+      type: "choice",
+      source: "gallery-of-kings",
+      target: "grand-staircase",
+      text: "Return to the Grand Staircase",
+      anchorBlockId: "gallery-desc",
+    },
+    {
+      id: "take-shield",
+      type: "choice",
+      source: "armory",
+      target: "armory",
+      text: "Take the Silver Shield",
+      conditions: [{ type: "notVisited", nodeId: "take-shield" }],
+      effects: [
+        { type: "grantEntity", entityId: "silver-shield" },
+        { type: "markVisited", nodeId: "take-shield" },
+      ],
+      anchorBlockId: "armory-desc",
+    },
+    {
+      id: "take-iron-key",
+      type: "choice",
+      source: "armory",
+      target: "armory",
+      text: "Take the rusty iron key",
+      conditions: [{ type: "notVisited", nodeId: "take-iron-key" }],
+      effects: [
+        { type: "grantEntity", entityId: "key" },
+        { type: "markVisited", nodeId: "take-iron-key" },
+      ],
+      anchorBlockId: "armory-desc",
+    },
+    {
+      id: "return-to-gallery-from-armory",
+      type: "choice",
+      source: "armory",
+      target: "gallery-of-kings",
+      text: "Return to the Gallery of Kings",
+      anchorBlockId: "armory-desc",
+    },
+    {
+      id: "answer-riddle",
+      type: "choice",
+      source: "riddle-chamber",
+      target: "forgotten-crypt",
+      text: "Answer: 'An Echo'",
+      effects: [
+        { type: "addResource", key: "gold", amount: 30 },
+        { type: "grantEntity", entityId: "spirit-elixir" },
+      ],
+      anchorBlockId: "riddle-desc",
+    },
+    {
+      id: "drink-spirit-elixir",
+      type: "choice",
+      source: "riddle-chamber",
+      target: "riddle-chamber",
+      text: "Drink the Spirit Elixir (+50 HP)",
+      conditions: [{ type: "hasEntity", entityId: "spirit-elixir" }],
+      effects: [
+        { type: "addResource", key: "health", amount: 50 },
+        { type: "revokeEntity", entityId: "spirit-elixir" },
+      ],
+      anchorBlockId: "riddle-desc",
+    },
+    {
+      id: "fail-riddle",
+      type: "choice",
+      source: "riddle-chamber",
+      target: "forgotten-crypt",
+      text: "Answer: 'A Shadow'",
+      effects: [{ type: "spendResource", key: "health", amount: 20, clampToZero: true }],
+      anchorBlockId: "riddle-desc",
     },
     {
       id: "study-heal",
@@ -346,6 +635,15 @@ export const story = defineGraph(registry, {
       anchorBlockId: "bridge-desc",
     },
     {
+      id: "use-water-rune",
+      type: "choice",
+      source: "collapsed-bridge",
+      target: "forgotten-crypt",
+      text: "Use the Rune of Water to cross safely",
+      conditions: [{ type: "hasEntity", entityId: "rune-of-water" }],
+      anchorBlockId: "bridge-desc",
+    },
+    {
       id: "succumb-to-injuries",
       type: "choice",
       source: "collapsed-bridge",
@@ -372,11 +670,41 @@ export const story = defineGraph(registry, {
       anchorBlockId: "crypt-desc",
     },
     {
+      id: "enter-treasury",
+      type: "choice",
+      source: "forgotten-crypt",
+      target: "treasury-vault",
+      text: "Enter the private Treasury Vault",
+      conditions: [{ type: "hasEntity", entityId: "obsidian-key" }],
+      anchorBlockId: "crypt-desc",
+    },
+    {
+      id: "claim-legendary-treasure",
+      type: "choice",
+      source: "treasury-vault",
+      target: "victory",
+      text: "Claim the legendary treasure of Alexandria!",
+      anchorBlockId: "study-desc",
+    },
+    {
       id: "die-at-crypt",
       type: "choice",
       source: "forgotten-crypt",
       target: "death",
       text: "Succumb to your wounds in the crypt",
+      anchorBlockId: "crypt-desc",
+    },
+    {
+      id: "drink-spirit-elixir-crypt",
+      type: "choice",
+      source: "forgotten-crypt",
+      target: "forgotten-crypt",
+      text: "Drink the Spirit Elixir (+50 HP)",
+      conditions: [{ type: "hasEntity", entityId: "spirit-elixir" }],
+      effects: [
+        { type: "addResource", key: "health", amount: 50 },
+        { type: "revokeEntity", entityId: "spirit-elixir" },
+      ],
       anchorBlockId: "crypt-desc",
     },
     {
@@ -404,6 +732,36 @@ export const story = defineGraph(registry, {
         { type: "markVisited", nodeId: "brew-elixir" },
       ],
       anchorBlockId: "lab-brewing",
+    },
+    {
+      id: "enter-study",
+      type: "choice",
+      source: "alchemists-lab",
+      target: "secret-study",
+      text: "Step into the private Secret Study",
+      conditions: [{ type: "hasFlag", key: "observatory-switch" }],
+      anchorBlockId: "lab-desc",
+    },
+    {
+      id: "take-obsidian-key",
+      type: "choice",
+      source: "secret-study",
+      target: "secret-study",
+      text: "Take the glowing Obsidian Key",
+      conditions: [{ type: "notVisited", nodeId: "take-obsidian-key" }],
+      effects: [
+        { type: "grantEntity", entityId: "obsidian-key" },
+        { type: "markVisited", nodeId: "take-obsidian-key" },
+      ],
+      anchorBlockId: "study-desc",
+    },
+    {
+      id: "return-to-lab-from-study",
+      type: "choice",
+      source: "secret-study",
+      target: "alchemists-lab",
+      text: "Return to the Alchemist's Lab",
+      anchorBlockId: "study-desc",
     },
     {
       id: "descend-trapdoor",
@@ -434,6 +792,35 @@ export const story = defineGraph(registry, {
       ],
       effects: [{ type: "spendResource", key: "mana", amount: 10, clampToZero: true }],
       anchorBlockId: "sunken-desc",
+    },
+    {
+      id: "dive-deeper",
+      type: "choice",
+      source: "sunken-passage",
+      target: "submerged-shrine",
+      text: "Dive deeper into the glowing blue waters",
+      anchorBlockId: "sunken-desc",
+    },
+    {
+      id: "take-water-rune",
+      type: "choice",
+      source: "submerged-shrine",
+      target: "submerged-shrine",
+      text: "Claim the Rune of Water from the altar",
+      conditions: [{ type: "notVisited", nodeId: "take-water-rune" }],
+      effects: [
+        { type: "grantEntity", entityId: "rune-of-water" },
+        { type: "markVisited", nodeId: "take-water-rune" },
+      ],
+      anchorBlockId: "shrine-desc",
+    },
+    {
+      id: "return-to-passage",
+      type: "choice",
+      source: "submerged-shrine",
+      target: "sunken-passage",
+      text: "Swim back up to the Sunken Passage",
+      anchorBlockId: "shrine-desc",
     },
     {
       id: "return-to-archives",

@@ -57,17 +57,36 @@ Source: `edges/choice.edge.ts:4`
 
 ### `library-mystery`
 
-- 11 nodes, 26 edges, max depth: 6
+- 19 nodes, 54 edges, max depth: 7
 - Endings: `victory`, `death`
-- Conditions used: `notVisited`, `resourceAtLeast`, `hasEntity`, `resourceLessThan`
-- Effects used: `grantEntity`, `addResource`, `markVisited`, `spendResource`, `revokeEntity`
+- Conditions used: `notVisited`, `hasEntity`, `notFlag`, `hasFlag`, `resourceAtLeast`, `resourceLessThan`
+- Effects used: `addResource`, `grantEntity`, `setFlag`, `markVisited`, `revokeEntity`, `spendResource`
+- ⚠️ 3 validation errors
 
 **Topology:**
 
 | Source | Edge | Target | Conditions | Effects |
 |---|---|---|---|---|
-| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="lantern")`<br>`addResource(key="health", amount=100)`<br>`addResource(key="mana", amount=50)`<br>`addResource(key="gold", amount=30)`<br>`addResource(key="turns", amount=0)` |
+| `courtyard` (scene) | `enter-entrance` (choice) | `entrance` (scene) | — | `addResource(key="health", amount=100)`<br>`addResource(key="mana", amount=50)`<br>`addResource(key="gold", amount=30)`<br>`addResource(key="turns", amount=0)` |
+| `entrance` (scene) | `enter-hall` (choice) | `main-hall` (scene) | — | `grantEntity(entityId="lantern")` |
 | `main-hall` (scene) | `explore-archives` (choice) | `archives` (scene) | `notVisited(nodeId="archives")` | — |
+| `main-hall` (scene) | `climb-staircase` (choice) | `grand-staircase` (scene) | — | — |
+| `grand-staircase` (scene) | `go-west` (choice) | `observatory` (scene) | — | — |
+| `grand-staircase` (scene) | `go-east` (choice) | `gallery-of-kings` (scene) | — | — |
+| `grand-staircase` (scene) | `return-to-hall-from-stairs` (choice) | `main-hall` (scene) | — | — |
+| `observatory` (scene) | `align-telescope` (choice) | `observatory` (scene) | `notVisited(nodeId="align-telescope")` | `setFlag(key="observatory-switch", value=true)`<br>`grantEntity(entityId="spirit-elixir")`<br>`markVisited(nodeId="align-telescope")` |
+| `observatory` (scene) | `return-to-stairs-from-observatory` (choice) | `grand-staircase` (scene) | — | — |
+| `gallery-of-kings` (scene) | `go-to-armory` (choice) | `armory` (scene) | — | — |
+| `gallery-of-kings` (scene) | `place-shield` (choice) | `gallery-of-kings` (scene) | `hasEntity(entityId="silver-shield")`<br>`notVisited(nodeId="place-shield")` | `setFlag(key="statues-deactivated", value=true)`<br>`revokeEntity(entityId="silver-shield")`<br>`markVisited(nodeId="place-shield")` |
+| `gallery-of-kings` (scene) | `run-past-statues` (choice) | `riddle-chamber` (scene) | `notFlag(key="statues-deactivated")` | `spendResource(key="health", amount=40, clampToZero=true)` |
+| `gallery-of-kings` (scene) | `walk-past-statues-safely` (choice) | `riddle-chamber` (scene) | `hasFlag(key="statues-deactivated")` | — |
+| `gallery-of-kings` (scene) | `return-to-stairs-from-gallery` (choice) | `grand-staircase` (scene) | — | — |
+| `armory` (scene) | `take-shield` (choice) | `armory` (scene) | `notVisited(nodeId="take-shield")` | `grantEntity(entityId="silver-shield")`<br>`markVisited(nodeId="take-shield")` |
+| `armory` (scene) | `take-iron-key` (choice) | `armory` (scene) | `notVisited(nodeId="take-iron-key")` | `grantEntity(entityId="key")`<br>`markVisited(nodeId="take-iron-key")` |
+| `armory` (scene) | `return-to-gallery-from-armory` (choice) | `gallery-of-kings` (scene) | — | — |
+| `riddle-chamber` (scene) | `answer-riddle` (choice) | `forgotten-crypt` (scene) | — | `addResource(key="gold", amount=30)`<br>`grantEntity(entityId="spirit-elixir")` |
+| `riddle-chamber` (scene) | `drink-spirit-elixir` (choice) | `riddle-chamber` (scene) | `hasEntity(entityId="spirit-elixir")` | `addResource(key="health", amount=50)`<br>`revokeEntity(entityId="spirit-elixir")` |
+| `riddle-chamber` (scene) | `fail-riddle` (choice) | `forgotten-crypt` (scene) | — | `spendResource(key="health", amount=20, clampToZero=true)` |
 | `archives` (scene) | `study-heal` (choice) | `archives` (scene) | `notVisited(nodeId="study-heal")` | `grantEntity(entityId="heal-spell")`<br>`markVisited(nodeId="study-heal")` |
 | `archives` (scene) | `study-mage-light` (choice) | `archives` (scene) | `notVisited(nodeId="study-mage-light")` | `grantEntity(entityId="mage-light")`<br>`markVisited(nodeId="study-mage-light")` |
 | `archives` (scene) | `buy-lockpick` (choice) | `archives` (scene) | `notVisited(nodeId="buy-lockpick")`<br>`resourceAtLeast(key="gold", value=15)` | `spendResource(key="gold", amount=15, clampToZero=true)`<br>`grantEntity(entityId="lockpick")`<br>`markVisited(nodeId="buy-lockpick")` |
@@ -82,15 +101,25 @@ Source: `edges/choice.edge.ts:4`
 | `collapsed-bridge` (scene) | `heal-with-elixir` (choice) | `collapsed-bridge` (scene) | `hasEntity(entityId="elixir")` | `addResource(key="health", amount=50)`<br>`revokeEntity(entityId="elixir")` |
 | `collapsed-bridge` (scene) | `cast-heal` (choice) | `collapsed-bridge` (scene) | `hasEntity(entityId="heal-spell")`<br>`resourceAtLeast(key="mana", value=20)`<br>`resourceLessThan(key="heal_cooldown", value=1)` | `addResource(key="health", amount=40)`<br>`spendResource(key="mana", amount=20, clampToZero=true)`<br>`addResource(key="heal_cooldown", amount=3)` |
 | `collapsed-bridge` (scene) | `climb-rubble` (choice) | `forgotten-crypt` (scene) | `resourceAtLeast(key="health", value=30)` | `spendResource(key="health", amount=20, clampToZero=true)` |
+| `collapsed-bridge` (scene) | `use-water-rune` (choice) | `forgotten-crypt` (scene) | `hasEntity(entityId="rune-of-water")` | — |
 | `collapsed-bridge` (scene) | `succumb-to-injuries` (choice) | `death` (scene) | — | — |
 | `forgotten-crypt` (scene) | `unlock-casket` (choice) | `victory` (scene) | `hasEntity(entityId="key")` | — |
 | `forgotten-crypt` (scene) | `lockpick-casket` (choice) | `victory` (scene) | `hasEntity(entityId="lockpick")` | — |
+| `forgotten-crypt` (scene) | `enter-treasury` (choice) | `treasury-vault` (?) | `hasEntity(entityId="obsidian-key")` | — |
+| `treasury-vault` (?) | `claim-legendary-treasure` (choice) | `victory` (scene) | — | — |
 | `forgotten-crypt` (scene) | `die-at-crypt` (choice) | `death` (scene) | — | — |
+| `forgotten-crypt` (scene) | `drink-spirit-elixir-crypt` (choice) | `forgotten-crypt` (scene) | `hasEntity(entityId="spirit-elixir")` | `addResource(key="health", amount=50)`<br>`revokeEntity(entityId="spirit-elixir")` |
 | `archives` (scene) | `enter-lab` (choice) | `alchemists-lab` (scene) | `notVisited(nodeId="alchemists-lab")` | — |
 | `alchemists-lab` (scene) | `brew-elixir` (choice) | `alchemists-lab` (scene) | `notVisited(nodeId="brew-elixir")`<br>`resourceAtLeast(key="gold", value=10)` | `spendResource(key="gold", amount=10, clampToZero=true)`<br>`grantEntity(entityId="elixir")`<br>`markVisited(nodeId="brew-elixir")` |
+| `alchemists-lab` (scene) | `enter-study` (choice) | `secret-study` (scene) | `hasFlag(key="observatory-switch")` | — |
+| `secret-study` (scene) | `take-obsidian-key` (choice) | `secret-study` (scene) | `notVisited(nodeId="take-obsidian-key")` | `grantEntity(entityId="obsidian-key")`<br>`markVisited(nodeId="take-obsidian-key")` |
+| `secret-study` (scene) | `return-to-lab-from-study` (choice) | `alchemists-lab` (scene) | — | — |
 | `alchemists-lab` (scene) | `descend-trapdoor` (choice) | `sunken-passage` (scene) | — | — |
 | `sunken-passage` (scene) | `swim-passage` (choice) | `forgotten-crypt` (scene) | — | `spendResource(key="health", amount=30, clampToZero=true)` |
 | `sunken-passage` (scene) | `cast-water-walk` (choice) | `forgotten-crypt` (scene) | `hasEntity(entityId="mage-light")`<br>`resourceAtLeast(key="mana", value=10)` | `spendResource(key="mana", amount=10, clampToZero=true)` |
+| `sunken-passage` (scene) | `dive-deeper` (choice) | `submerged-shrine` (scene) | — | — |
+| `submerged-shrine` (scene) | `take-water-rune` (choice) | `submerged-shrine` (scene) | `notVisited(nodeId="take-water-rune")` | `grantEntity(entityId="rune-of-water")`<br>`markVisited(nodeId="take-water-rune")` |
+| `submerged-shrine` (scene) | `return-to-passage` (choice) | `sunken-passage` (scene) | — | — |
 | `alchemists-lab` (scene) | `return-to-archives` (choice) | `archives` (scene) | — | — |
 
 Source: `graphs/story.graph.ts:4`
