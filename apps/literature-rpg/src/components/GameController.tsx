@@ -189,7 +189,7 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
           <Box flexDirection="column" marginBottom={1}>
             <Box flexDirection="row">
               <Box width={8}>
-                <Text color="red">{"❤️  HP"}</Text>
+                <Text color="red">{"🔴  HP"}</Text>
               </Box>
               <Text color="red">
                 {renderProgressBar(hp, 100)} {hp}%
@@ -198,7 +198,7 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
 
             <Box flexDirection="row">
               <Box width={8}>
-                <Text color="blue">{"🧪  MP"}</Text>
+                <Text color="blue">{"🔵  MP"}</Text>
               </Box>
               <Text color="blue">
                 {renderProgressBar(mp, 50)} {mp}/50
