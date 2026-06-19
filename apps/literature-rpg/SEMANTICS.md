@@ -57,11 +57,11 @@ Source: `edges/choice.edge.ts:4`
 
 ### `library-mystery`
 
-- 19 nodes, 54 edges, max depth: 7
+- 20 nodes, 54 edges, max depth: 7
 - Endings: `victory`, `death`
 - Conditions used: `notVisited`, `hasEntity`, `notFlag`, `hasFlag`, `resourceAtLeast`, `resourceLessThan`
 - Effects used: `addResource`, `grantEntity`, `setFlag`, `markVisited`, `revokeEntity`, `spendResource`
-- ⚠️ 3 validation errors
+- ⚠️ 18 validation errors
 
 **Topology:**
 
@@ -105,8 +105,8 @@ Source: `edges/choice.edge.ts:4`
 | `collapsed-bridge` (scene) | `succumb-to-injuries` (choice) | `death` (scene) | — | — |
 | `forgotten-crypt` (scene) | `unlock-casket` (choice) | `victory` (scene) | `hasEntity(entityId="key")` | — |
 | `forgotten-crypt` (scene) | `lockpick-casket` (choice) | `victory` (scene) | `hasEntity(entityId="lockpick")` | — |
-| `forgotten-crypt` (scene) | `enter-treasury` (choice) | `treasury-vault` (?) | `hasEntity(entityId="obsidian-key")` | — |
-| `treasury-vault` (?) | `claim-legendary-treasure` (choice) | `victory` (scene) | — | — |
+| `forgotten-crypt` (scene) | `enter-treasury` (choice) | `treasury-vault` (scene) | `hasEntity(entityId="obsidian-key")` | — |
+| `treasury-vault` (scene) | `claim-legendary-treasure` (choice) | `victory` (scene) | — | — |
 | `forgotten-crypt` (scene) | `die-at-crypt` (choice) | `death` (scene) | — | — |
 | `forgotten-crypt` (scene) | `drink-spirit-elixir-crypt` (choice) | `forgotten-crypt` (scene) | `hasEntity(entityId="spirit-elixir")` | `addResource(key="health", amount=50)`<br>`revokeEntity(entityId="spirit-elixir")` |
 | `archives` (scene) | `enter-lab` (choice) | `alchemists-lab` (scene) | `notVisited(nodeId="alchemists-lab")` | — |

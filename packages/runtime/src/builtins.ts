@@ -50,6 +50,7 @@ export const builtinConditionConfigs: ConditionConfig[] = [
     },
   },
   { id: "hasFlag", parameters: { key: { type: "string", required: true } } },
+  { id: "notFlag", parameters: { key: { type: "string", required: true } } },
   {
     id: "flagEquals",
     parameters: {

@@ -86,6 +86,14 @@ export const hasFlagEvaluator: ConditionEvaluator = (
   return key in state.flags
 }
 
+export const notFlagEvaluator: ConditionEvaluator = (
+  state: GraphRuntimeState,
+  condition: Condition,
+): boolean => {
+  const { key } = condition as KeyCondition
+  return !(key in state.flags) || !state.flags[key]
+}
+
 export const flagEqualsEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
   condition: Condition,
@@ -134,6 +142,7 @@ export const coreBuiltinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["lessThan", lessThanEvaluator],
   ["lessThanOrEqual", lessThanOrEqualEvaluator],
   ["hasFlag", hasFlagEvaluator],
+  ["notFlag", notFlagEvaluator],
   ["flagEquals", flagEqualsEvaluator],
   ["visited", visitedEvaluator],
   ["notVisited", notVisitedEvaluator],

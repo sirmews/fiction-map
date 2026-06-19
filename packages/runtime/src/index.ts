@@ -20,6 +20,7 @@ export {
   greaterThanEvaluator,
   greaterThanOrEqualEvaluator,
   hasFlagEvaluator,
+  notFlagEvaluator,
   hasVariableEvaluator,
   lessThanEvaluator,
   lessThanOrEqualEvaluator,
