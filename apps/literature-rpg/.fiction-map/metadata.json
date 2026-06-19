@@ -166,6 +166,38 @@
           ]
         },
         {
+          "id": "alchemists-lab",
+          "type": "scene",
+          "blocks": [
+            {
+              "id": "lab-desc",
+              "type": "paragraph",
+              "text": "A cluttered laboratory smelling of sulfur and ozone. Beakers bubble with colorful liquids, and a heavy stone mortar sits on the table."
+            },
+            {
+              "id": "lab-brewing",
+              "type": "paragraph",
+              "text": "An alchemical brewing stand is active, containing ingredients for a powerful Elixir of Healing."
+            },
+            {
+              "id": "lab-hidden-passage",
+              "type": "paragraph",
+              "text": "A dusty trapdoor in the corner leads down into a damp, flooded tunnel."
+            }
+          ]
+        },
+        {
+          "id": "sunken-passage",
+          "type": "scene",
+          "blocks": [
+            {
+              "id": "sunken-desc",
+              "type": "paragraph",
+              "text": "A flooded stone tunnel. The water is freezing cold, and you can see glowing moss growing on the submerged walls."
+            }
+          ]
+        },
+        {
           "id": "victory",
           "type": "scene",
           "blocks": [
@@ -570,11 +602,119 @@
           "target": "death",
           "text": "Succumb to your wounds in the crypt",
           "anchorBlockId": "crypt-desc"
+        },
+        {
+          "id": "enter-lab",
+          "type": "choice",
+          "source": "archives",
+          "target": "alchemists-lab",
+          "text": "Step through the hidden door into the Alchemist's Lab",
+          "conditions": [
+            {
+              "type": "notVisited",
+              "nodeId": "alchemists-lab"
+            }
+          ],
+          "anchorBlockId": "archives-desc"
+        },
+        {
+          "id": "brew-elixir",
+          "type": "choice",
+          "source": "alchemists-lab",
+          "target": "alchemists-lab",
+          "text": "Brew a Healing Elixir (-10 gold)",
+          "conditions": [
+            {
+              "type": "notVisited",
+              "nodeId": "brew-elixir"
+            },
+            {
+              "type": "resourceAtLeast",
+              "key": "gold",
+              "value": 10
+            }
+          ],
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "gold",
+              "amount": 10,
+              "clampToZero": true
+            },
+            {
+              "type": "grantEntity",
+              "entityId": "elixir"
+            },
+            {
+              "type": "markVisited",
+              "nodeId": "brew-elixir"
+            }
+          ],
+          "anchorBlockId": "lab-brewing"
+        },
+        {
+          "id": "descend-trapdoor",
+          "type": "choice",
+          "source": "alchemists-lab",
+          "target": "sunken-passage",
+          "text": "Descend through the trapdoor into the flooded tunnel",
+          "anchorBlockId": "lab-hidden-passage"
+        },
+        {
+          "id": "swim-passage",
+          "type": "choice",
+          "source": "sunken-passage",
+          "target": "forgotten-crypt",
+          "text": "Swim through the freezing water (-30 HP)",
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "health",
+              "amount": 30,
+              "clampToZero": true
+            }
+          ],
+          "anchorBlockId": "sunken-desc"
+        },
+        {
+          "id": "cast-water-walk",
+          "type": "choice",
+          "source": "sunken-passage",
+          "target": "forgotten-crypt",
+          "text": "Cast Mage Light to illuminate the path and wade safely (-10 MP)",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "mage-light"
+            },
+            {
+              "type": "resourceAtLeast",
+              "key": "mana",
+              "value": 10
+            }
+          ],
+          "effects": [
+            {
+              "type": "spendResource",
+              "key": "mana",
+              "amount": 10,
+              "clampToZero": true
+            }
+          ],
+          "anchorBlockId": "sunken-desc"
+        },
+        {
+          "id": "return-to-archives",
+          "type": "choice",
+          "source": "alchemists-lab",
+          "target": "archives",
+          "text": "Return to the Dusty Archives",
+          "anchorBlockId": "lab-desc"
         }
       ],
-      "nodeCount": 9,
-      "edgeCount": 20,
-      "maxDepth": 5,
+      "nodeCount": 11,
+      "edgeCount": 26,
+      "maxDepth": 6,
       "endings": [
         "victory",
         "death"
