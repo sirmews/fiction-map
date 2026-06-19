@@ -2,18 +2,17 @@
  * Fiction Map — Graph Definition
  */
 
-import {
-  GraphDefinition,
-  GraphConfig,
-  GraphMetadata,
-  NodeInstance,
+import { RegistryError } from "./errors"
+import type { ProjectRegistry } from "./registry"
+import type {
   EdgeInstance,
+  GraphConfig,
+  GraphDefinition,
+  NodeInstance,
+  SourceLocation,
   ValidationError,
   ValidationWarning,
-  SourceLocation,
 } from "./types"
-import type { ProjectRegistry } from "./registry"
-import { RegistryError } from "./errors"
 
 function formatKnownValues(values: string[], label: string): string {
   return values.length > 0
@@ -27,9 +26,9 @@ function formatKnownValues(values: string[], label: string): string {
 function getCallSite(): SourceLocation {
   const stack = new Error().stack?.split("\n") || []
   const callerLine = stack[3] || ""
-  
+
   const match = callerLine.match(/(?:at\s+)?(?:.*?\()?(.+?):(\d+):(\d+)/)
-  
+
   if (match) {
     return {
       file: match[1],
@@ -37,7 +36,7 @@ function getCallSite(): SourceLocation {
       column: parseInt(match[3], 10),
     }
   }
-  
+
   return { file: "unknown", line: 0, column: 0 }
 }
 
@@ -47,11 +46,11 @@ function getCallSite(): SourceLocation {
 export function validateGraph(
   registry: ProjectRegistry,
   nodes: NodeInstance[],
-  edges: EdgeInstance[]
+  edges: EdgeInstance[],
 ): { errors: ValidationError[]; warnings: ValidationWarning[] } {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
-  
+
   // Build node index
   const nodeIndex = new Map<string, NodeInstance>()
   for (const node of nodes) {
@@ -64,7 +63,7 @@ export function validateGraph(
     }
     nodeIndex.set(node.id, node)
   }
-  
+
   // Validate nodes
   for (const node of nodes) {
     // Check type exists
@@ -79,7 +78,7 @@ export function validateGraph(
       })
     }
   }
-  
+
   // Validate edges
   for (const edge of edges) {
     // Check source exists
@@ -92,7 +91,7 @@ export function validateGraph(
         edgeId: edge.id,
       })
     }
-    
+
     // Check target exists
     if (!nodeIndex.has(edge.target)) {
       errors.push({
@@ -103,7 +102,7 @@ export function validateGraph(
         edgeId: edge.id,
       })
     }
-    
+
     // Check edge type exists
     const edgeType = registry.edgeTypes.get(edge.type)
     if (!edgeType) {
@@ -116,11 +115,11 @@ export function validateGraph(
       })
       continue
     }
-    
+
     // Validate edge type constraints
     const sourceNode = nodeIndex.get(edge.source)
     const targetNode = nodeIndex.get(edge.target)
-    
+
     if (sourceNode && edgeType.sourceTypes.length > 0) {
       if (!edgeType.sourceTypes.includes(sourceNode.type)) {
         errors.push({
@@ -133,7 +132,7 @@ export function validateGraph(
         })
       }
     }
-    
+
     if (targetNode && edgeType.targetTypes.length > 0) {
       if (!edgeType.targetTypes.includes(targetNode.type)) {
         errors.push({
@@ -146,7 +145,7 @@ export function validateGraph(
         })
       }
     }
-    
+
     // Validate edge anchor block exists in source node
     if (edge.anchorBlockId) {
       const sourceNode = nodeIndex.get(edge.source)
@@ -162,7 +161,7 @@ export function validateGraph(
         }
       }
     }
-    
+
     // Validate conditions
     if (edge.conditions) {
       for (const condition of edge.conditions) {
@@ -178,7 +177,7 @@ export function validateGraph(
         }
       }
     }
-    
+
     // Validate effects
     if (edge.effects) {
       for (const effect of edge.effects) {
@@ -193,7 +192,7 @@ export function validateGraph(
           })
         } else if (effect.type === "spendResource") {
           const hasAtLeastCondition = edge.conditions?.some(
-            (c) => c.type === "resourceAtLeast" && c.key === effect.key
+            (c) => c.type === "resourceAtLeast" && c.key === effect.key,
           )
           const isSafeOverspend = effect.clampToZero === true || effect.allowNegative === true
 
@@ -208,23 +207,23 @@ export function validateGraph(
       }
     }
   }
-  
+
   // Check for unreachable nodes
   const reachable = new Set<string>()
   const queue = [nodes[0]?.id].filter(Boolean)
-  
+
   while (queue.length > 0) {
     const nodeId = queue.shift()!
     if (reachable.has(nodeId)) continue
     reachable.add(nodeId)
-    
+
     for (const edge of edges) {
       if (edge.source === nodeId && !reachable.has(edge.target)) {
         queue.push(edge.target)
       }
     }
   }
-  
+
   for (const node of nodes) {
     if (!reachable.has(node.id)) {
       warnings.push({
@@ -234,20 +233,20 @@ export function validateGraph(
       })
     }
   }
-  
+
   // Check for nodes with no outgoing edges (endings)
   const hasOutgoing = new Set<string>()
   for (const edge of edges) {
     hasOutgoing.add(edge.source)
   }
-  
+
   const endings: string[] = []
   for (const node of nodes) {
     if (!hasOutgoing.has(node.id)) {
       endings.push(node.id)
     }
   }
-  
+
   // Warn if no endings
   if (endings.length === 0 && nodes.length > 0) {
     warnings.push({
@@ -255,14 +254,14 @@ export function validateGraph(
       message: "Graph has no ending nodes (nodes with no outgoing edges)",
     })
   }
-  
+
   return { errors, warnings }
 }
 
 export function analyzeGraph(
   registry: ProjectRegistry,
   nodes: NodeInstance[],
-  edges: EdgeInstance[]
+  edges: EdgeInstance[],
 ): {
   errors: ValidationError[]
   warnings: ValidationWarning[]
@@ -290,7 +289,7 @@ export function analyzeGraph(
  */
 function calculateMaxDepth(nodes: NodeInstance[], edges: EdgeInstance[]): number {
   if (nodes.length === 0) return 0
-  
+
   const adjacency = new Map<string, string[]>()
   for (const node of nodes) {
     adjacency.set(node.id, [])
@@ -298,20 +297,20 @@ function calculateMaxDepth(nodes: NodeInstance[], edges: EdgeInstance[]): number
   for (const edge of edges) {
     adjacency.get(edge.source)?.push(edge.target)
   }
-  
+
   const visited = new Set<string>()
   let maxDepth = 0
-  
+
   function dfs(nodeId: string, depth: number) {
     if (visited.has(nodeId)) return
     visited.add(nodeId)
     maxDepth = Math.max(maxDepth, depth)
-    
+
     for (const target of adjacency.get(nodeId) || []) {
       dfs(target, depth + 1)
     }
   }
-  
+
   dfs(nodes[0].id, 0)
   return maxDepth
 }
@@ -321,7 +320,7 @@ function calculateMaxDepth(nodes: NodeInstance[], edges: EdgeInstance[]): number
  */
 function collectTypeUsage(
   nodes: NodeInstance[],
-  edges: EdgeInstance[]
+  edges: EdgeInstance[],
 ): {
   nodeTypesUsed: string[]
   edgeTypesUsed: string[]
@@ -332,11 +331,11 @@ function collectTypeUsage(
   const edgeTypesUsed = new Set<string>()
   const conditionsUsed = new Set<string>()
   const effectsUsed = new Set<string>()
-  
+
   for (const node of nodes) {
     nodeTypesUsed.add(node.type)
   }
-  
+
   for (const edge of edges) {
     edgeTypesUsed.add(edge.type)
     if (edge.conditions) {
@@ -350,7 +349,7 @@ function collectTypeUsage(
       }
     }
   }
-  
+
   return {
     nodeTypesUsed: Array.from(nodeTypesUsed),
     edgeTypesUsed: Array.from(edgeTypesUsed),
@@ -367,13 +366,13 @@ function findEndings(nodes: NodeInstance[], edges: EdgeInstance[]): string[] {
   for (const edge of edges) {
     hasOutgoing.add(edge.source)
   }
-  
-  return nodes.filter(n => !hasOutgoing.has(n.id)).map(n => n.id)
+
+  return nodes.filter((n) => !hasOutgoing.has(n.id)).map((n) => n.id)
 }
 
 /**
  * Define a graph
- * 
+ *
  * @example
  * ```typescript
  * export const myStory = defineGraph(registry, {
@@ -392,13 +391,16 @@ export function defineGraph(registry: ProjectRegistry, config: GraphConfig): Gra
   if (!config.id) {
     throw new RegistryError("Graph must have an id", "ERR_REGISTRY_MISSING_ID")
   }
-  
+
   if (registry.graphs.has(config.id)) {
-    throw new RegistryError(`Graph "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
+    throw new RegistryError(
+      `Graph "${config.id}" is already defined in this registry`,
+      "ERR_REGISTRY_DUPLICATE_ID",
+    )
   }
-  
+
   const analysis = analyzeGraph(registry, config.nodes, config.edges)
-  
+
   const definition: GraphDefinition = {
     id: config.id,
     name: config.id,
@@ -409,8 +411,8 @@ export function defineGraph(registry: ProjectRegistry, config: GraphConfig): Gra
     edgeCount: config.edges.length,
     ...analysis,
   }
-  
+
   registry.graphs.set(config.id, definition)
-  
+
   return definition
 }

@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { mkdir, writeFile, rm } from "fs/promises"
-import { join } from "path"
+import { mkdir, rm, writeFile } from "node:fs/promises"
+import { join } from "node:path"
 import type { GraphMetadata } from "@fiction-map/core"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { explain } from "./commands/query"
 import { renderSemantics } from "./generator/semantics"
 
@@ -69,8 +69,8 @@ describe("LLM-facing surfaces", () => {
     const content = renderSemantics(makeMetadata())
 
     expect(content).toContain("| Source | Edge | Target | Conditions | Effects |")
-    expect(content).toContain("`hasEntity(entityId=\"lantern\")`")
-    expect(content).toContain("`grantEntity(entityId=\"torch\")`")
+    expect(content).toContain('`hasEntity(entityId="lantern")`')
+    expect(content).toContain('`grantEntity(entityId="torch")`')
     expect(content).toContain("- Conditions used: `hasEntity`")
     expect(content).toContain("- Effects used: `grantEntity`")
   })
@@ -83,7 +83,15 @@ describe("LLM-facing surfaces", () => {
 
     await explain("descend", { rootDir: TEST_DIR, outputDir })
 
-    expect(logSpy.mock.calls.some((call) => String(call[0]).includes("Conditions: hasEntity(entityId=\"lantern\")"))).toBe(true)
-    expect(logSpy.mock.calls.some((call) => String(call[0]).includes("Effects: grantEntity(entityId=\"torch\")"))).toBe(true)
+    expect(
+      logSpy.mock.calls.some((call) =>
+        String(call[0]).includes('Conditions: hasEntity(entityId="lantern")'),
+      ),
+    ).toBe(true)
+    expect(
+      logSpy.mock.calls.some((call) =>
+        String(call[0]).includes('Effects: grantEntity(entityId="torch")'),
+      ),
+    ).toBe(true)
   })
 })

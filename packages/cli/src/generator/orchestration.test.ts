@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { mkdir, writeFile, readFile, rm, access } from "fs/promises"
-import { join } from "path"
+import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises"
+import { join } from "node:path"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { generate } from "../commands/generate"
-import { generateMetadata, generateProject } from "./index"
 import * as generatorModule from "./index"
+import { generateMetadata, generateProject } from "./index"
 
 const TEST_DIR = join(__dirname, "orchestration-fixtures")
 
@@ -30,7 +30,7 @@ export const TestNode = defineNodeType(registry, {
   outgoingEdges: ["link"],
   incomingEdges: ["link"],
 })
-`
+`,
   )
 
   await writeFile(
@@ -43,7 +43,7 @@ export const LinkEdge = defineEdgeType(registry, {
   sourceTypes: ["test"],
   targetTypes: ["test"],
 })
-`
+`,
   )
 
   await writeFile(
@@ -57,7 +57,7 @@ export const HasValueCondition = defineCondition(registry, {
     key: { type: "string", required: true },
   },
 })
-`
+`,
   )
 
   await writeFile(
@@ -71,7 +71,7 @@ export const SetValueEffect = defineEffect(registry, {
     key: { type: "string", required: true },
   },
 })
-`
+`,
   )
 }
 
@@ -141,13 +141,17 @@ describe("generator orchestration", () => {
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => {})
       const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       const generateProjectSpy = vi.spyOn(generatorModule, "generateProject")
-      const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => {
-        throw new Error(`process.exit(${code ?? ""})`)
-      }) as never
+      const exitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation((code?: string | number | null) => {
+          throw new Error(`process.exit(${code ?? ""})`)
+        }) as never
 
       await generate({ rootDir: TEST_DIR, outputDir })
 
-      const metadata = JSON.parse(await readFile(join(outputDir, ".fiction-map", "metadata.json"), "utf8"))
+      const metadata = JSON.parse(
+        await readFile(join(outputDir, ".fiction-map", "metadata.json"), "utf8"),
+      )
       const semantics = await readFile(join(outputDir, "SEMANTICS.md"), "utf8")
 
       expect(metadata.nodeTypes).toHaveLength(1)
@@ -162,9 +166,11 @@ describe("generator orchestration", () => {
       const outputDir = join(TEST_DIR, "command-failure-output")
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => {})
       const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-      const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => {
-        throw new Error(`process.exit(${code ?? ""})`)
-      }) as never
+      const exitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation((code?: string | number | null) => {
+          throw new Error(`process.exit(${code ?? ""})`)
+        }) as never
 
       await mkdir(join(outputDir, "SEMANTICS.md"), { recursive: true })
 

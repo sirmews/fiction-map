@@ -7,24 +7,29 @@
  * that want a non-entity runtime can use `coreBuiltinHandlers` alone.
  */
 
-import type { GraphRuntimeState, Effect, EffectHandler } from "../types"
 import {
-  grantEntity,
-  revokeEntity,
   activateEntity,
-  deactivateEntity,
-  unlockEntity,
-  lockEntity,
   addResource,
+  deactivateEntity,
+  grantEntity,
+  lockEntity,
+  revokeEntity,
   spendResource,
+  unlockEntity,
 } from "../core/state"
+import type { Effect, EffectHandler, GraphRuntimeState } from "../types"
 
 type EntityEffect = Effect & { entityId: string }
-type ResourceEffect = Effect & { key: string; amount: number; allowNegative?: boolean; clampToZero?: boolean }
+type ResourceEffect = Effect & {
+  key: string
+  amount: number
+  allowNegative?: boolean
+  clampToZero?: boolean
+}
 
 export const grantEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { entityId } = effect as EntityEffect
   return typeof entityId === "string" ? grantEntity(state, entityId) : state
@@ -32,7 +37,7 @@ export const grantEntityHandler: EffectHandler = (
 
 export const revokeEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { entityId } = effect as EntityEffect
   return typeof entityId === "string" ? revokeEntity(state, entityId) : state
@@ -40,7 +45,7 @@ export const revokeEntityHandler: EffectHandler = (
 
 export const activateEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { entityId } = effect as EntityEffect
   return typeof entityId === "string" ? activateEntity(state, entityId) : state
@@ -48,7 +53,7 @@ export const activateEntityHandler: EffectHandler = (
 
 export const deactivateEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { entityId } = effect as EntityEffect
   return typeof entityId === "string" ? deactivateEntity(state, entityId) : state
@@ -56,7 +61,7 @@ export const deactivateEntityHandler: EffectHandler = (
 
 export const unlockEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { entityId } = effect as EntityEffect
   return typeof entityId === "string" ? unlockEntity(state, entityId) : state
@@ -64,7 +69,7 @@ export const unlockEntityHandler: EffectHandler = (
 
 export const lockEntityHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { entityId } = effect as EntityEffect
   return typeof entityId === "string" ? lockEntity(state, entityId) : state
@@ -72,7 +77,7 @@ export const lockEntityHandler: EffectHandler = (
 
 export const addResourceHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { key, amount } = effect as ResourceEffect
   return typeof key === "string" && typeof amount === "number"
@@ -82,7 +87,7 @@ export const addResourceHandler: EffectHandler = (
 
 export const spendResourceHandler: EffectHandler = (
   state: GraphRuntimeState,
-  effect: Effect
+  effect: Effect,
 ): GraphRuntimeState => {
   const { key, amount, allowNegative, clampToZero } = effect as ResourceEffect
   return typeof key === "string" && typeof amount === "number"

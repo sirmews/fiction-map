@@ -1,76 +1,133 @@
-import { defineGraph } from "@fiction-map/core";
-import { registry } from "../project";
+import { defineGraph } from "@fiction-map/core"
+import { registry } from "../project"
 
 export const story = defineGraph(registry, {
   id: "library-mystery",
   nodes: [
-    { 
-      id: "entrance", 
-      type: "scene", 
+    {
+      id: "entrance",
+      type: "scene",
       blocks: [
-        { id: "entrance-desc", type: "paragraph", text: "You stand at the entrance to the old library." }
-      ] 
+        {
+          id: "entrance-desc",
+          type: "paragraph",
+          text: "You stand at the entrance to the old library.",
+        },
+      ],
     },
-    { 
-      id: "main-hall", 
-      type: "scene", 
+    {
+      id: "main-hall",
+      type: "scene",
       blocks: [
-        { id: "hall-desc", type: "paragraph", text: "Dust motes float in shafts of grey light. A lantern sits on a table." },
-        { id: "hall-passage", type: "paragraph", text: "In the center of the hall, a yawning dark chasm drops into the earth." },
-        { id: "hall-archives", type: "paragraph", text: "To your left, the heavy iron-reinforced doors of the archives loom." }
-      ] 
+        {
+          id: "hall-desc",
+          type: "paragraph",
+          text: "Dust motes float in shafts of grey light. A lantern sits on a table.",
+        },
+        {
+          id: "hall-passage",
+          type: "paragraph",
+          text: "In the center of the hall, a yawning dark chasm drops into the earth.",
+        },
+        {
+          id: "hall-archives",
+          type: "paragraph",
+          text: "To your left, the heavy iron-reinforced doors of the archives loom.",
+        },
+      ],
     },
-    { 
-      id: "archives", 
-      type: "scene", 
+    {
+      id: "archives",
+      type: "scene",
       blocks: [
-        { id: "archives-desc", type: "paragraph", text: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby.", metadata: { delayAfterMs: 400 } },
-        { id: "archives-heal-tome", type: "paragraph", text: "On a brass stand rests the glowing 'Tome of Heal Spell'." },
-        { id: "archives-light-tome", type: "paragraph", text: "On a nearby desk rests the 'Tome of Mage Light Spell'." },
-        { id: "archives-librarian", type: "paragraph", text: "The spectral librarian gazes at you, offering lockpicks for trade." }
-      ] 
+        {
+          id: "archives-desc",
+          type: "paragraph",
+          text: "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby.",
+          metadata: { delayAfterMs: 400 },
+        },
+        {
+          id: "archives-heal-tome",
+          type: "paragraph",
+          text: "On a brass stand rests the glowing 'Tome of Heal Spell'.",
+        },
+        {
+          id: "archives-light-tome",
+          type: "paragraph",
+          text: "On a nearby desk rests the 'Tome of Mage Light Spell'.",
+        },
+        {
+          id: "archives-librarian",
+          type: "paragraph",
+          text: "The spectral librarian gazes at you, offering lockpicks for trade.",
+        },
+      ],
     },
-    { 
-      id: "dark-chapter", 
-      type: "scene", 
+    {
+      id: "dark-chapter",
+      type: "scene",
       blocks: [
-        { id: "chapter-desc", type: "paragraph", text: "A narrow passage drops into darkness. You hear the crackle of ancient magic." }
-      ] 
+        {
+          id: "chapter-desc",
+          type: "paragraph",
+          text: "A narrow passage drops into darkness. You hear the crackle of ancient magic.",
+        },
+      ],
     },
-    { 
-      id: "chamber-of-runes", 
-      type: "scene", 
+    {
+      id: "chamber-of-runes",
+      type: "scene",
       blocks: [
-        { id: "runes-desc", type: "paragraph", text: "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key." }
-      ] 
+        {
+          id: "runes-desc",
+          type: "paragraph",
+          text: "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key.",
+        },
+      ],
     },
-    { 
-      id: "collapsed-bridge", 
-      type: "scene", 
+    {
+      id: "collapsed-bridge",
+      type: "scene",
       blocks: [
-        { id: "bridge-desc", type: "paragraph", text: "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere." }
-      ] 
+        {
+          id: "bridge-desc",
+          type: "paragraph",
+          text: "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere.",
+        },
+      ],
     },
-    { 
-      id: "forgotten-crypt", 
-      type: "scene", 
+    {
+      id: "forgotten-crypt",
+      type: "scene",
       blocks: [
-        { id: "crypt-desc", type: "paragraph", text: "An ancient crypt, smelling of age. A massive iron casket lies in the center." }
-      ] 
+        {
+          id: "crypt-desc",
+          type: "paragraph",
+          text: "An ancient crypt, smelling of age. A massive iron casket lies in the center.",
+        },
+      ],
     },
-    { 
-      id: "victory", 
-      type: "scene", 
+    {
+      id: "victory",
+      type: "scene",
       blocks: [
-        { id: "victory-desc", type: "paragraph", text: "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!" }
-      ] 
+        {
+          id: "victory-desc",
+          type: "paragraph",
+          text: "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!",
+        },
+      ],
     },
-    { 
-      id: "death", 
-      type: "scene", 
+    {
+      id: "death",
+      type: "scene",
       blocks: [
-        { id: "death-desc", type: "paragraph", text: "The dark forces of the passage overwhelm you. Your journey ends here." }
-      ] 
+        {
+          id: "death-desc",
+          type: "paragraph",
+          text: "The dark forces of the passage overwhelm you. Your journey ends here.",
+        },
+      ],
     },
   ],
   edges: [
@@ -105,7 +162,10 @@ export const story = defineGraph(registry, {
       target: "archives",
       text: "Study the Tome of Heal Spell",
       conditions: [{ type: "notVisited", nodeId: "study-heal" }],
-      effects: [{ type: "grantEntity", entityId: "heal-spell" }, { type: "markVisited", nodeId: "study-heal" }],
+      effects: [
+        { type: "grantEntity", entityId: "heal-spell" },
+        { type: "markVisited", nodeId: "study-heal" },
+      ],
       anchorBlockId: "archives-heal-tome",
     },
     {
@@ -115,7 +175,10 @@ export const story = defineGraph(registry, {
       target: "archives",
       text: "Study the Tome of Mage Light Spell",
       conditions: [{ type: "notVisited", nodeId: "study-mage-light" }],
-      effects: [{ type: "grantEntity", entityId: "mage-light" }, { type: "markVisited", nodeId: "study-mage-light" }],
+      effects: [
+        { type: "grantEntity", entityId: "mage-light" },
+        { type: "markVisited", nodeId: "study-mage-light" },
+      ],
       anchorBlockId: "archives-light-tome",
     },
     {
@@ -170,9 +233,7 @@ export const story = defineGraph(registry, {
         { type: "hasEntity", entityId: "mage-light" },
         { type: "resourceAtLeast", key: "mana", value: 15 },
       ],
-      effects: [
-        { type: "spendResource", key: "mana", amount: 15, clampToZero: true },
-      ],
+      effects: [{ type: "spendResource", key: "mana", amount: 15, clampToZero: true }],
       anchorBlockId: "chapter-desc",
     },
     {
@@ -287,4 +348,4 @@ export const story = defineGraph(registry, {
       anchorBlockId: "crypt-desc",
     },
   ],
-});
+})

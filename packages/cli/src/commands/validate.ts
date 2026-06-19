@@ -8,8 +8,8 @@
  * --strict is passed.
  */
 
-import { readFile } from "fs/promises"
-import { join, relative, resolve, dirname } from "path"
+import { readFile } from "node:fs/promises"
+import { dirname, join, relative, resolve } from "node:path"
 import type { GraphMetadata } from "@fiction-map/core"
 
 export interface ValidateOptions {
@@ -52,9 +52,9 @@ function hintForIssue(code: string): string | null {
 
 export async function validate(options: ValidateOptions = {}): Promise<void> {
   const rootDir = resolve(options.rootDir || process.cwd())
-  const outputDir = options.outputDir 
-    ? resolve(options.outputDir) 
-    : options.rootDir 
+  const outputDir = options.outputDir
+    ? resolve(options.outputDir)
+    : options.rootDir
       ? dirname(rootDir)
       : rootDir
   const metadataPath = join(outputDir, ".fiction-map", "metadata.json")
@@ -69,7 +69,9 @@ export async function validate(options: ValidateOptions = {}): Promise<void> {
     metadata = JSON.parse(raw) as GraphMetadata
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      console.error(`❌ ${relative(rootDir, metadataPath)} not found. Run \`fiction-map generate\` first.\n`)
+      console.error(
+        `❌ ${relative(rootDir, metadataPath)} not found. Run \`fiction-map generate\` first.\n`,
+      )
       process.exit(1)
     }
     console.error("\n❌ Failed to read metadata:")
@@ -97,7 +99,9 @@ export async function validate(options: ValidateOptions = {}): Promise<void> {
   for (const graph of graphs) {
     if (graph.errors.length === 0 && graph.warnings.length === 0) continue
 
-    console.log(`Graph \`${graph.id}\` (${relative(rootDir, graph.location.file)}:${graph.location.line})`)
+    console.log(
+      `Graph \`${graph.id}\` (${relative(rootDir, graph.location.file)}:${graph.location.line})`,
+    )
     for (const err of graph.errors) {
       summary.graphErrors += 1
       const where = err.edgeId ? ` [edge=${err.edgeId}]` : err.nodeId ? ` [node=${err.nodeId}]` : ""
@@ -125,7 +129,7 @@ export async function validate(options: ValidateOptions = {}): Promise<void> {
   console.log(
     `Checked ${graphs.length} graph${graphs.length === 1 ? "" : "s"}: ` +
       `${totalErrors} error${totalErrors === 1 ? "" : "s"}, ` +
-      `${totalWarnings} warning${totalWarnings === 1 ? "" : "s"}.`
+      `${totalWarnings} warning${totalWarnings === 1 ? "" : "s"}.`,
   )
 
   if (totalErrors > 0 || (options.strict && totalWarnings > 0)) {

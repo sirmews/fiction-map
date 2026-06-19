@@ -7,22 +7,13 @@
  * that want a non-entity runtime can use `coreBuiltinEvaluators` alone.
  */
 
+import { entityIsActive, entityIsUnlocked, getResource, ownsEntity } from "../core/state"
 import type { Condition, ConditionEvaluator } from "../types"
-import {
-  ownsEntity,
-  entityIsActive,
-  entityIsUnlocked,
-  getResource,
-} from "../core/state"
 
 type EntityCondition = Condition & { entityId: string }
 type NumericCondition = Condition & { key: string; value: number }
 
-export const hasEntityEvaluator: ConditionEvaluator = (
-  state,
-  condition,
-  context
-): boolean => {
+export const hasEntityEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
   const { entityId } = condition as EntityCondition
   if (typeof entityId !== "string") return false
 
@@ -32,11 +23,7 @@ export const hasEntityEvaluator: ConditionEvaluator = (
   return ownsEntity(state, entityId)
 }
 
-export const entityActiveEvaluator: ConditionEvaluator = (
-  state,
-  condition,
-  context
-): boolean => {
+export const entityActiveEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
   const { entityId } = condition as EntityCondition
   if (typeof entityId !== "string") return false
 
@@ -46,11 +33,7 @@ export const entityActiveEvaluator: ConditionEvaluator = (
   return entityIsActive(state, entityId)
 }
 
-export const entityUnlockedEvaluator: ConditionEvaluator = (
-  state,
-  condition,
-  context
-): boolean => {
+export const entityUnlockedEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
   const { entityId } = condition as EntityCondition
   if (typeof entityId !== "string") return false
 
@@ -60,28 +43,14 @@ export const entityUnlockedEvaluator: ConditionEvaluator = (
   return entityIsUnlocked(state, entityId)
 }
 
-export const resourceAtLeastEvaluator: ConditionEvaluator = (
-  state,
-  condition
-): boolean => {
+export const resourceAtLeastEvaluator: ConditionEvaluator = (state, condition): boolean => {
   const { key, value } = condition as NumericCondition
-  return (
-    typeof key === "string" &&
-    typeof value === "number" &&
-    getResource(state, key) >= value
-  )
+  return typeof key === "string" && typeof value === "number" && getResource(state, key) >= value
 }
 
-export const resourceLessThanEvaluator: ConditionEvaluator = (
-  state,
-  condition
-): boolean => {
+export const resourceLessThanEvaluator: ConditionEvaluator = (state, condition): boolean => {
   const { key, value } = condition as NumericCondition
-  return (
-    typeof key === "string" &&
-    typeof value === "number" &&
-    getResource(state, key) < value
-  )
+  return typeof key === "string" && typeof value === "number" && getResource(state, key) < value
 }
 
 export const entityBuiltinEvaluators: Map<string, ConditionEvaluator> = new Map([

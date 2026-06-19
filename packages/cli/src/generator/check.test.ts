@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
-import { mkdir, writeFile, readFile, rm } from "fs/promises"
-import { join } from "path"
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
+import { join } from "node:path"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { checkProject, generateProject } from "./index"
 
 const TEST_DIR = join(__dirname, "check-fixtures")
@@ -19,7 +19,7 @@ export const TestNode = defineNodeType(registry, {
   outgoingEdges: [],
   incomingEdges: [],
 })
-`
+`,
   )
 }
 
@@ -59,11 +59,20 @@ describe("checkProject", () => {
 
     const metadataPath = join(outputDir, ".fiction-map", "metadata.json")
     const original = JSON.parse(await readFile(metadataPath, "utf8"))
-    original.nodeTypes.push({ id: "ghost", name: "ghost", location: { file: "x", line: 1, column: 1 }, properties: {}, outgoingEdges: [], incomingEdges: [] })
+    original.nodeTypes.push({
+      id: "ghost",
+      name: "ghost",
+      location: { file: "x", line: 1, column: 1 },
+      properties: {},
+      outgoingEdges: [],
+      incomingEdges: [],
+    })
     await writeFile(metadataPath, JSON.stringify(original, null, 2))
 
     const result = await checkProject({ rootDir: TEST_DIR, outputDir })
     expect(result.ok).toBe(false)
-    expect(result.mismatches.some((m) => m.reason === "different" && m.path === metadataPath)).toBe(true)
+    expect(result.mismatches.some((m) => m.reason === "different" && m.path === metadataPath)).toBe(
+      true,
+    )
   })
 })

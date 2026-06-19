@@ -1,4 +1,4 @@
-import type { Transition, NodeDefinition, Effect, Condition, ContentBlock } from "./types"
+import type { Condition, ContentBlock, Effect, NodeDefinition, Transition } from "./types"
 
 export interface EdgeBlueprint {
   id: string
@@ -50,41 +50,32 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
     metadata: e.metadata,
   }))
 
-  const startNodeId =
-    blueprint.startNode ?? blueprint.nodes[0]?.id
+  const startNodeId = blueprint.startNode ?? blueprint.nodes[0]?.id
 
   const endingNodeIds = new Set(
-    blueprint.endings ?? findTerminalNodes(blueprint.nodes, transitions)
+    blueprint.endings ?? findTerminalNodes(blueprint.nodes, transitions),
   )
 
   const nodes = new Map<string, NodeDefinition>(
     blueprint.nodes.map((n) => {
       const { id, type, blocks, ...properties } = n
       return [id, { id, type, blocks, properties }]
-    })
+    }),
   )
 
   return { transitions, nodes, startNodeId, endingNodeIds }
 }
 
-function findTerminalNodes(
-  nodes: NodeBlueprint[],
-  transitions: Transition[]
-): string[] {
+function findTerminalNodes(nodes: NodeBlueprint[], transitions: Transition[]): string[] {
   const sources = new Set(transitions.map((t) => t.sourceNodeId))
-  return nodes
-    .map((n) => n.id)
-    .filter((id) => !sources.has(id) && id !== nodes[0]?.id)
+  return nodes.map((n) => n.id).filter((id) => !sources.has(id) && id !== nodes[0]?.id)
 }
 
 export function determineEndings(
   nodes: NodeBlueprint[] | Map<string, NodeDefinition>,
-  transitions: Transition[]
+  transitions: Transition[],
 ): Set<string> {
-  const nodeIds =
-    nodes instanceof Map
-      ? new Set(nodes.keys())
-      : new Set(nodes.map((n) => n.id))
+  const nodeIds = nodes instanceof Map ? new Set(nodes.keys()) : new Set(nodes.map((n) => n.id))
 
   const sources = new Set(transitions.map((t) => t.sourceNodeId))
   const endings = [...nodeIds].filter((id) => !sources.has(id))

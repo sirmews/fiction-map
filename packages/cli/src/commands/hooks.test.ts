@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { mkdir, writeFile, readFile, rm } from "fs/promises"
-import { join } from "path"
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
+import { join } from "node:path"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { installHooks } from "./hooks"
 
 const TEST_DIR = join(__dirname, "hooks-fixtures")
@@ -17,13 +17,17 @@ describe("hooks install command", () => {
 
   it("exits if .git is missing", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => {
-      throw new Error(`process.exit(${code ?? ""})`)
-    }) as never
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((code?: string | number | null) => {
+        throw new Error(`process.exit(${code ?? ""})`)
+      }) as never
 
     await expect(installHooks(TEST_DIR)).rejects.toThrow("process.exit(1)")
     expect(exitSpy).toHaveBeenCalledWith(1)
-    expect(errorSpy.mock.calls.some((c) => String(c[0]).includes("No .git directory found"))).toBe(true)
+    expect(errorSpy.mock.calls.some((c) => String(c[0]).includes("No .git directory found"))).toBe(
+      true,
+    )
   })
 
   it("creates a new hook if none exists", async () => {
@@ -36,7 +40,9 @@ describe("hooks install command", () => {
 
     const hookContent = await readFile(join(gitDir, "hooks", "pre-commit"), "utf8")
     expect(hookContent).toContain("Fiction Map pre-commit hook")
-    expect(logSpy.mock.calls.some((c) => String(c[0]).includes("Installed Fiction Map pre-commit hook"))).toBe(true)
+    expect(
+      logSpy.mock.calls.some((c) => String(c[0]).includes("Installed Fiction Map pre-commit hook")),
+    ).toBe(true)
   })
 
   it("appends to an existing hook", async () => {
@@ -53,7 +59,9 @@ describe("hooks install command", () => {
     const hookContent = await readFile(hookPath, "utf8")
     expect(hookContent).toContain("echo 'existing'")
     expect(hookContent).toContain("Fiction Map pre-commit hook")
-    expect(logSpy.mock.calls.some((c) => String(c[0]).includes("Appended Fiction Map to existing"))).toBe(true)
+    expect(
+      logSpy.mock.calls.some((c) => String(c[0]).includes("Appended Fiction Map to existing")),
+    ).toBe(true)
   })
 
   it("does not append if already installed", async () => {
@@ -61,7 +69,10 @@ describe("hooks install command", () => {
     await mkdir(join(gitDir, "hooks"), { recursive: true })
     const hookPath = join(gitDir, "hooks", "pre-commit")
 
-    await writeFile(hookPath, "#!/usr/bin/env bash\\n# Fiction Map pre-commit hook\\necho 'already here'\\n")
+    await writeFile(
+      hookPath,
+      "#!/usr/bin/env bash\\n# Fiction Map pre-commit hook\\necho 'already here'\\n",
+    )
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {})
 

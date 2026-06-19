@@ -1,5 +1,5 @@
-import { defineNodeType } from "@fiction-map/core";
-import { registry } from "../project";
+import { defineNodeType } from "@fiction-map/core"
+import { registry } from "../project"
 
 export const SceneNode = defineNodeType(registry, {
   id: "scene",
@@ -9,4 +9,4 @@ export const SceneNode = defineNodeType(registry, {
   },
   outgoingEdges: ["choice"],
   incomingEdges: ["choice"],
-});
+})

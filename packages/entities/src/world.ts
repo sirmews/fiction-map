@@ -1,6 +1,6 @@
 import {
-  RegistryError,
   type PropertySchema,
+  RegistryError,
   type SourceLocation,
   type ValidationError,
   type ValidationWarning,
@@ -8,7 +8,6 @@ import {
 import type { EntityRegistry } from "./registry"
 import type {
   EntityInstance,
-  EntityMetadata,
   EntityModifier,
   EntityPrerequisite,
   EntityReferenceDefinition,
@@ -59,9 +58,7 @@ function validatePropertyValue(value: unknown, schema: PropertySchema): boolean 
         return false
       }
       if (!schema.valueType) return true
-      return Object.values(value).every((item) =>
-        validatePropertyValue(item, schema.valueType!)
-      )
+      return Object.values(value).every((item) => validatePropertyValue(item, schema.valueType!))
     default:
       return true
   }
@@ -69,7 +66,7 @@ function validatePropertyValue(value: unknown, schema: PropertySchema): boolean 
 
 function normalizeReferenceValues(
   value: EntityReferenceValue | undefined,
-  definition: EntityReferenceDefinition
+  definition: EntityReferenceDefinition,
 ): string[] {
   if (value === undefined) return []
   if (definition.multiple) {
@@ -88,7 +85,7 @@ function validatePrerequisite(prerequisite: EntityPrerequisite): boolean {
 
 function validateWorld(
   registry: EntityRegistry,
-  entities: EntityInstance[]
+  entities: EntityInstance[],
 ): { errors: ValidationError[]; warnings: ValidationWarning[] } {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -226,7 +223,10 @@ export function defineWorld(registry: EntityRegistry, config: WorldConfig): Worl
   }
 
   if (registry.worlds.has(config.id)) {
-    throw new RegistryError(`World "${config.id}" is already defined in this registry`, "ERR_REGISTRY_DUPLICATE_ID")
+    throw new RegistryError(
+      `World "${config.id}" is already defined in this registry`,
+      "ERR_REGISTRY_DUPLICATE_ID",
+    )
   }
 
   const { errors, warnings } = validateWorld(registry, config.entities)
@@ -234,7 +234,7 @@ export function defineWorld(registry: EntityRegistry, config: WorldConfig): Worl
 
   const definition: WorldDefinition = {
     id: config.id,
-    name: config.id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()) + "World",
+    name: `${config.id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}World`,
     location: getCallSite(),
     entities: config.entities,
     entityCount: config.entities.length,
@@ -247,4 +247,3 @@ export function defineWorld(registry: EntityRegistry, config: WorldConfig): Worl
 
   return definition
 }
-

@@ -1,15 +1,15 @@
+import { RuntimeError } from "@fiction-map/core"
 import type {
   EntityRuntimeState,
   GraphRuntimeState,
   SerializableEntityState,
   SerializableState,
-} from "../types";
-import { SERIALIZATION_SCHEMA_VERSION } from "../types";
-import { RuntimeError } from "@fiction-map/core";
+} from "../types"
+import { SERIALIZATION_SCHEMA_VERSION } from "../types"
 
 /**
  * Create initial state at a starting node.
- * 
+ *
  * @param startNodeId - The node ID to start at
  * @param initialVariables - Optional initial variable values
  * @param initialExtensions - Optional initial extension data
@@ -18,7 +18,7 @@ export function createInitialState(
   startNodeId: string,
   initialVariables?: Record<string, unknown>,
   initialExtensions?: Record<string, unknown>,
-  initialEntityState?: EntityRuntimeState
+  initialEntityState?: EntityRuntimeState,
 ): GraphRuntimeState {
   return {
     currentNodeId: startNodeId,
@@ -28,12 +28,12 @@ export function createInitialState(
     visited: new Set([startNodeId]),
     entityState: initialEntityState ? cloneEntityState(initialEntityState) : undefined,
     extensions: initialExtensions ? { ...initialExtensions } : undefined,
-  };
+  }
 }
 
 /**
  * Clone state (deep copy).
- * 
+ *
  * Use before any mutation. Guarantees immutability.
  * Sets are cloned, objects are shallow-copied.
  */
@@ -46,90 +46,87 @@ export function cloneState(state: GraphRuntimeState): GraphRuntimeState {
     visited: new Set(state.visited),
     entityState: state.entityState ? cloneEntityState(state.entityState) : undefined,
     extensions: state.extensions ? { ...state.extensions } : undefined,
-  };
+  }
 }
 
 /**
  * Merge partial state updates into a cloned state.
- * 
+ *
  * Returns new state with updates applied.
  * Arrays and Sets are replaced, not merged.
  */
 export function mergeState(
   state: GraphRuntimeState,
-  updates: Partial<GraphRuntimeState>
+  updates: Partial<GraphRuntimeState>,
 ): GraphRuntimeState {
-  const cloned = cloneState(state);
-  
+  const cloned = cloneState(state)
+
   if (updates.currentNodeId !== undefined) {
-    cloned.currentNodeId = updates.currentNodeId;
+    cloned.currentNodeId = updates.currentNodeId
   }
-  
+
   if (updates.history !== undefined) {
-    cloned.history = [...updates.history];
+    cloned.history = [...updates.history]
   }
-  
+
   if (updates.variables !== undefined) {
-    cloned.variables = { ...cloned.variables, ...updates.variables };
+    cloned.variables = { ...cloned.variables, ...updates.variables }
   }
-  
+
   if (updates.flags !== undefined) {
-    cloned.flags = { ...cloned.flags, ...updates.flags };
+    cloned.flags = { ...cloned.flags, ...updates.flags }
   }
-  
+
   if (updates.visited !== undefined) {
-    cloned.visited = new Set(updates.visited);
+    cloned.visited = new Set(updates.visited)
   }
 
   if (updates.entityState !== undefined) {
-    cloned.entityState = cloneEntityState(updates.entityState);
+    cloned.entityState = cloneEntityState(updates.entityState)
   }
-  
+
   if (updates.extensions !== undefined) {
-    cloned.extensions = { ...cloned.extensions, ...updates.extensions };
+    cloned.extensions = { ...cloned.extensions, ...updates.extensions }
   }
-  
-  return cloned;
+
+  return cloned
 }
 
 /**
  * Navigate to a new node.
- * 
+ *
  * Updates currentNodeId, adds to history, and marks as visited.
  * Returns cloned state.
  */
-export function navigateToNode(
-  state: GraphRuntimeState,
-  nodeId: string
-): GraphRuntimeState {
-  const cloned = cloneState(state);
-  cloned.history = [...cloned.history, cloned.currentNodeId];
-  cloned.currentNodeId = nodeId;
-  cloned.visited.add(nodeId);
-  return cloned;
+export function navigateToNode(state: GraphRuntimeState, nodeId: string): GraphRuntimeState {
+  const cloned = cloneState(state)
+  cloned.history = [...cloned.history, cloned.currentNodeId]
+  cloned.currentNodeId = nodeId
+  cloned.visited.add(nodeId)
+  return cloned
 }
 
 /**
  * Go back to the previous node in history.
- * 
+ *
  * Returns null if there's no history to go back to.
  */
 export function backtrack(state: GraphRuntimeState): GraphRuntimeState | null {
   if (state.history.length === 0) {
-    return null;
+    return null
   }
-  
-  const cloned = cloneState(state);
-  const previousNodeId = cloned.history.pop()!;
-  cloned.currentNodeId = previousNodeId;
-  return cloned;
+
+  const cloned = cloneState(state)
+  const previousNodeId = cloned.history.pop()!
+  cloned.currentNodeId = previousNodeId
+  return cloned
 }
 
 /**
  * Check if a node has been visited.
  */
 export function hasVisited(state: GraphRuntimeState, nodeId: string): boolean {
-  return state.visited.has(nodeId);
+  return state.visited.has(nodeId)
 }
 
 /**
@@ -137,9 +134,9 @@ export function hasVisited(state: GraphRuntimeState, nodeId: string): boolean {
  * Note: This counts based on history + current position.
  */
 export function visitCount(state: GraphRuntimeState, nodeId: string): number {
-  let count = state.currentNodeId === nodeId ? 1 : 0;
-  count += state.history.filter((id: string) => id === nodeId).length;
-  return count;
+  let count = state.currentNodeId === nodeId ? 1 : 0
+  count += state.history.filter((id: string) => id === nodeId).length
+  return count
 }
 
 /**
@@ -148,27 +145,27 @@ export function visitCount(state: GraphRuntimeState, nodeId: string): number {
 export function setFlag(
   state: GraphRuntimeState,
   key: string,
-  value: boolean | string | number
+  value: boolean | string | number,
 ): GraphRuntimeState {
-  const cloned = cloneState(state);
-  cloned.flags[key] = value;
-  return cloned;
+  const cloned = cloneState(state)
+  cloned.flags[key] = value
+  return cloned
 }
 
 /**
  * Clear a flag.
  */
 export function clearFlag(state: GraphRuntimeState, key: string): GraphRuntimeState {
-  const cloned = cloneState(state);
-  delete cloned.flags[key];
-  return cloned;
+  const cloned = cloneState(state)
+  delete cloned.flags[key]
+  return cloned
 }
 
 /**
  * Check if a flag exists.
  */
 export function hasFlag(state: GraphRuntimeState, key: string): boolean {
-  return key in state.flags;
+  return key in state.flags
 }
 
 /**
@@ -176,9 +173,9 @@ export function hasFlag(state: GraphRuntimeState, key: string): boolean {
  */
 export function getFlag(
   state: GraphRuntimeState,
-  key: string
+  key: string,
 ): boolean | string | number | undefined {
-  return state.flags[key];
+  return state.flags[key]
 }
 
 /**
@@ -187,37 +184,37 @@ export function getFlag(
 export function setVariable(
   state: GraphRuntimeState,
   key: string,
-  value: unknown
+  value: unknown,
 ): GraphRuntimeState {
-  const cloned = cloneState(state);
-  cloned.variables[key] = value;
-  return cloned;
+  const cloned = cloneState(state)
+  cloned.variables[key] = value
+  return cloned
 }
 
 /**
  * Get a variable value.
  */
 export function getVariable(state: GraphRuntimeState, key: string): unknown {
-  return state.variables[key];
+  return state.variables[key]
 }
 
 /**
  * Increment a numeric variable.
- * 
+ *
  * Returns state unchanged if variable is not a number.
  */
 export function incrementVariable(
   state: GraphRuntimeState,
   key: string,
-  delta: number
+  delta: number,
 ): GraphRuntimeState {
-  const current = state.variables[key];
+  const current = state.variables[key]
   if (typeof current !== "number") {
-    return state;
+    return state
   }
-  const cloned = cloneState(state);
-  cloned.variables[key] = current + delta;
-  return cloned;
+  const cloned = cloneState(state)
+  cloned.variables[key] = current + delta
+  return cloned
 }
 
 // ============================================================================
@@ -230,7 +227,7 @@ function createEmptyEntityState(): EntityRuntimeState {
     active: new Set(),
     unlocked: new Set(),
     resources: {},
-  };
+  }
 }
 
 function cloneEntityState(entityState: EntityRuntimeState): EntityRuntimeState {
@@ -240,123 +237,105 @@ function cloneEntityState(entityState: EntityRuntimeState): EntityRuntimeState {
     unlocked: new Set(entityState.unlocked),
     resources: { ...entityState.resources },
     extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
-  };
+  }
 }
 
 function cloneStateWithEntityState(state: GraphRuntimeState): GraphRuntimeState {
-  const cloned = cloneState(state);
-  cloned.entityState = cloned.entityState ?? createEmptyEntityState();
-  return cloned;
+  const cloned = cloneState(state)
+  cloned.entityState = cloned.entityState ?? createEmptyEntityState()
+  return cloned
 }
 
-export function grantEntity(
-  state: GraphRuntimeState,
-  entityId: string
-): GraphRuntimeState {
-  const cloned = cloneStateWithEntityState(state);
-  cloned.entityState!.owned.add(entityId);
-  return cloned;
+export function grantEntity(state: GraphRuntimeState, entityId: string): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state)
+  cloned.entityState!.owned.add(entityId)
+  return cloned
 }
 
-export function revokeEntity(
-  state: GraphRuntimeState,
-  entityId: string
-): GraphRuntimeState {
-  const cloned = cloneStateWithEntityState(state);
-  cloned.entityState!.owned.delete(entityId);
-  return cloned;
+export function revokeEntity(state: GraphRuntimeState, entityId: string): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state)
+  cloned.entityState!.owned.delete(entityId)
+  return cloned
 }
 
 export function ownsEntity(state: GraphRuntimeState, entityId: string): boolean {
-  return state.entityState?.owned.has(entityId) ?? false;
+  return state.entityState?.owned.has(entityId) ?? false
 }
 
-export function activateEntity(
-  state: GraphRuntimeState,
-  entityId: string
-): GraphRuntimeState {
-  const cloned = cloneStateWithEntityState(state);
-  cloned.entityState!.active.add(entityId);
-  return cloned;
+export function activateEntity(state: GraphRuntimeState, entityId: string): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state)
+  cloned.entityState!.active.add(entityId)
+  return cloned
 }
 
-export function deactivateEntity(
-  state: GraphRuntimeState,
-  entityId: string
-): GraphRuntimeState {
-  const cloned = cloneStateWithEntityState(state);
-  cloned.entityState!.active.delete(entityId);
-  return cloned;
+export function deactivateEntity(state: GraphRuntimeState, entityId: string): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state)
+  cloned.entityState!.active.delete(entityId)
+  return cloned
 }
 
 export function entityIsActive(state: GraphRuntimeState, entityId: string): boolean {
-  return state.entityState?.active.has(entityId) ?? false;
+  return state.entityState?.active.has(entityId) ?? false
 }
 
-export function unlockEntity(
-  state: GraphRuntimeState,
-  entityId: string
-): GraphRuntimeState {
-  const cloned = cloneStateWithEntityState(state);
-  cloned.entityState!.unlocked.add(entityId);
-  return cloned;
+export function unlockEntity(state: GraphRuntimeState, entityId: string): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state)
+  cloned.entityState!.unlocked.add(entityId)
+  return cloned
 }
 
-export function lockEntity(
-  state: GraphRuntimeState,
-  entityId: string
-): GraphRuntimeState {
-  const cloned = cloneStateWithEntityState(state);
-  cloned.entityState!.unlocked.delete(entityId);
-  return cloned;
+export function lockEntity(state: GraphRuntimeState, entityId: string): GraphRuntimeState {
+  const cloned = cloneStateWithEntityState(state)
+  cloned.entityState!.unlocked.delete(entityId)
+  return cloned
 }
 
 export function entityIsUnlocked(state: GraphRuntimeState, entityId: string): boolean {
-  return state.entityState?.unlocked.has(entityId) ?? false;
+  return state.entityState?.unlocked.has(entityId) ?? false
 }
 
 export function addResource(
   state: GraphRuntimeState,
   key: string,
-  amount: number
+  amount: number,
 ): GraphRuntimeState {
   if (!Number.isFinite(amount)) {
-    return state;
+    return state
   }
 
-  const cloned = cloneStateWithEntityState(state);
-  const current = cloned.entityState!.resources[key] ?? 0;
-  cloned.entityState!.resources[key] = current + amount;
-  return cloned;
+  const cloned = cloneStateWithEntityState(state)
+  const current = cloned.entityState!.resources[key] ?? 0
+  cloned.entityState!.resources[key] = current + amount
+  return cloned
 }
 
 export function spendResource(
   state: GraphRuntimeState,
   key: string,
   amount: number,
-  options?: { allowNegative?: boolean; clampToZero?: boolean }
+  options?: { allowNegative?: boolean; clampToZero?: boolean },
 ): GraphRuntimeState {
-  const current = getResource(state, key);
+  const current = getResource(state, key)
 
   if (!Number.isFinite(amount) || amount < 0) {
-    return state;
+    return state
   }
 
-  const allowNegative = options?.allowNegative ?? false;
-  const clampToZero = options?.clampToZero ?? false;
+  const allowNegative = options?.allowNegative ?? false
+  const clampToZero = options?.clampToZero ?? false
 
   if (current < amount && !allowNegative && !clampToZero) {
-    return state;
+    return state
   }
 
-  const cloned = cloneStateWithEntityState(state);
-  const newValue = current - amount;
-  cloned.entityState!.resources[key] = clampToZero ? Math.max(0, newValue) : newValue;
-  return cloned;
+  const cloned = cloneStateWithEntityState(state)
+  const newValue = current - amount
+  cloned.entityState!.resources[key] = clampToZero ? Math.max(0, newValue) : newValue
+  return cloned
 }
 
 export function getResource(state: GraphRuntimeState, key: string): number {
-  return state.entityState?.resources[key] ?? 0;
+  return state.entityState?.resources[key] ?? 0
 }
 
 // ============================================================================
@@ -364,10 +343,10 @@ export function getResource(state: GraphRuntimeState, key: string): number {
 // ============================================================================
 
 function serializeEntityState(
-  entityState: EntityRuntimeState | undefined
+  entityState: EntityRuntimeState | undefined,
 ): SerializableEntityState | undefined {
   if (!entityState) {
-    return undefined;
+    return undefined
   }
 
   return {
@@ -376,14 +355,14 @@ function serializeEntityState(
     unlocked: [...entityState.unlocked],
     resources: { ...entityState.resources },
     extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
-  };
+  }
 }
 
 function deserializeEntityState(
-  entityState: SerializableEntityState | undefined
+  entityState: SerializableEntityState | undefined,
 ): EntityRuntimeState | undefined {
   if (!entityState) {
-    return undefined;
+    return undefined
   }
 
   return {
@@ -392,7 +371,7 @@ function deserializeEntityState(
     unlocked: new Set(entityState.unlocked),
     resources: { ...entityState.resources },
     extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
-  };
+  }
 }
 
 /**
@@ -411,7 +390,7 @@ export function serializeState(state: GraphRuntimeState): SerializableState {
     visited: [...state.visited],
     entityState: serializeEntityState(state.entityState),
     extensions: state.extensions ? { ...state.extensions } : undefined,
-  };
+  }
 }
 
 /**
@@ -427,8 +406,8 @@ export function deserializeState(data: SerializableState): GraphRuntimeState {
       `Unsupported save schemaVersion: ${data.schemaVersion}. ` +
         `Current version is ${SERIALIZATION_SCHEMA_VERSION}. ` +
         `Migrate the data before calling deserializeState.`,
-      "ERR_RUNTIME_SCHEMA_MISMATCH"
-    );
+      "ERR_RUNTIME_SCHEMA_MISMATCH",
+    )
   }
 
   return {
@@ -439,5 +418,5 @@ export function deserializeState(data: SerializableState): GraphRuntimeState {
     visited: new Set(data.visited),
     entityState: deserializeEntityState(data.entityState),
     extensions: data.extensions ? { ...data.extensions } : undefined,
-  };
+  }
 }

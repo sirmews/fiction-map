@@ -1,10 +1,7 @@
-import type { GraphDefinition, EdgeInstance } from "@fiction-map/core"
-import type {
-  ConditionEvaluator,
-  EffectHandler,
-} from "./types"
-import { GraphRuntime } from "./runtime"
+import type { EdgeInstance, GraphDefinition } from "@fiction-map/core"
 import type { EdgeBlueprint, GraphBlueprint } from "./adapter"
+import { GraphRuntime } from "./runtime"
+import type { ConditionEvaluator, EffectHandler } from "./types"
 
 const EDGE_RUNTIME_KEYS = new Set([
   "id",
@@ -85,11 +82,7 @@ export function graphDefinitionToBlueprint(graph: GraphDefinition): GraphBluepri
 export function createRuntimeFromGraph(
   graph: GraphDefinition,
   evaluators?: Map<string, ConditionEvaluator>,
-  handlers?: Map<string, EffectHandler>
+  handlers?: Map<string, EffectHandler>,
 ): GraphRuntime {
-  return new GraphRuntime(
-    graphDefinitionToBlueprint(graph),
-    evaluators,
-    handlers
-  )
+  return new GraphRuntime(graphDefinitionToBlueprint(graph), evaluators, handlers)
 }

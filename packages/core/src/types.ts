@@ -1,6 +1,6 @@
 /**
  * Fiction Map — Core Types
- * 
+ *
  * The metadata schema for graph-based systems.
  */
 
@@ -18,7 +18,7 @@ export interface SourceLocation {
 // Property Schema
 // ============================================================================
 
-export type PropertyType = 
+export type PropertyType =
   | "string"
   | "number"
   | "boolean"
@@ -35,17 +35,17 @@ export interface PropertySchema {
   required?: boolean
   default?: unknown
   description?: string
-  
+
   // For enums
   values?: string[]
-  
+
   // For arrays
   items?: PropertySchema
-  
+
   // For maps
   keyType?: PropertyType
   valueType?: PropertySchema
-  
+
   // For references
   referenceTo?: string
 }
@@ -188,19 +188,19 @@ export interface GraphDefinition {
   aiRule?: string
   nodes: NodeInstance[]
   edges: EdgeInstance[]
-  
+
   // Computed during analysis
   nodeCount: number
   edgeCount: number
   maxDepth: number
   endings: string[]
-  
+
   // Type usage
   nodeTypesUsed: string[]
   edgeTypesUsed: string[]
   conditionsUsed: string[]
   effectsUsed: string[]
-  
+
   // Validation
   errors: ValidationError[]
   warnings: ValidationWarning[]

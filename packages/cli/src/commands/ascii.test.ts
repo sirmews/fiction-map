@@ -1,6 +1,6 @@
-import { expect, test, describe } from "vitest"
-import { generateTerminalMap, generateLlmMap, generateMermaidMap } from "./ascii"
-import { GraphDefinition } from "@fiction-map/core"
+import type { GraphDefinition } from "@fiction-map/core"
+import { describe, expect, test } from "vitest"
+import { generateLlmMap, generateMermaidMap, generateTerminalMap } from "./ascii"
 
 const sampleGraph: GraphDefinition = {
   id: "test-graph",
@@ -46,9 +46,7 @@ describe("generateTerminalMap", () => {
       id: "cyclic-graph",
       name: "cyclicGraph",
       location: { file: "test.ts", line: 1, column: 1 },
-      nodes: [
-        { id: "node-a", type: "scene", title: "Node A", body: "First node" },
-      ],
+      nodes: [{ id: "node-a", type: "scene", title: "Node A", body: "First node" }],
       edges: [
         {
           id: "edge-loop",
@@ -84,8 +82,8 @@ describe("generateLlmMap", () => {
     expect(output).toContain('  * Title: "Node A"')
     expect(output).toContain('  * Body: "First node"')
     expect(output).toContain('    * `edge-ab` ──► **node-b** ("Go to B")')
-    expect(output).toContain("      * ❓ conditions: hasEntity(entityId=\"lantern\")")
-    expect(output).toContain("      * ⚡ effects: grantEntity(entityId=\"key\")")
+    expect(output).toContain('      * ❓ conditions: hasEntity(entityId="lantern")')
+    expect(output).toContain('      * ⚡ effects: grantEntity(entityId="key")')
     expect(output).toContain("* **node-b** (scene) [Ending]")
   })
 })
@@ -97,7 +95,9 @@ describe("generateMermaidMap", () => {
     expect(output).toContain("flowchart TD")
     expect(output).toContain('  node-a["node-a (scene)<br/>Node A"]')
     expect(output).toContain('  node-b["node-b (scene)<br/>Node B"]')
-    expect(output).toContain('  node-a -->|"edge-ab: \'Go to B\' [requires: hasEntity(entityId=\'lantern\')] [grants: grantEntity(entityId=\'key\')]"| node-b')
+    expect(output).toContain(
+      "  node-a -->|\"edge-ab: 'Go to B' [requires: hasEntity(entityId='lantern')] [grants: grantEntity(entityId='key')]\"| node-b",
+    )
     expect(output).toContain("```")
   })
 })

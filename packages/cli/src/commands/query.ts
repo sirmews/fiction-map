@@ -1,11 +1,6 @@
-import { readFile } from "fs/promises"
-import { join, relative, resolve, dirname } from "path"
-import type {
-  EdgeInstance,
-  GraphDefinition,
-  GraphMetadata,
-  NodeInstance,
-} from "@fiction-map/core"
+import { readFile } from "node:fs/promises"
+import { dirname, join, relative, resolve } from "node:path"
+import type { EdgeInstance, GraphDefinition, GraphMetadata, NodeInstance } from "@fiction-map/core"
 
 export interface MetadataCommandOptions {
   rootDir?: string
@@ -50,9 +45,9 @@ function fail(message: string): never {
 
 export async function loadMetadata(options: MetadataCommandOptions = {}): Promise<LoadedMetadata> {
   const rootDir = resolve(options.rootDir || process.cwd())
-  const outputDir = options.outputDir 
-    ? resolve(options.outputDir) 
-    : options.rootDir 
+  const outputDir = options.outputDir
+    ? resolve(options.outputDir)
+    : options.rootDir
       ? dirname(rootDir)
       : rootDir
   const metadataPath = join(outputDir, ".fiction-map", "metadata.json")
@@ -105,7 +100,7 @@ function formatInstanceValue(value: unknown): string {
 }
 
 function formatInstances(
-  items: Array<{ type: string; [key: string]: unknown }> | undefined
+  items: Array<{ type: string; [key: string]: unknown }> | undefined,
 ): string {
   if (!items || items.length === 0) return "(none)"
 
@@ -121,9 +116,7 @@ function formatInstances(
 
 function inferRootNodeIds(graph: GraphDefinition): string[] {
   const targeted = new Set(graph.edges.map((edge) => edge.target))
-  const roots = graph.nodes
-    .filter((node) => !targeted.has(node.id))
-    .map((node) => node.id)
+  const roots = graph.nodes.filter((node) => !targeted.has(node.id)).map((node) => node.id)
 
   return roots.length > 0 ? roots : graph.nodes.map((node) => node.id)
 }
@@ -146,7 +139,7 @@ function computeStaticPaths(graph: GraphDefinition): PathResult[] {
     currentNodeId: string,
     nodeIds: string[],
     edgeIds: string[],
-    seen: Set<string>
+    seen: Set<string>,
   ): void => {
     const edges = outgoing.get(currentNodeId) ?? []
     if (edges.length === 0) {
@@ -188,7 +181,10 @@ function computeStaticPaths(graph: GraphDefinition): PathResult[] {
   return results
 }
 
-export async function query(kind: "nodes" | "edges" | "paths", options: QueryOptions = {}): Promise<void> {
+export async function query(
+  kind: "nodes" | "edges" | "paths",
+  options: QueryOptions = {},
+): Promise<void> {
   const { metadata } = await loadMetadata(options)
   const graphs = selectGraphs(metadata, options.graph)
 
@@ -253,7 +249,10 @@ export async function query(kind: "nodes" | "edges" | "paths", options: QueryOpt
   console.log("")
 }
 
-export async function showGraph(graphId: string | undefined, options: QueryOptions = {}): Promise<void> {
+export async function showGraph(
+  graphId: string | undefined,
+  options: QueryOptions = {},
+): Promise<void> {
   if (!graphId) {
     fail("❌ Missing graph id. Usage: `fiction-map graph show <graph-id>`")
   }
@@ -297,7 +296,10 @@ export async function showGraph(graphId: string | undefined, options: QueryOptio
   console.log("")
 }
 
-export async function explain(targetId: string | undefined, options: QueryOptions = {}): Promise<void> {
+export async function explain(
+  targetId: string | undefined,
+  options: QueryOptions = {},
+): Promise<void> {
   if (!targetId) {
     fail("❌ Missing id. Usage: `fiction-map explain <graph|node|edge-id>`")
   }
@@ -311,9 +313,7 @@ export async function explain(targetId: string | undefined, options: QueryOption
   }
 
   const nodeMatches = graphs.flatMap((item) =>
-    item.nodes
-      .filter((node) => node.id === targetId)
-      .map((node) => ({ graph: item, node }))
+    item.nodes.filter((node) => node.id === targetId).map((node) => ({ graph: item, node })),
   )
 
   if (nodeMatches.length > 0) {
@@ -343,9 +343,7 @@ export async function explain(targetId: string | undefined, options: QueryOption
   }
 
   const edgeMatches = graphs.flatMap((item) =>
-    item.edges
-      .filter((edge) => edge.id === targetId)
-      .map((edge) => ({ graph: item, edge }))
+    item.edges.filter((edge) => edge.id === targetId).map((edge) => ({ graph: item, edge })),
   )
 
   if (edgeMatches.length > 0) {

@@ -1,6 +1,6 @@
 /**
  * @fiction-map/runtime
- * 
+ *
  * A schema-driven runtime engine for graph-based narratives, workflows, and decision trees.
  */
 
@@ -59,7 +59,7 @@ export interface EvaluationContext {
 export type ConditionEvaluator = (
   state: GraphRuntimeState,
   condition: Condition,
-  context?: EvaluationContext
+  context?: EvaluationContext,
 ) => boolean
 
 // ============================================================================
@@ -80,7 +80,7 @@ export interface EffectContext {
 export type EffectHandler = (
   state: GraphRuntimeState,
   effect: Effect,
-  context?: EffectContext
+  context?: EffectContext,
 ) => GraphRuntimeState
 
 // ============================================================================
@@ -237,4 +237,3 @@ export interface SerializableEntityState {
   resources: Record<string, number>
   extensions?: Record<string, unknown>
 }
-

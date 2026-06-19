@@ -3,7 +3,10 @@
  * Uses a `code` string discriminator for cross-realm safe `catch` checks.
  */
 export class FictionMapError extends Error {
-  constructor(message: string, public readonly code: string) {
+  constructor(
+    message: string,
+    public readonly code: string,
+  ) {
     super(message)
     this.name = this.constructor.name
     // Maintain prototype chain for V8
