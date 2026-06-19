@@ -20,11 +20,11 @@ export {
   greaterThanEvaluator,
   greaterThanOrEqualEvaluator,
   hasFlagEvaluator,
-  notFlagEvaluator,
   hasVariableEvaluator,
   lessThanEvaluator,
   lessThanOrEqualEvaluator,
   notEqualsEvaluator,
+  notFlagEvaluator,
   notVisitedEvaluator,
   visitedEvaluator,
 } from "./conditions/builtin"

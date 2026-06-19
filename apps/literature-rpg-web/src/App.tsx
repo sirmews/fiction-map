@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./componen
 import { useStoryRuntime } from "./hooks/useStoryRuntime"
 
 function App() {
-  const { currentNode, availableChoices, step, reset, context, state } = useStoryRuntime()
+  const { currentNode, availableChoices, step, reset, context, state, world } = useStoryRuntime()
 
   if (!currentNode) {
     return (
@@ -32,6 +32,27 @@ function App() {
 
   // Figure out what we have active from the derived state (e.g. 'lantern')
   const inventory = Array.from(context.derivedState.ownedEntityIds)
+
+  const getEntityLabelAndIcon = (id: string): { label: string; icon: string } => {
+    const entity = world.entities.find((e) => e.id === id)
+    const label = (entity as any)?.label ?? id
+    const icon = id.includes("spell")
+      ? "✨"
+      : id === "lantern"
+        ? "🔦"
+        : id === "elixir"
+          ? "🧪"
+          : id === "lockpick"
+            ? "⚙️"
+            : id === "silver-shield"
+              ? "🛡️"
+              : id === "spirit-elixir"
+                ? "🔮"
+                : id === "rune-of-water"
+                  ? "💧"
+                  : "🔑"
+    return { label, icon }
+  }
 
   // Group choices by anchorBlockId
   const anchoredChoices = new Map<string, typeof availableChoices>()
@@ -105,22 +126,14 @@ function App() {
                 <span className="text-xs text-slate-500 italic">Inventory empty</span>
               ) : (
                 inventory.map((item) => {
-                  const icon = item.includes("spell")
-                    ? "✨"
-                    : item === "lantern"
-                      ? "🔦"
-                      : item === "elixir"
-                        ? "🧪"
-                        : item === "lockpick"
-                          ? "⚙️"
-                          : "🔑"
+                  const { label, icon } = getEntityLabelAndIcon(item)
                   return (
                     <Badge
                       key={item}
                       variant="secondary"
                       className="bg-amber-900/60 text-amber-100 hover:bg-amber-800 shrink-0 border border-amber-800/40 text-[10px] px-1.5 py-0.5"
                     >
-                      {icon} {item}
+                      {icon} {label}
                     </Badge>
                   )
                 })
