@@ -21,7 +21,21 @@ import type {
   PropertySchema,
   SourceLocation,
 } from "@fiction-map/core"
-import * as ts from "typescript"
+import { Node, Project, type SourceFile, SyntaxKind } from "ts-morph"
+
+const project = new Project()
+
+function getSourceFile(filePath: string): SourceFile | null {
+  try {
+    const existing = project.getSourceFile(filePath)
+    if (existing) {
+      project.removeSourceFile(existing)
+    }
+    return project.addSourceFileAtPath(filePath)
+  } catch {
+    return null
+  }
+}
 
 interface ExtractedJSDoc {
   description?: string
@@ -31,46 +45,31 @@ interface ExtractedJSDoc {
 /**
  * Extract JSDoc comments from leading comments
  */
-function extractLeadingJSDoc(node: ts.Node, sourceFile: ts.SourceFile): ExtractedJSDoc {
+function extractLeadingJSDoc(node: Node): ExtractedJSDoc {
   const result: ExtractedJSDoc = {}
 
-  // Get the parent to find comments before the export statement
-  let targetNode = node
-  let parent = node.parent
+  const variableStatement = node.getFirstAncestorByKind(SyntaxKind.VariableStatement)
+  if (!variableStatement) return result
 
-  // Walk up to find the variable declaration or export statement
-  while (parent) {
-    if (ts.isVariableDeclaration(parent) || ts.isVariableStatement(parent)) {
-      targetNode = parent
-      break
+  const jsDocs = variableStatement.getJsDocs()
+  if (jsDocs.length === 0) return result
+
+  const jsDoc = jsDocs[jsDocs.length - 1]
+  const tags = jsDoc.getTags()
+
+  for (const tag of tags) {
+    const tagName = tag.getTagName()
+    if (tagName === "description") {
+      const match = tag.getText().match(/@description\s+([\s\S]+)/)
+      if (match) {
+        result.description = match[1].replace(/[\r\n\s*]+$/, "").trim()
+      }
+    } else if (tagName === "ai-rule") {
+      const match = tag.getText().match(/@ai-rule\s+([\s\S]+)/)
+      if (match) {
+        result.aiRule = match[1].replace(/[\r\n\s*]+$/, "").trim()
+      }
     }
-    if (ts.isExportDeclaration(parent) || ts.isVariableDeclarationList(parent)) {
-      targetNode = parent
-      break
-    }
-    parent = parent.parent
-  }
-
-  const fullText = sourceFile.getFullText()
-  const nodeStart = targetNode.getStart(sourceFile)
-
-  // Get the text before the node
-  const textBefore = fullText.substring(0, nodeStart)
-
-  // Find the last comment block before the node
-  const commentMatches = textBefore.match(/\/\*\*[\s\S]*?\*\//g)
-  if (!commentMatches) return result
-
-  const lastComment = commentMatches[commentMatches.length - 1]
-
-  const descMatch = lastComment.match(/@description\s+(.+)/)
-  if (descMatch) {
-    result.description = descMatch[1].trim()
-  }
-
-  const ruleMatch = lastComment.match(/@ai-rule\s+(.+)/)
-  if (ruleMatch) {
-    result.aiRule = ruleMatch[1].trim()
   }
 
   return result
@@ -79,12 +78,12 @@ function extractLeadingJSDoc(node: ts.Node, sourceFile: ts.SourceFile): Extracte
 /**
  * Get source location for a node
  */
-function getSourceLocation(node: ts.Node, sourceFile: ts.SourceFile): SourceLocation {
-  const pos = node.getStart(sourceFile)
-  const { line, character } = sourceFile.getLineAndCharacterOfPosition(pos)
+function getSourceLocation(node: Node, sourceFile: SourceFile): SourceLocation {
+  const pos = node.getStart()
+  const { line, character } = sourceFile.compilerNode.getLineAndCharacterOfPosition(pos)
 
   return {
-    file: sourceFile.fileName,
+    file: sourceFile.getFilePath(),
     line: line + 1,
     column: character + 1,
   }
@@ -93,40 +92,41 @@ function getSourceLocation(node: ts.Node, sourceFile: ts.SourceFile): SourceLoca
 /**
  * Parse property schema from object literal
  */
-function parsePropertySchema(node: ts.Node, sourceFile: ts.SourceFile): PropertySchema | null {
-  if (!ts.isObjectLiteralExpression(node)) return null
+function parsePropertySchema(node: Node): PropertySchema | null {
+  if (!Node.isObjectLiteralExpression(node)) return null
 
   const schema: PropertySchema = { type: "string" }
 
-  for (const prop of node.properties) {
-    if (!ts.isPropertyAssignment(prop)) continue
+  for (const prop of node.getProperties()) {
+    if (!Node.isPropertyAssignment(prop)) continue
 
-    const name = prop.name.getText(sourceFile)
-    const value = prop.initializer
+    const name = prop.getName()
+    const value = prop.getInitializer()
+    if (!value) continue
 
     switch (name) {
       case "type":
-        if (ts.isStringLiteral(value)) {
-          schema.type = value.text as PropertySchema["type"]
+        if (Node.isStringLiteral(value)) {
+          schema.type = value.getLiteralValue() as PropertySchema["type"]
         }
         break
       case "required":
-        if (value.getText(sourceFile) === "true") {
+        if (value.getText() === "true") {
           schema.required = true
         }
         break
       case "default":
-        if (ts.isStringLiteral(value)) {
-          schema.default = value.text
-        } else if (ts.isNumericLiteral(value)) {
-          schema.default = parseFloat(value.text)
-        } else if (value.getText(sourceFile) === "true" || value.getText(sourceFile) === "false") {
-          schema.default = value.getText(sourceFile) === "true"
+        if (Node.isStringLiteral(value)) {
+          schema.default = value.getLiteralValue()
+        } else if (Node.isNumericLiteral(value)) {
+          schema.default = value.getLiteralValue()
+        } else if (value.getText() === "true" || value.getText() === "false") {
+          schema.default = value.getText() === "true"
         }
         break
       case "values":
-        if (ts.isArrayLiteralExpression(value)) {
-          schema.values = value.elements.map((e) => e.getText(sourceFile).replace(/['"]/g, ""))
+        if (Node.isArrayLiteralExpression(value)) {
+          schema.values = value.getElements().map((e) => e.getText().replace(/['"]/g, ""))
         }
         break
     }
@@ -138,18 +138,18 @@ function parsePropertySchema(node: ts.Node, sourceFile: ts.SourceFile): Property
 /**
  * Extract properties from a config object
  */
-function extractObjectProperties(
-  obj: ts.ObjectLiteralExpression,
-  sourceFile: ts.SourceFile,
-): PropertyDefinition {
+function extractObjectProperties(obj: Node): PropertyDefinition {
   const properties: PropertyDefinition = {}
+  if (!Node.isObjectLiteralExpression(obj)) return properties
 
-  for (const propDef of obj.properties) {
-    if (!ts.isPropertyAssignment(propDef)) continue
+  for (const propDef of obj.getProperties()) {
+    if (!Node.isPropertyAssignment(propDef)) continue
 
-    const propName = propDef.name.getText(sourceFile)
-    const schema = parsePropertySchema(propDef.initializer, sourceFile)
+    const propName = propDef.getName()
+    const initializer = propDef.getInitializer()
+    if (!initializer) continue
 
+    const schema = parsePropertySchema(initializer)
     if (schema) {
       properties[propName] = schema
     }
@@ -161,53 +161,41 @@ function extractObjectProperties(
 /**
  * Extract config object property
  */
-function extractConfigProperty(
-  callExpr: ts.CallExpression,
-  propertyName: string,
-  sourceFile: ts.SourceFile,
-): PropertyDefinition {
+function extractConfigProperty(callExpr: Node, propertyName: string): PropertyDefinition {
   const properties: PropertyDefinition = {}
 
-  const arg = callExpr.arguments[callExpr.arguments.length - 1]
-  if (!arg || !ts.isObjectLiteralExpression(arg)) return properties
+  const args = callExpr.getArguments()
+  const arg = args[args.length - 1]
+  if (!arg || !Node.isObjectLiteralExpression(arg)) return properties
 
-  for (const prop of arg.properties) {
-    if (!ts.isPropertyAssignment(prop)) continue
-    if (prop.name.getText(sourceFile) !== propertyName) continue
+  const prop = arg.getProperty(propertyName)
+  if (!prop || !Node.isPropertyAssignment(prop)) return properties
 
-    const propsObj = prop.initializer
-    if (!ts.isObjectLiteralExpression(propsObj)) continue
+  const propsObj = prop.getInitializer()
+  if (!propsObj || !Node.isObjectLiteralExpression(propsObj)) return properties
 
-    return extractObjectProperties(propsObj, sourceFile)
-  }
-
-  return properties
+  return extractObjectProperties(propsObj)
 }
 
 /**
  * Extract string array from call expression property
  */
-function extractStringArray(
-  callExpr: ts.CallExpression,
-  propName: string,
-  sourceFile: ts.SourceFile,
-): string[] {
+function extractStringArray(callExpr: Node, propName: string): string[] {
   const result: string[] = []
 
-  const arg = callExpr.arguments[callExpr.arguments.length - 1]
-  if (!arg || !ts.isObjectLiteralExpression(arg)) return result
+  const args = callExpr.getArguments()
+  const arg = args[args.length - 1]
+  if (!arg || !Node.isObjectLiteralExpression(arg)) return result
 
-  for (const prop of arg.properties) {
-    if (!ts.isPropertyAssignment(prop)) continue
-    if (prop.name.getText(sourceFile) !== propName) continue
+  const prop = arg.getProperty(propName)
+  if (!prop || !Node.isPropertyAssignment(prop)) return result
 
-    const arr = prop.initializer
-    if (!ts.isArrayLiteralExpression(arr)) continue
+  const arr = prop.getInitializer()
+  if (!arr || !Node.isArrayLiteralExpression(arr)) return result
 
-    for (const elem of arr.elements) {
-      if (ts.isStringLiteral(elem)) {
-        result.push(elem.text)
-      }
+  for (const elem of arr.getElements()) {
+    if (Node.isStringLiteral(elem)) {
+      result.push(elem.getLiteralValue())
     }
   }
 
@@ -217,72 +205,55 @@ function extractStringArray(
 /**
  * Extract id from call expression
  */
-function extractId(callExpr: ts.CallExpression, sourceFile: ts.SourceFile): string | null {
-  const arg = callExpr.arguments[callExpr.arguments.length - 1]
-  if (!arg || !ts.isObjectLiteralExpression(arg)) return null
+function extractId(callExpr: Node): string | null {
+  const args = callExpr.getArguments()
+  const arg = args[args.length - 1]
+  if (!arg || !Node.isObjectLiteralExpression(arg)) return null
 
-  for (const prop of arg.properties) {
-    if (!ts.isPropertyAssignment(prop)) continue
-    if (prop.name.getText(sourceFile) !== "id") continue
+  const prop = arg.getProperty("id")
+  if (!prop || !Node.isPropertyAssignment(prop)) return null
 
-    if (ts.isStringLiteral(prop.initializer)) {
-      return prop.initializer.text
-    }
+  const initializer = prop.getInitializer()
+  if (initializer && Node.isStringLiteral(initializer)) {
+    return initializer.getLiteralValue()
   }
 
   return null
 }
 
 /**
- * Create a TypeScript program for parsing
- */
-function createProgram(filePath: string): ts.Program {
-  return ts.createProgram([filePath], {
-    target: ts.ScriptTarget.ES2022,
-    module: ts.ModuleKind.ESNext,
-    moduleResolution: ts.ModuleResolutionKind.Bundler,
-  })
-}
-
-/**
  * Extract node type definition from file
  */
 export function extractNodeType(filePath: string, rootDir: string): NodeTypeDefinition | null {
-  const program = createProgram(filePath)
-  const sourceFile = program.getSourceFile(filePath)
+  const sourceFile = getSourceFile(filePath)
   if (!sourceFile) return null
 
   let definition: NodeTypeDefinition | null = null
-  const sf = sourceFile
 
-  function visit(node: ts.Node) {
-    if (ts.isCallExpression(node)) {
-      const expr = node.expression
-      if (ts.isIdentifier(expr) && expr.text === "defineNodeType") {
-        const id = extractId(node, sf)
-        if (!id) return
+  for (const callExpr of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+    const expr = callExpr.getExpression()
+    if (Node.isIdentifier(expr) && expr.getText() === "defineNodeType") {
+      const id = extractId(callExpr)
+      if (!id) continue
 
-        const jsDoc = extractLeadingJSDoc(node, sf)
-        const location = getSourceLocation(node, sf)
-        location.file = relative(rootDir, location.file)
+      const jsDoc = extractLeadingJSDoc(callExpr)
+      const location = getSourceLocation(callExpr, sourceFile)
+      location.file = relative(rootDir, location.file)
 
-        definition = {
-          id,
-          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Node`,
-          location,
-          description: jsDoc.description,
-          aiRule: jsDoc.aiRule,
-          properties: extractConfigProperty(node, "properties", sf),
-          outgoingEdges: extractStringArray(node, "outgoingEdges", sf),
-          incomingEdges: extractStringArray(node, "incomingEdges", sf),
-        }
+      definition = {
+        id,
+        name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Node`,
+        location,
+        description: jsDoc.description,
+        aiRule: jsDoc.aiRule,
+        properties: extractConfigProperty(callExpr, "properties"),
+        outgoingEdges: extractStringArray(callExpr, "outgoingEdges"),
+        incomingEdges: extractStringArray(callExpr, "incomingEdges"),
       }
+      break
     }
-
-    ts.forEachChild(node, visit)
   }
 
-  visit(sf)
   return definition
 }
 
@@ -290,41 +261,35 @@ export function extractNodeType(filePath: string, rootDir: string): NodeTypeDefi
  * Extract edge type definition from file
  */
 export function extractEdgeType(filePath: string, rootDir: string): EdgeTypeDefinition | null {
-  const program = createProgram(filePath)
-  const sourceFile = program.getSourceFile(filePath)
+  const sourceFile = getSourceFile(filePath)
   if (!sourceFile) return null
 
   let definition: EdgeTypeDefinition | null = null
-  const sf = sourceFile
 
-  function visit(node: ts.Node) {
-    if (ts.isCallExpression(node)) {
-      const expr = node.expression
-      if (ts.isIdentifier(expr) && expr.text === "defineEdgeType") {
-        const id = extractId(node, sf)
-        if (!id) return
+  for (const callExpr of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+    const expr = callExpr.getExpression()
+    if (Node.isIdentifier(expr) && expr.getText() === "defineEdgeType") {
+      const id = extractId(callExpr)
+      if (!id) continue
 
-        const jsDoc = extractLeadingJSDoc(node, sf)
-        const location = getSourceLocation(node, sf)
-        location.file = relative(rootDir, location.file)
+      const jsDoc = extractLeadingJSDoc(callExpr)
+      const location = getSourceLocation(callExpr, sourceFile)
+      location.file = relative(rootDir, location.file)
 
-        definition = {
-          id,
-          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Edge`,
-          location,
-          description: jsDoc.description,
-          aiRule: jsDoc.aiRule,
-          properties: extractConfigProperty(node, "properties", sf),
-          sourceTypes: extractStringArray(node, "sourceTypes", sf),
-          targetTypes: extractStringArray(node, "targetTypes", sf),
-        }
+      definition = {
+        id,
+        name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Edge`,
+        location,
+        description: jsDoc.description,
+        aiRule: jsDoc.aiRule,
+        properties: extractConfigProperty(callExpr, "properties"),
+        sourceTypes: extractStringArray(callExpr, "sourceTypes"),
+        targetTypes: extractStringArray(callExpr, "targetTypes"),
       }
+      break
     }
-
-    ts.forEachChild(node, visit)
   }
 
-  visit(sf)
   return definition
 }
 
@@ -332,39 +297,33 @@ export function extractEdgeType(filePath: string, rootDir: string): EdgeTypeDefi
  * Extract condition definition from file
  */
 export function extractCondition(filePath: string, rootDir: string): ConditionDefinition | null {
-  const program = createProgram(filePath)
-  const sourceFile = program.getSourceFile(filePath)
+  const sourceFile = getSourceFile(filePath)
   if (!sourceFile) return null
 
   let definition: ConditionDefinition | null = null
-  const sf = sourceFile
 
-  function visit(node: ts.Node) {
-    if (ts.isCallExpression(node)) {
-      const expr = node.expression
-      if (ts.isIdentifier(expr) && expr.text === "defineCondition") {
-        const id = extractId(node, sf)
-        if (!id) return
+  for (const callExpr of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+    const expr = callExpr.getExpression()
+    if (Node.isIdentifier(expr) && expr.getText() === "defineCondition") {
+      const id = extractId(callExpr)
+      if (!id) continue
 
-        const jsDoc = extractLeadingJSDoc(node, sf)
-        const location = getSourceLocation(node, sf)
-        location.file = relative(rootDir, location.file)
+      const jsDoc = extractLeadingJSDoc(callExpr)
+      const location = getSourceLocation(callExpr, sourceFile)
+      location.file = relative(rootDir, location.file)
 
-        definition = {
-          id,
-          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Condition`,
-          location,
-          description: jsDoc.description,
-          aiRule: jsDoc.aiRule,
-          parameters: extractConfigProperty(node, "parameters", sf),
-        }
+      definition = {
+        id,
+        name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Condition`,
+        location,
+        description: jsDoc.description,
+        aiRule: jsDoc.aiRule,
+        parameters: extractConfigProperty(callExpr, "parameters"),
       }
+      break
     }
-
-    ts.forEachChild(node, visit)
   }
 
-  visit(sf)
   return definition
 }
 
@@ -372,39 +331,33 @@ export function extractCondition(filePath: string, rootDir: string): ConditionDe
  * Extract effect definition from file
  */
 export function extractEffect(filePath: string, rootDir: string): EffectDefinition | null {
-  const program = createProgram(filePath)
-  const sourceFile = program.getSourceFile(filePath)
+  const sourceFile = getSourceFile(filePath)
   if (!sourceFile) return null
 
   let definition: EffectDefinition | null = null
-  const sf = sourceFile
 
-  function visit(node: ts.Node) {
-    if (ts.isCallExpression(node)) {
-      const expr = node.expression
-      if (ts.isIdentifier(expr) && expr.text === "defineEffect") {
-        const id = extractId(node, sf)
-        if (!id) return
+  for (const callExpr of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+    const expr = callExpr.getExpression()
+    if (Node.isIdentifier(expr) && expr.getText() === "defineEffect") {
+      const id = extractId(callExpr)
+      if (!id) continue
 
-        const jsDoc = extractLeadingJSDoc(node, sf)
-        const location = getSourceLocation(node, sf)
-        location.file = relative(rootDir, location.file)
+      const jsDoc = extractLeadingJSDoc(callExpr)
+      const location = getSourceLocation(callExpr, sourceFile)
+      location.file = relative(rootDir, location.file)
 
-        definition = {
-          id,
-          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Effect`,
-          location,
-          description: jsDoc.description,
-          aiRule: jsDoc.aiRule,
-          parameters: extractConfigProperty(node, "parameters", sf),
-        }
+      definition = {
+        id,
+        name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Effect`,
+        location,
+        description: jsDoc.description,
+        aiRule: jsDoc.aiRule,
+        parameters: extractConfigProperty(callExpr, "parameters"),
       }
+      break
     }
-
-    ts.forEachChild(node, visit)
   }
 
-  visit(sf)
   return definition
 }
 
@@ -412,79 +365,75 @@ export function extractEffect(filePath: string, rootDir: string): EffectDefiniti
  * Extract graph definition from file
  */
 export function extractGraph(filePath: string, rootDir: string): GraphDefinition | null {
-  const program = createProgram(filePath)
-  const sourceFile = program.getSourceFile(filePath)
+  const sourceFile = getSourceFile(filePath)
   if (!sourceFile) return null
 
   let definition: GraphDefinition | null = null
-  const sf = sourceFile
 
-  function visit(node: ts.Node) {
-    if (ts.isCallExpression(node)) {
-      const expr = node.expression
-      if (ts.isIdentifier(expr) && expr.text === "defineGraph") {
-        const id = extractId(node, sf)
-        if (!id) return
+  for (const callExpr of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+    const expr = callExpr.getExpression()
+    if (Node.isIdentifier(expr) && expr.getText() === "defineGraph") {
+      const id = extractId(callExpr)
+      if (!id) continue
 
-        const jsDoc = extractLeadingJSDoc(node, sf)
-        const location = getSourceLocation(node, sf)
-        location.file = relative(rootDir, location.file)
+      const jsDoc = extractLeadingJSDoc(callExpr)
+      const location = getSourceLocation(callExpr, sourceFile)
+      location.file = relative(rootDir, location.file)
 
-        const nodes = extractNodesArray(node, sf)
-        const edges = extractEdgesArray(node, sf)
+      const nodes = extractNodesArray(callExpr)
+      const edges = extractEdgesArray(callExpr)
 
-        definition = {
-          id,
-          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Graph`,
-          location,
-          description: jsDoc.description,
-          nodes,
-          edges,
-          nodeCount: nodes.length,
-          edgeCount: edges.length,
-          maxDepth: 0,
-          endings: [],
-          nodeTypesUsed: [...new Set(nodes.map((n) => n.type))],
-          edgeTypesUsed: [...new Set(edges.map((e) => e.type))],
-          conditionsUsed: [],
-          effectsUsed: [],
-          errors: [],
-          warnings: [],
-        }
+      definition = {
+        id,
+        name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Graph`,
+        location,
+        description: jsDoc.description,
+        nodes,
+        edges,
+        nodeCount: nodes.length,
+        edgeCount: edges.length,
+        maxDepth: 0,
+        endings: [],
+        nodeTypesUsed: [...new Set(nodes.map((n) => n.type))],
+        edgeTypesUsed: [...new Set(edges.map((e) => e.type))],
+        conditionsUsed: [],
+        effectsUsed: [],
+        errors: [],
+        warnings: [],
       }
+      break
     }
-
-    ts.forEachChild(node, visit)
   }
 
-  visit(sf)
   return definition
 }
 
 /**
  * Extract nodes array from defineGraph call
  */
-function extractNodesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFile): NodeInstance[] {
+function extractNodesArray(callExpr: Node): NodeInstance[] {
   const result: NodeInstance[] = []
-  const nodes = extractArrayProperty(callExpr, "nodes", sourceFile)
+  const nodes = extractArrayProperty(callExpr, "nodes")
 
-  if (!nodes || !ts.isArrayLiteralExpression(nodes)) return result
+  if (!nodes || !Node.isArrayLiteralExpression(nodes)) return result
 
-  for (const elem of nodes.elements) {
-    if (!ts.isObjectLiteralExpression(elem)) continue
+  for (const elem of nodes.getElements()) {
+    if (!Node.isObjectLiteralExpression(elem)) continue
 
     const node: NodeInstance = { id: "", type: "" }
 
-    for (const prop of elem.properties) {
-      if (!ts.isPropertyAssignment(prop)) continue
-      const name = prop.name.getText(sourceFile)
+    for (const prop of elem.getProperties()) {
+      if (!Node.isPropertyAssignment(prop)) continue
+      const name = prop.getName()
+      const initializer = prop.getInitializer()
+      if (!initializer) continue
 
-      if (name === "id" && ts.isStringLiteral(prop.initializer)) {
-        node.id = prop.initializer.text
-      } else if (name === "type" && ts.isStringLiteral(prop.initializer)) {
-        node.type = prop.initializer.text
+      if (name === "id" && Node.isStringLiteral(initializer)) {
+        node.id = initializer.getLiteralValue()
+      } else if (name === "type" && Node.isStringLiteral(initializer)) {
+        node.type = initializer.getLiteralValue()
       } else {
-        const value = extractValue(prop.initializer, sourceFile)
+        const value = extractValue(initializer)
         if (value !== undefined) {
           node[name] = value
         }
@@ -502,31 +451,33 @@ function extractNodesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFil
 /**
  * Extract edges array from defineGraph call
  */
-function extractEdgesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFile): EdgeInstance[] {
+function extractEdgesArray(callExpr: Node): EdgeInstance[] {
   const result: EdgeInstance[] = []
-  const edges = extractArrayProperty(callExpr, "edges", sourceFile)
+  const edges = extractArrayProperty(callExpr, "edges")
 
-  if (!edges || !ts.isArrayLiteralExpression(edges)) return result
+  if (!edges || !Node.isArrayLiteralExpression(edges)) return result
 
-  for (const elem of edges.elements) {
-    if (!ts.isObjectLiteralExpression(elem)) continue
+  for (const elem of edges.getElements()) {
+    if (!Node.isObjectLiteralExpression(elem)) continue
 
     const edge: EdgeInstance = { id: "", type: "", source: "", target: "" }
 
-    for (const prop of elem.properties) {
-      if (!ts.isPropertyAssignment(prop)) continue
-      const name = prop.name.getText(sourceFile)
+    for (const prop of elem.getProperties()) {
+      if (!Node.isPropertyAssignment(prop)) continue
+      const name = prop.getName()
+      const initializer = prop.getInitializer()
+      if (!initializer) continue
 
-      if (name === "id" && ts.isStringLiteral(prop.initializer)) {
-        edge.id = prop.initializer.text
-      } else if (name === "type" && ts.isStringLiteral(prop.initializer)) {
-        edge.type = prop.initializer.text
-      } else if (name === "source" && ts.isStringLiteral(prop.initializer)) {
-        edge.source = prop.initializer.text
-      } else if (name === "target" && ts.isStringLiteral(prop.initializer)) {
-        edge.target = prop.initializer.text
+      if (name === "id" && Node.isStringLiteral(initializer)) {
+        edge.id = initializer.getLiteralValue()
+      } else if (name === "type" && Node.isStringLiteral(initializer)) {
+        edge.type = initializer.getLiteralValue()
+      } else if (name === "source" && Node.isStringLiteral(initializer)) {
+        edge.source = initializer.getLiteralValue()
+      } else if (name === "target" && Node.isStringLiteral(initializer)) {
+        edge.target = initializer.getLiteralValue()
       } else {
-        const value = extractValue(prop.initializer, sourceFile)
+        const value = extractValue(initializer)
         if (value !== undefined) {
           edge[name] = value
         }
@@ -544,21 +495,17 @@ function extractEdgesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFil
 /**
  * Extract array property from object literal
  */
-function extractArrayProperty(
-  callExpr: ts.CallExpression,
-  propName: string,
-  sourceFile: ts.SourceFile,
-): ts.ArrayLiteralExpression | null {
-  const arg = callExpr.arguments[callExpr.arguments.length - 1]
-  if (!arg || !ts.isObjectLiteralExpression(arg)) return null
+function extractArrayProperty(callExpr: Node, propName: string): Node | null {
+  const args = callExpr.getArguments()
+  const arg = args[args.length - 1]
+  if (!arg || !Node.isObjectLiteralExpression(arg)) return null
 
-  for (const prop of arg.properties) {
-    if (!ts.isPropertyAssignment(prop)) continue
-    if (prop.name.getText(sourceFile) !== propName) continue
+  const prop = arg.getProperty(propName)
+  if (!prop || !Node.isPropertyAssignment(prop)) return null
 
-    if (ts.isArrayLiteralExpression(prop.initializer)) {
-      return prop.initializer
-    }
+  const initializer = prop.getInitializer()
+  if (initializer && Node.isArrayLiteralExpression(initializer)) {
+    return initializer
   }
 
   return null
@@ -567,31 +514,34 @@ function extractArrayProperty(
 /**
  * Extract a value from an expression
  */
-function extractValue(expr: ts.Expression, sourceFile: ts.SourceFile): unknown {
-  if (ts.isStringLiteral(expr)) {
-    return expr.text
+function extractValue(expr: Node): unknown {
+  if (Node.isStringLiteral(expr)) {
+    return expr.getLiteralValue()
   }
-  if (ts.isNumericLiteral(expr)) {
-    return Number(expr.text)
+  if (Node.isNumericLiteral(expr)) {
+    return expr.getLiteralValue()
   }
-  if (expr.kind === ts.SyntaxKind.TrueKeyword) {
+  if (expr.getKind() === SyntaxKind.TrueKeyword) {
     return true
   }
-  if (expr.kind === ts.SyntaxKind.FalseKeyword) {
+  if (expr.getKind() === SyntaxKind.FalseKeyword) {
     return false
   }
-  if (expr.kind === ts.SyntaxKind.NullKeyword) {
+  if (expr.getKind() === SyntaxKind.NullKeyword) {
     return null
   }
-  if (ts.isArrayLiteralExpression(expr)) {
-    return expr.elements.map((e) => extractValue(e, sourceFile))
+  if (Node.isArrayLiteralExpression(expr)) {
+    return expr.getElements().map((e) => extractValue(e))
   }
-  if (ts.isObjectLiteralExpression(expr)) {
+  if (Node.isObjectLiteralExpression(expr)) {
     const obj: Record<string, unknown> = {}
-    for (const prop of expr.properties) {
-      if (ts.isPropertyAssignment(prop)) {
-        const name = prop.name.getText(sourceFile)
-        obj[name] = extractValue(prop.initializer, sourceFile)
+    for (const prop of expr.getProperties()) {
+      if (Node.isPropertyAssignment(prop)) {
+        const name = prop.getName()
+        const initializer = prop.getInitializer()
+        if (initializer) {
+          obj[name] = extractValue(initializer)
+        }
       }
     }
     return obj
