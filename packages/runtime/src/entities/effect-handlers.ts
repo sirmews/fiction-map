@@ -18,11 +18,13 @@ import {
   unlockEntity,
 } from "../core/state"
 import type { Effect, EffectHandler, GraphRuntimeState } from "../types"
+import { evaluateFormula } from "../utils/formula"
 
 type EntityEffect = Effect & { entityId: string }
 type ResourceEffect = Effect & {
   key: string
-  amount: number
+  amount?: number
+  formula?: string
   allowNegative?: boolean
   clampToZero?: boolean
 }
@@ -79,19 +81,29 @@ export const addResourceHandler: EffectHandler = (
   state: GraphRuntimeState,
   effect: Effect,
 ): GraphRuntimeState => {
-  const { key, amount } = effect as ResourceEffect
-  return typeof key === "string" && typeof amount === "number"
-    ? addResource(state, key, amount)
-    : state
+  const resourceEffect = effect as ResourceEffect
+  const { key, amount, formula } = resourceEffect
+
+  if (typeof key !== "string") return state
+
+  const resolvedAmount = typeof formula === "string" ? evaluateFormula(formula, state) : amount
+
+  return typeof resolvedAmount === "number" ? addResource(state, key, resolvedAmount) : state
 }
 
 export const spendResourceHandler: EffectHandler = (
   state: GraphRuntimeState,
   effect: Effect,
 ): GraphRuntimeState => {
-  const { key, amount, allowNegative, clampToZero } = effect as ResourceEffect
-  return typeof key === "string" && typeof amount === "number"
-    ? spendResource(state, key, amount, { allowNegative, clampToZero })
+  const resourceEffect = effect as ResourceEffect
+  const { key, amount, formula, allowNegative, clampToZero } = resourceEffect
+
+  if (typeof key !== "string") return state
+
+  const resolvedAmount = typeof formula === "string" ? evaluateFormula(formula, state) : amount
+
+  return typeof resolvedAmount === "number"
+    ? spendResource(state, key, resolvedAmount, { allowNegative, clampToZero })
     : state
 }
 
