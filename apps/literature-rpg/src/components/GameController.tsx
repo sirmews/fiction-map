@@ -103,7 +103,7 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
   if (!currentNode) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Text color="red">❌ Error: Current Node '{state.currentNodeId}' not found.</Text>
+        <Text color="red">✖ Error: Current Node '{state.currentNodeId}' not found.</Text>
       </Box>
     )
   }
@@ -115,25 +115,41 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
   const cooldown = state.entityState?.resources?.heal_cooldown ?? 0
   const inventory = Array.from(context.derivedState.ownedEntityIds)
 
-  const getEntityLabelAndIcon = (id: string): string => {
+  const getEntityLabelAndIcon = (id: string) => {
     const entity = world.entities.find((e) => e.id === id)
     const label = (entity as any)?.label ?? id
-    const icon = id.includes("spell")
-      ? "✨"
-      : id === "lantern"
-        ? "🔦"
-        : id === "elixir"
-          ? "🧪"
-          : id === "lockpick"
-            ? "⚙️"
-            : id === "silver-shield"
-              ? "🛡️"
-              : id === "spirit-elixir"
-                ? "🔮"
-                : id === "rune-of-water"
-                  ? "💧"
-                  : "🔑"
-    return `${icon} ${label}`
+
+    let symbol = "•"
+    let color = "green"
+
+    if (id.includes("spell")) {
+      symbol = "★"
+      color = "cyan"
+    } else if (id === "lantern") {
+      symbol = "⛯"
+      color = "yellow"
+    } else if (id === "elixir" || id === "spirit-elixir") {
+      symbol = "⚗"
+      color = "magenta"
+    } else if (id === "lockpick") {
+      symbol = "⚿"
+      color = "gray"
+    } else if (id === "silver-shield") {
+      symbol = "⛨"
+      color = "white"
+    } else if (id === "rune-of-water") {
+      symbol = "≈"
+      color = "blue"
+    } else if (id === "key" || id === "obsidian-key") {
+      symbol = "🗝"
+      color = "yellow"
+    }
+
+    return (
+      <Text color={color}>
+        {symbol} {label}
+      </Text>
+    )
   }
 
   const activeBlocks = currentNode.blocks ? currentNode.blocks.slice(0, pacingIndex + 1) : []
@@ -188,8 +204,8 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
 
           <Box flexDirection="column" marginBottom={1}>
             <Box flexDirection="row">
-              <Box width={8}>
-                <Text color="red">{"🔴  HP"}</Text>
+              <Box width={10}>
+                <Text color="red">♥ HP</Text>
               </Box>
               <Text color="red">
                 {renderProgressBar(hp, 100)} {hp}%
@@ -197,8 +213,8 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
             </Box>
 
             <Box flexDirection="row">
-              <Box width={8}>
-                <Text color="blue">{"🔵  MP"}</Text>
+              <Box width={10}>
+                <Text color="blue">♦ MP</Text>
               </Box>
               <Text color="blue">
                 {renderProgressBar(mp, 50)} {mp}/50
@@ -207,15 +223,15 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
           </Box>
 
           <Box flexDirection="row">
-            <Box width={8}>
-              <Text color="yellow">{"🪙  Gold"}</Text>
+            <Box width={10}>
+              <Text color="yellow">⛃ Gold</Text>
             </Box>
             <Text color="yellow">: {gold}g</Text>
           </Box>
 
           <Box flexDirection="row">
-            <Box width={8}>
-              <Text color="white">{"🕒  Turn"}</Text>
+            <Box width={10}>
+              <Text color="white">⏳ Turn</Text>
             </Box>
             <Text color="white">: {turns}</Text>
           </Box>
@@ -223,7 +239,7 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
           {turns > 10 && (
             <Box marginTop={1}>
               <Text bold color="red">
-                ⚠️ THE CAVERN IS COLLAPSING!
+                ⚠ THE CAVERN IS COLLAPSING!
               </Text>
               <Text color="red">(-25 HP per turn!)</Text>
             </Box>
@@ -240,11 +256,7 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
               INVENTORY
             </Text>
             {inventory.length > 0 ? (
-              inventory.map((id) => (
-                <Text key={id} color="green">
-                  • {getEntityLabelAndIcon(id)}
-                </Text>
-              ))
+              inventory.map((id) => <Box key={id}>{getEntityLabelAndIcon(id)}</Box>)
             ) : (
               <Text dimColor>Empty backpack</Text>
             )}
@@ -284,7 +296,7 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
         ) : (
           <Box marginY={1}>
             <Text bold color="green">
-              ✨ Traversal complete! Press [Enter] or [Q] to exit. ✨
+              ★ Traversal complete! Press [Enter] or [Q] to exit. ★
             </Text>
           </Box>
         )}
