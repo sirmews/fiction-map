@@ -247,6 +247,17 @@ export const story = defineGraph(registry, {
       ],
     },
     {
+      id: "treasury-vault",
+      type: "scene",
+      blocks: [
+        {
+          id: "vault-desc",
+          type: "paragraph",
+          text: "The legendary treasury vault of Alexandria. Piles of gold coins, glowing chalices, and ancient relics fill the room.",
+        },
+      ],
+    },
+    {
       id: "victory",
       type: "scene",
       blocks: [
@@ -684,7 +695,7 @@ export const story = defineGraph(registry, {
       source: "treasury-vault",
       target: "victory",
       text: "Claim the legendary treasure of Alexandria!",
-      anchorBlockId: "study-desc",
+      anchorBlockId: "vault-desc",
     },
     {
       id: "die-at-crypt",
