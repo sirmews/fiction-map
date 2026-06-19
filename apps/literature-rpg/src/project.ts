@@ -8,6 +8,6 @@
  * definitions.
  */
 
-import { EntityRegistry } from "@fiction-map/entities";
+import { EntityRegistry } from "@fiction-map/entities"
 
-export const registry: EntityRegistry = new EntityRegistry();
+export const registry: EntityRegistry = new EntityRegistry()

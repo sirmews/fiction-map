@@ -1,12 +1,12 @@
-import { defineEntityType, defineWorld } from "@fiction-map/entities";
-import { registry } from "./project";
+import { defineEntityType, defineWorld } from "@fiction-map/entities"
+import { registry } from "./project"
 
 defineEntityType(registry, {
   id: "item",
   properties: {
     label: { type: "string", required: true },
   },
-});
+})
 
 defineEntityType(registry, {
   id: "spell",
@@ -14,7 +14,7 @@ defineEntityType(registry, {
     label: { type: "string", required: true },
     manaCost: { type: "number", required: true },
   },
-});
+})
 
 export const world = defineWorld(registry, {
   id: "library",
@@ -26,4 +26,4 @@ export const world = defineWorld(registry, {
     { id: "heal-spell", type: "spell", label: "Heal", manaCost: 20 },
     { id: "mage-light", type: "spell", label: "Mage Light", manaCost: 15 },
   ],
-});
+})

@@ -1,197 +1,180 @@
 // Persistence schema version constant
-export { SERIALIZATION_SCHEMA_VERSION } from "./types";
-
-// Core types
-export type {
-  EntityRuntimeState,
-  GraphRuntimeState,
-  SerializableEntityState,
-  Condition,
-  ConditionSet,
-  ConditionEvaluator,
-  EvaluationContext,
-  Effect,
-  EffectHandler,
-  EffectContext,
-  Transition,
-  TransitionAvailability,
-  TransitionResult,
-  TransitionTrace,
-  ConditionGroup,
-  ConditionScope,
-  FailedCondition,
-  Consequence,
-  NodeDefinition,
-  GraphErrorType,
-  GraphError,
-  ValidationResult,
-  EntityTransitionReferenceError,
-  EntityTransitionReferenceValidationResult,
-  SerializableState,
-} from "./types";
-
-// State management
-export {
-  createInitialState,
-  cloneState,
-  mergeState,
-  navigateToNode,
-  backtrack,
-  hasVisited,
-  visitCount,
-  setFlag,
-  clearFlag,
-  hasFlag,
-  getFlag,
-  setVariable,
-  getVariable,
-  incrementVariable,
-  grantEntity,
-  revokeEntity,
-  ownsEntity,
-  activateEntity,
-  deactivateEntity,
-  entityIsActive,
-  unlockEntity,
-  lockEntity,
-  entityIsUnlocked,
-  addResource,
-  spendResource,
-  getResource,
-  serializeState,
-  deserializeState,
-} from "./core/state";
-
-// Entity derivation
-export {
-  deriveEntityState,
-  type ActiveEntityModifier,
-  type EntityPrerequisiteResult,
-  type DerivedEntityState,
-} from "./entities/derived";
-
-// Entity-aware transition validation
-export {
-  validateEntityTransitionReferences,
-} from "./entities/validation";
-
-// Condition evaluation
-export {
-  evaluateCondition,
-  evaluateConditionSet,
-  createComposedEvaluator,
-} from "./conditions";
-
-// Built-in condition evaluators (core, non-entity)
-export {
-  equalsEvaluator,
-  notEqualsEvaluator,
-  greaterThanEvaluator,
-  greaterThanOrEqualEvaluator,
-  lessThanEvaluator,
-  lessThanOrEqualEvaluator,
-  hasFlagEvaluator,
-  flagEqualsEvaluator,
-  visitedEvaluator,
-  notVisitedEvaluator,
-  currentNodeEvaluator,
-  hasVariableEvaluator,
-  coreBuiltinEvaluators,
-} from "./conditions/builtin";
-
-// Built-in condition evaluators (entity-aware)
-export {
-  hasEntityEvaluator,
-  entityActiveEvaluator,
-  entityUnlockedEvaluator,
-  resourceAtLeastEvaluator,
-  entityBuiltinEvaluators,
-} from "./entities/condition-evaluators";
-
-// Combined default evaluator map (core + entity)
-export { builtinEvaluators, builtinHandlers } from "./default-bindings";
 
 export {
-  registerBuiltins,
   builtinConditionConfigs,
   builtinEffectConfigs,
-} from "./builtins";
-
+  registerBuiltins,
+} from "./builtins"
+// Condition evaluation
+export {
+  createComposedEvaluator,
+  evaluateCondition,
+  evaluateConditionSet,
+} from "./conditions"
+// Built-in condition evaluators (core, non-entity)
+export {
+  coreBuiltinEvaluators,
+  currentNodeEvaluator,
+  equalsEvaluator,
+  flagEqualsEvaluator,
+  greaterThanEvaluator,
+  greaterThanOrEqualEvaluator,
+  hasFlagEvaluator,
+  hasVariableEvaluator,
+  lessThanEvaluator,
+  lessThanOrEqualEvaluator,
+  notEqualsEvaluator,
+  notVisitedEvaluator,
+  visitedEvaluator,
+} from "./conditions/builtin"
+// State management
+export {
+  activateEntity,
+  addResource,
+  backtrack,
+  clearFlag,
+  cloneState,
+  createInitialState,
+  deactivateEntity,
+  deserializeState,
+  entityIsActive,
+  entityIsUnlocked,
+  getFlag,
+  getResource,
+  getVariable,
+  grantEntity,
+  hasFlag,
+  hasVisited,
+  incrementVariable,
+  lockEntity,
+  mergeState,
+  navigateToNode,
+  ownsEntity,
+  revokeEntity,
+  serializeState,
+  setFlag,
+  setVariable,
+  spendResource,
+  unlockEntity,
+  visitCount,
+} from "./core/state"
+// Combined default evaluator map (core + entity)
+export { builtinEvaluators, builtinHandlers } from "./default-bindings"
 // Effect application
 export {
   applyEffect,
   applyEffects,
   combineHandlers,
-} from "./effects";
-
+} from "./effects"
 // Built-in effect handlers (core, non-entity)
 export {
-  setVariableHandler,
+  clampHandler,
+  clearFlagHandler,
+  coreBuiltinHandlers,
+  decrementHandler,
   deleteVariableHandler,
   incrementHandler,
-  decrementHandler,
-  clampHandler,
-  setFlagHandler,
-  clearFlagHandler,
   markVisitedHandler,
+  mergeExtensionHandler,
   navigateHandler,
   noOpHandler,
   setExtensionHandler,
-  mergeExtensionHandler,
-  coreBuiltinHandlers,
-} from "./effects/builtin";
+  setFlagHandler,
+  setVariableHandler,
+} from "./effects/builtin"
 
+// Built-in condition evaluators (entity-aware)
+export {
+  entityActiveEvaluator,
+  entityBuiltinEvaluators,
+  entityUnlockedEvaluator,
+  hasEntityEvaluator,
+  resourceAtLeastEvaluator,
+} from "./entities/condition-evaluators"
+// Entity derivation
+export {
+  type ActiveEntityModifier,
+  type DerivedEntityState,
+  deriveEntityState,
+  type EntityPrerequisiteResult,
+} from "./entities/derived"
 // Built-in effect handlers (entity-aware)
 export {
-  grantEntityHandler,
-  revokeEntityHandler,
   activateEntityHandler,
-  deactivateEntityHandler,
-  unlockEntityHandler,
-  lockEntityHandler,
   addResourceHandler,
-  spendResourceHandler,
+  deactivateEntityHandler,
   entityBuiltinHandlers,
-} from "./entities/effect-handlers";
+  grantEntityHandler,
+  lockEntityHandler,
+  revokeEntityHandler,
+  spendResourceHandler,
+  unlockEntityHandler,
+} from "./entities/effect-handlers"
+// Entity-aware transition validation
+export { validateEntityTransitionReferences } from "./entities/validation"
+// Core types
+export type {
+  Condition,
+  ConditionEvaluator,
+  ConditionGroup,
+  ConditionScope,
+  ConditionSet,
+  Consequence,
+  Effect,
+  EffectContext,
+  EffectHandler,
+  EntityRuntimeState,
+  EntityTransitionReferenceError,
+  EntityTransitionReferenceValidationResult,
+  EvaluationContext,
+  FailedCondition,
+  GraphError,
+  GraphErrorType,
+  GraphRuntimeState,
+  NodeDefinition,
+  SerializableEntityState,
+  SerializableState,
+  Transition,
+  TransitionAvailability,
+  TransitionResult,
+  TransitionTrace,
+  ValidationResult,
+} from "./types"
+export { SERIALIZATION_SCHEMA_VERSION } from "./types"
 
 // `builtinHandlers` (combined) is exported above via ./default-bindings
 
+// Export runtime error for convenience
+export { RuntimeError } from "@fiction-map/core"
+// Blueprint types accepted by the GraphRuntime constructor
+export type {
+  EdgeBlueprint,
+  GraphBlueprint,
+  NodeBlueprint,
+} from "./adapter"
 // Transition engine
 export {
-  checkTransitionAvailability,
   applyTransition,
+  checkTransitionAvailability,
   getAvailableTransitions,
   getTransitionsByAvailability,
-} from "./core/transition";
-
+} from "./core/transition"
 // Graph validation
 export {
-  validateGraph,
   findReachableNodes,
   hasDanglingTransitions,
   hasUnreachableNodes,
-} from "./core/validation";
-
+  validateGraph,
+} from "./core/validation"
+// Graph definition adapter
+export {
+  createRuntimeFromGraph,
+  graphDefinitionToBlueprint,
+} from "./graph-definition"
 // High-level runtime wrapper
 export {
   GraphRuntime,
-  type StepResult,
   type PathStep,
+  type StepResult,
   type TraversalPath,
-} from "./runtime";
-
-// Graph definition adapter
-export {
-  graphDefinitionToBlueprint,
-  createRuntimeFromGraph,
-} from "./graph-definition";
-
-// Blueprint types accepted by the GraphRuntime constructor
-export type {
-  GraphBlueprint,
-  NodeBlueprint,
-  EdgeBlueprint,
-} from "./adapter";
-
-// Export runtime error for convenience
-export { RuntimeError } from "@fiction-map/core";
+} from "./runtime"

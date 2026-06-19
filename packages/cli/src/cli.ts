@@ -4,12 +4,12 @@
  * Fiction Map CLI
  */
 
-import { parseArgs } from "util"
+import { parseArgs } from "node:util"
+import { ascii } from "./commands/ascii"
 import { generate } from "./commands/generate"
-import { validate } from "./commands/validate"
 import { installHooks } from "./commands/hooks"
 import { explain, query, showGraph } from "./commands/query"
-import { ascii } from "./commands/ascii"
+import { validate } from "./commands/validate"
 
 const VERSION = "0.1.0"
 

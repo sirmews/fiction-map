@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { mkdir, writeFile, rm } from "fs/promises"
-import { join } from "path"
+import { mkdir, rm, writeFile } from "node:fs/promises"
+import { join } from "node:path"
 import type { GraphMetadata } from "@fiction-map/core"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { validate } from "./validate"
 
 const TEST_DIR = join(__dirname, "validate-fixtures")
@@ -40,9 +40,11 @@ describe("validate command", () => {
 
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
     vi.spyOn(console, "log").mockImplementation(() => {})
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => {
-      throw new Error(`process.exit(${code ?? ""})`)
-    }) as never
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((code?: string | number | null) => {
+        throw new Error(`process.exit(${code ?? ""})`)
+      }) as never
 
     await expect(validate({ rootDir: TEST_DIR, outputDir })).rejects.toThrow("process.exit(1)")
     expect(exitSpy).toHaveBeenCalledWith(1)
@@ -54,9 +56,11 @@ describe("validate command", () => {
     await writeMetadata(outputDir, makeMetadata())
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {})
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => {
-      throw new Error(`process.exit(${code ?? ""})`)
-    }) as never
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((code?: string | number | null) => {
+        throw new Error(`process.exit(${code ?? ""})`)
+      }) as never
 
     await validate({ rootDir: TEST_DIR, outputDir })
     expect(exitSpy).not.toHaveBeenCalled()
@@ -87,19 +91,23 @@ describe("validate command", () => {
             warnings: [],
           },
         ],
-      })
+      }),
     )
 
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
     vi.spyOn(console, "log").mockImplementation(() => {})
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => {
-      throw new Error(`process.exit(${code ?? ""})`)
-    }) as never
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((code?: string | number | null) => {
+        throw new Error(`process.exit(${code ?? ""})`)
+      }) as never
 
     await expect(validate({ rootDir: TEST_DIR, outputDir })).rejects.toThrow("process.exit(1)")
     expect(exitSpy).toHaveBeenCalledWith(1)
     expect(errorSpy.mock.calls.some((c) => String(c[0]).includes("UNKNOWN_NODE_TYPE"))).toBe(true)
-    expect(errorSpy.mock.calls.some((c) => String(c[0]).includes("Hint: Define the missing node type"))).toBe(true)
+    expect(
+      errorSpy.mock.calls.some((c) => String(c[0]).includes("Hint: Define the missing node type")),
+    ).toBe(true)
   })
 
   it("passes warnings unless --strict is set", async () => {
@@ -126,20 +134,26 @@ describe("validate command", () => {
             warnings: [{ code: "UNREACHABLE_NODE", message: "Node x is unreachable" }],
           },
         ],
-      })
+      }),
     )
 
     vi.spyOn(console, "log").mockImplementation(() => {})
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => {
-      throw new Error(`process.exit(${code ?? ""})`)
-    }) as never
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((code?: string | number | null) => {
+        throw new Error(`process.exit(${code ?? ""})`)
+      }) as never
 
     await validate({ rootDir: TEST_DIR, outputDir })
     expect(exitSpy).not.toHaveBeenCalled()
 
-    await expect(validate({ rootDir: TEST_DIR, outputDir, strict: true })).rejects.toThrow("process.exit(1)")
+    await expect(validate({ rootDir: TEST_DIR, outputDir, strict: true })).rejects.toThrow(
+      "process.exit(1)",
+    )
     expect(exitSpy).toHaveBeenCalledWith(1)
-    expect(warnSpy.mock.calls.some((c) => String(c[0]).includes("Hint: Either connect the node"))).toBe(true)
+    expect(
+      warnSpy.mock.calls.some((c) => String(c[0]).includes("Hint: Either connect the node")),
+    ).toBe(true)
   })
 })

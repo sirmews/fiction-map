@@ -1,15 +1,30 @@
 /**
  * Metadata generator
- * 
+ *
  * Orchestrates file discovery and extraction to produce metadata.json
  */
 
-import { lstat, mkdir, readFile, rm, writeFile } from "fs/promises"
-import { dirname, join } from "path"
-import { ProjectRegistry, analyzeGraph, type GraphMetadata, type NodeTypeDefinition, type EdgeTypeDefinition, type ConditionDefinition, type EffectDefinition, type GraphDefinition } from "@fiction-map/core"
+import { lstat, mkdir, readFile, rm, writeFile } from "node:fs/promises"
+import { dirname, join } from "node:path"
+import {
+  analyzeGraph,
+  type ConditionDefinition,
+  type EdgeTypeDefinition,
+  type EffectDefinition,
+  type GraphDefinition,
+  type GraphMetadata,
+  type NodeTypeDefinition,
+  ProjectRegistry,
+} from "@fiction-map/core"
 import { builtinConditionConfigs, builtinEffectConfigs } from "@fiction-map/runtime"
 import { discoverFiles } from "./discover"
-import { extractNodeType, extractEdgeType, extractCondition, extractEffect, extractGraph } from "./extract"
+import {
+  extractCondition,
+  extractEdgeType,
+  extractEffect,
+  extractGraph,
+  extractNodeType,
+} from "./extract"
 import { renderSemantics } from "./semantics"
 
 export { renderSemantics } from "./semantics"
@@ -121,7 +136,9 @@ async function restoreFileBackup(path: string, backup: FileBackup): Promise<void
 /**
  * Build metadata from a project without filesystem side effects.
  */
-export async function buildMetadata(options: Pick<GeneratorOptions, "rootDir">): Promise<GraphMetadata> {
+export async function buildMetadata(
+  options: Pick<GeneratorOptions, "rootDir">,
+): Promise<GraphMetadata> {
   const { rootDir } = options
   const discovered = await discoverFiles(rootDir)
 
@@ -130,27 +147,27 @@ export async function buildMetadata(options: Pick<GeneratorOptions, "rootDir">):
   const conditions: ConditionDefinition[] = []
   const effects: EffectDefinition[] = []
   const graphs: GraphDefinition[] = []
-  
+
   for (const file of discovered.nodes) {
     const def = extractNodeType(file.path, rootDir)
     if (def) nodeTypes.push(def)
   }
-  
+
   for (const file of discovered.edges) {
     const def = extractEdgeType(file.path, rootDir)
     if (def) edgeTypes.push(def)
   }
-  
+
   for (const file of discovered.conditions) {
     const def = extractCondition(file.path, rootDir)
     if (def) conditions.push(def)
   }
-  
+
   for (const file of discovered.effects) {
     const def = extractEffect(file.path, rootDir)
     if (def) effects.push(def)
   }
-  
+
   for (const file of discovered.graphs) {
     const def = extractGraph(file.path, rootDir)
     if (def) graphs.push(def)
@@ -187,7 +204,10 @@ export async function buildMetadata(options: Pick<GeneratorOptions, "rootDir">):
 /**
  * Write metadata to the standard output location.
  */
-export async function writeMetadata(metadata: GraphMetadata, options: GeneratorOptions): Promise<string> {
+export async function writeMetadata(
+  metadata: GraphMetadata,
+  options: GeneratorOptions,
+): Promise<string> {
   const resolved = resolveGeneratorOptions(options)
   const outputPath = getMetadataPath(resolved)
   await mkdir(dirname(outputPath), { recursive: true })
@@ -234,7 +254,10 @@ export async function generateProject(options: GeneratorOptions): Promise<Projec
  * Rendering is delegated to `renderSemantics` so the same string can be produced
  * without filesystem side effects (used by `generate --check`).
  */
-export async function generateSemantics(metadata: GraphMetadata, options: GeneratorOptions): Promise<string> {
+export async function generateSemantics(
+  metadata: GraphMetadata,
+  options: GeneratorOptions,
+): Promise<string> {
   const resolved = resolveGeneratorOptions(options)
   const content = renderSemantics(metadata)
   const outputPath = getSemanticsPath(resolved)
@@ -290,13 +313,19 @@ export async function checkProject(options: GeneratorOptions): Promise<ProjectCh
 
   if (actualMetadata === null) {
     mismatches.push({ path: metadataPath, reason: "missing" })
-  } else if (actualMetadata.replace(/\\r\\n/g, "\\n").trimEnd() !== expectedMetadata.replace(/\\r\\n/g, "\\n").trimEnd()) {
+  } else if (
+    actualMetadata.replace(/\\r\\n/g, "\\n").trimEnd() !==
+    expectedMetadata.replace(/\\r\\n/g, "\\n").trimEnd()
+  ) {
     mismatches.push({ path: metadataPath, reason: "different" })
   }
 
   if (actualSemantics === null) {
     mismatches.push({ path: semanticsPath, reason: "missing" })
-  } else if (actualSemantics.replace(/\\r\\n/g, "\\n").trimEnd() !== expectedSemantics.replace(/\\r\\n/g, "\\n").trimEnd()) {
+  } else if (
+    actualSemantics.replace(/\\r\\n/g, "\\n").trimEnd() !==
+    expectedSemantics.replace(/\\r\\n/g, "\\n").trimEnd()
+  ) {
     mismatches.push({ path: semanticsPath, reason: "different" })
   }
 

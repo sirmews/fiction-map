@@ -1,9 +1,9 @@
 import type {
-  NodeTypeDefinition,
-  EdgeTypeDefinition,
   ConditionDefinition,
+  EdgeTypeDefinition,
   EffectDefinition,
   GraphDefinition,
+  NodeTypeDefinition,
 } from "./types"
 
 export class ProjectRegistry {

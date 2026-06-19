@@ -1,6 +1,6 @@
 /**
  * Metadata extraction from source files
- * 
+ *
  * Extracts:
  * - JSDoc @description
  * - JSDoc @ai-rule
@@ -8,20 +8,20 @@
  * - Source locations
  */
 
-import * as ts from "typescript"
-import { relative } from "path"
-import type { 
-  NodeTypeDefinition, 
-  EdgeTypeDefinition,
+import { relative } from "node:path"
+import type {
   ConditionDefinition,
+  EdgeInstance,
+  EdgeTypeDefinition,
   EffectDefinition,
   GraphDefinition,
   NodeInstance,
-  EdgeInstance,
-  PropertySchema,
+  NodeTypeDefinition,
   PropertyDefinition,
+  PropertySchema,
   SourceLocation,
 } from "@fiction-map/core"
+import * as ts from "typescript"
 
 interface ExtractedJSDoc {
   description?: string
@@ -33,11 +33,11 @@ interface ExtractedJSDoc {
  */
 function extractLeadingJSDoc(node: ts.Node, sourceFile: ts.SourceFile): ExtractedJSDoc {
   const result: ExtractedJSDoc = {}
-  
+
   // Get the parent to find comments before the export statement
   let targetNode = node
   let parent = node.parent
-  
+
   // Walk up to find the variable declaration or export statement
   while (parent) {
     if (ts.isVariableDeclaration(parent) || ts.isVariableStatement(parent)) {
@@ -50,29 +50,29 @@ function extractLeadingJSDoc(node: ts.Node, sourceFile: ts.SourceFile): Extracte
     }
     parent = parent.parent
   }
-  
+
   const fullText = sourceFile.getFullText()
   const nodeStart = targetNode.getStart(sourceFile)
-  
+
   // Get the text before the node
   const textBefore = fullText.substring(0, nodeStart)
-  
+
   // Find the last comment block before the node
   const commentMatches = textBefore.match(/\/\*\*[\s\S]*?\*\//g)
   if (!commentMatches) return result
-  
+
   const lastComment = commentMatches[commentMatches.length - 1]
-  
+
   const descMatch = lastComment.match(/@description\s+(.+)/)
   if (descMatch) {
     result.description = descMatch[1].trim()
   }
-  
+
   const ruleMatch = lastComment.match(/@ai-rule\s+(.+)/)
   if (ruleMatch) {
     result.aiRule = ruleMatch[1].trim()
   }
-  
+
   return result
 }
 
@@ -82,7 +82,7 @@ function extractLeadingJSDoc(node: ts.Node, sourceFile: ts.SourceFile): Extracte
 function getSourceLocation(node: ts.Node, sourceFile: ts.SourceFile): SourceLocation {
   const pos = node.getStart(sourceFile)
   const { line, character } = sourceFile.getLineAndCharacterOfPosition(pos)
-  
+
   return {
     file: sourceFile.fileName,
     line: line + 1,
@@ -95,15 +95,15 @@ function getSourceLocation(node: ts.Node, sourceFile: ts.SourceFile): SourceLoca
  */
 function parsePropertySchema(node: ts.Node, sourceFile: ts.SourceFile): PropertySchema | null {
   if (!ts.isObjectLiteralExpression(node)) return null
-  
+
   const schema: PropertySchema = { type: "string" }
-  
+
   for (const prop of node.properties) {
     if (!ts.isPropertyAssignment(prop)) continue
-    
+
     const name = prop.name.getText(sourceFile)
     const value = prop.initializer
-    
+
     switch (name) {
       case "type":
         if (ts.isStringLiteral(value)) {
@@ -126,32 +126,35 @@ function parsePropertySchema(node: ts.Node, sourceFile: ts.SourceFile): Property
         break
       case "values":
         if (ts.isArrayLiteralExpression(value)) {
-          schema.values = value.elements.map(e => e.getText(sourceFile).replace(/['"]/g, ""))
+          schema.values = value.elements.map((e) => e.getText(sourceFile).replace(/['"]/g, ""))
         }
         break
     }
   }
-  
+
   return schema
 }
 
 /**
  * Extract properties from a config object
  */
-function extractObjectProperties(obj: ts.ObjectLiteralExpression, sourceFile: ts.SourceFile): PropertyDefinition {
+function extractObjectProperties(
+  obj: ts.ObjectLiteralExpression,
+  sourceFile: ts.SourceFile,
+): PropertyDefinition {
   const properties: PropertyDefinition = {}
-  
+
   for (const propDef of obj.properties) {
     if (!ts.isPropertyAssignment(propDef)) continue
-    
+
     const propName = propDef.name.getText(sourceFile)
     const schema = parsePropertySchema(propDef.initializer, sourceFile)
-    
+
     if (schema) {
       properties[propName] = schema
     }
   }
-  
+
   return properties
 }
 
@@ -159,51 +162,55 @@ function extractObjectProperties(obj: ts.ObjectLiteralExpression, sourceFile: ts
  * Extract config object property
  */
 function extractConfigProperty(
-  callExpr: ts.CallExpression, 
-  propertyName: string, 
-  sourceFile: ts.SourceFile
+  callExpr: ts.CallExpression,
+  propertyName: string,
+  sourceFile: ts.SourceFile,
 ): PropertyDefinition {
   const properties: PropertyDefinition = {}
-  
+
   const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return properties
-  
+
   for (const prop of arg.properties) {
     if (!ts.isPropertyAssignment(prop)) continue
     if (prop.name.getText(sourceFile) !== propertyName) continue
-    
+
     const propsObj = prop.initializer
     if (!ts.isObjectLiteralExpression(propsObj)) continue
-    
+
     return extractObjectProperties(propsObj, sourceFile)
   }
-  
+
   return properties
 }
 
 /**
  * Extract string array from call expression property
  */
-function extractStringArray(callExpr: ts.CallExpression, propName: string, sourceFile: ts.SourceFile): string[] {
+function extractStringArray(
+  callExpr: ts.CallExpression,
+  propName: string,
+  sourceFile: ts.SourceFile,
+): string[] {
   const result: string[] = []
-  
+
   const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return result
-  
+
   for (const prop of arg.properties) {
     if (!ts.isPropertyAssignment(prop)) continue
     if (prop.name.getText(sourceFile) !== propName) continue
-    
+
     const arr = prop.initializer
     if (!ts.isArrayLiteralExpression(arr)) continue
-    
+
     for (const elem of arr.elements) {
       if (ts.isStringLiteral(elem)) {
         result.push(elem.text)
       }
     }
   }
-  
+
   return result
 }
 
@@ -213,16 +220,16 @@ function extractStringArray(callExpr: ts.CallExpression, propName: string, sourc
 function extractId(callExpr: ts.CallExpression, sourceFile: ts.SourceFile): string | null {
   const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return null
-  
+
   for (const prop of arg.properties) {
     if (!ts.isPropertyAssignment(prop)) continue
     if (prop.name.getText(sourceFile) !== "id") continue
-    
+
     if (ts.isStringLiteral(prop.initializer)) {
       return prop.initializer.text
     }
   }
-  
+
   return null
 }
 
@@ -244,24 +251,24 @@ export function extractNodeType(filePath: string, rootDir: string): NodeTypeDefi
   const program = createProgram(filePath)
   const sourceFile = program.getSourceFile(filePath)
   if (!sourceFile) return null
-  
+
   let definition: NodeTypeDefinition | null = null
   const sf = sourceFile
-  
+
   function visit(node: ts.Node) {
     if (ts.isCallExpression(node)) {
       const expr = node.expression
       if (ts.isIdentifier(expr) && expr.text === "defineNodeType") {
         const id = extractId(node, sf)
         if (!id) return
-        
+
         const jsDoc = extractLeadingJSDoc(node, sf)
         const location = getSourceLocation(node, sf)
         location.file = relative(rootDir, location.file)
-        
+
         definition = {
           id,
-          name: id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()) + "Node",
+          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Node`,
           location,
           description: jsDoc.description,
           aiRule: jsDoc.aiRule,
@@ -271,10 +278,10 @@ export function extractNodeType(filePath: string, rootDir: string): NodeTypeDefi
         }
       }
     }
-    
+
     ts.forEachChild(node, visit)
   }
-  
+
   visit(sf)
   return definition
 }
@@ -286,24 +293,24 @@ export function extractEdgeType(filePath: string, rootDir: string): EdgeTypeDefi
   const program = createProgram(filePath)
   const sourceFile = program.getSourceFile(filePath)
   if (!sourceFile) return null
-  
+
   let definition: EdgeTypeDefinition | null = null
   const sf = sourceFile
-  
+
   function visit(node: ts.Node) {
     if (ts.isCallExpression(node)) {
       const expr = node.expression
       if (ts.isIdentifier(expr) && expr.text === "defineEdgeType") {
         const id = extractId(node, sf)
         if (!id) return
-        
+
         const jsDoc = extractLeadingJSDoc(node, sf)
         const location = getSourceLocation(node, sf)
         location.file = relative(rootDir, location.file)
-        
+
         definition = {
           id,
-          name: id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()) + "Edge",
+          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Edge`,
           location,
           description: jsDoc.description,
           aiRule: jsDoc.aiRule,
@@ -313,10 +320,10 @@ export function extractEdgeType(filePath: string, rootDir: string): EdgeTypeDefi
         }
       }
     }
-    
+
     ts.forEachChild(node, visit)
   }
-  
+
   visit(sf)
   return definition
 }
@@ -328,24 +335,24 @@ export function extractCondition(filePath: string, rootDir: string): ConditionDe
   const program = createProgram(filePath)
   const sourceFile = program.getSourceFile(filePath)
   if (!sourceFile) return null
-  
+
   let definition: ConditionDefinition | null = null
   const sf = sourceFile
-  
+
   function visit(node: ts.Node) {
     if (ts.isCallExpression(node)) {
       const expr = node.expression
       if (ts.isIdentifier(expr) && expr.text === "defineCondition") {
         const id = extractId(node, sf)
         if (!id) return
-        
+
         const jsDoc = extractLeadingJSDoc(node, sf)
         const location = getSourceLocation(node, sf)
         location.file = relative(rootDir, location.file)
-        
+
         definition = {
           id,
-          name: id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()) + "Condition",
+          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Condition`,
           location,
           description: jsDoc.description,
           aiRule: jsDoc.aiRule,
@@ -353,10 +360,10 @@ export function extractCondition(filePath: string, rootDir: string): ConditionDe
         }
       }
     }
-    
+
     ts.forEachChild(node, visit)
   }
-  
+
   visit(sf)
   return definition
 }
@@ -368,24 +375,24 @@ export function extractEffect(filePath: string, rootDir: string): EffectDefiniti
   const program = createProgram(filePath)
   const sourceFile = program.getSourceFile(filePath)
   if (!sourceFile) return null
-  
+
   let definition: EffectDefinition | null = null
   const sf = sourceFile
-  
+
   function visit(node: ts.Node) {
     if (ts.isCallExpression(node)) {
       const expr = node.expression
       if (ts.isIdentifier(expr) && expr.text === "defineEffect") {
         const id = extractId(node, sf)
         if (!id) return
-        
+
         const jsDoc = extractLeadingJSDoc(node, sf)
         const location = getSourceLocation(node, sf)
         location.file = relative(rootDir, location.file)
-        
+
         definition = {
           id,
-          name: id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()) + "Effect",
+          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Effect`,
           location,
           description: jsDoc.description,
           aiRule: jsDoc.aiRule,
@@ -393,10 +400,10 @@ export function extractEffect(filePath: string, rootDir: string): EffectDefiniti
         }
       }
     }
-    
+
     ts.forEachChild(node, visit)
   }
-  
+
   visit(sf)
   return definition
 }
@@ -408,27 +415,27 @@ export function extractGraph(filePath: string, rootDir: string): GraphDefinition
   const program = createProgram(filePath)
   const sourceFile = program.getSourceFile(filePath)
   if (!sourceFile) return null
-  
+
   let definition: GraphDefinition | null = null
   const sf = sourceFile
-  
+
   function visit(node: ts.Node) {
     if (ts.isCallExpression(node)) {
       const expr = node.expression
       if (ts.isIdentifier(expr) && expr.text === "defineGraph") {
         const id = extractId(node, sf)
         if (!id) return
-        
+
         const jsDoc = extractLeadingJSDoc(node, sf)
         const location = getSourceLocation(node, sf)
         location.file = relative(rootDir, location.file)
-        
+
         const nodes = extractNodesArray(node, sf)
         const edges = extractEdgesArray(node, sf)
-        
+
         definition = {
           id,
-          name: id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()) + "Graph",
+          name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Graph`,
           location,
           description: jsDoc.description,
           nodes,
@@ -437,8 +444,8 @@ export function extractGraph(filePath: string, rootDir: string): GraphDefinition
           edgeCount: edges.length,
           maxDepth: 0,
           endings: [],
-          nodeTypesUsed: [...new Set(nodes.map(n => n.type))],
-          edgeTypesUsed: [...new Set(edges.map(e => e.type))],
+          nodeTypesUsed: [...new Set(nodes.map((n) => n.type))],
+          edgeTypesUsed: [...new Set(edges.map((e) => e.type))],
           conditionsUsed: [],
           effectsUsed: [],
           errors: [],
@@ -446,10 +453,10 @@ export function extractGraph(filePath: string, rootDir: string): GraphDefinition
         }
       }
     }
-    
+
     ts.forEachChild(node, visit)
   }
-  
+
   visit(sf)
   return definition
 }
@@ -460,18 +467,18 @@ export function extractGraph(filePath: string, rootDir: string): GraphDefinition
 function extractNodesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFile): NodeInstance[] {
   const result: NodeInstance[] = []
   const nodes = extractArrayProperty(callExpr, "nodes", sourceFile)
-  
+
   if (!nodes || !ts.isArrayLiteralExpression(nodes)) return result
-  
+
   for (const elem of nodes.elements) {
     if (!ts.isObjectLiteralExpression(elem)) continue
-    
+
     const node: NodeInstance = { id: "", type: "" }
-    
+
     for (const prop of elem.properties) {
       if (!ts.isPropertyAssignment(prop)) continue
       const name = prop.name.getText(sourceFile)
-      
+
       if (name === "id" && ts.isStringLiteral(prop.initializer)) {
         node.id = prop.initializer.text
       } else if (name === "type" && ts.isStringLiteral(prop.initializer)) {
@@ -483,12 +490,12 @@ function extractNodesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFil
         }
       }
     }
-    
+
     if (node.id && node.type) {
       result.push(node)
     }
   }
-  
+
   return result
 }
 
@@ -498,18 +505,18 @@ function extractNodesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFil
 function extractEdgesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFile): EdgeInstance[] {
   const result: EdgeInstance[] = []
   const edges = extractArrayProperty(callExpr, "edges", sourceFile)
-  
+
   if (!edges || !ts.isArrayLiteralExpression(edges)) return result
-  
+
   for (const elem of edges.elements) {
     if (!ts.isObjectLiteralExpression(elem)) continue
-    
+
     const edge: EdgeInstance = { id: "", type: "", source: "", target: "" }
-    
+
     for (const prop of elem.properties) {
       if (!ts.isPropertyAssignment(prop)) continue
       const name = prop.name.getText(sourceFile)
-      
+
       if (name === "id" && ts.isStringLiteral(prop.initializer)) {
         edge.id = prop.initializer.text
       } else if (name === "type" && ts.isStringLiteral(prop.initializer)) {
@@ -525,31 +532,35 @@ function extractEdgesArray(callExpr: ts.CallExpression, sourceFile: ts.SourceFil
         }
       }
     }
-    
+
     if (edge.id && edge.type && edge.source && edge.target) {
       result.push(edge)
     }
   }
-  
+
   return result
 }
 
 /**
  * Extract array property from object literal
  */
-function extractArrayProperty(callExpr: ts.CallExpression, propName: string, sourceFile: ts.SourceFile): ts.ArrayLiteralExpression | null {
+function extractArrayProperty(
+  callExpr: ts.CallExpression,
+  propName: string,
+  sourceFile: ts.SourceFile,
+): ts.ArrayLiteralExpression | null {
   const arg = callExpr.arguments[callExpr.arguments.length - 1]
   if (!arg || !ts.isObjectLiteralExpression(arg)) return null
-  
+
   for (const prop of arg.properties) {
     if (!ts.isPropertyAssignment(prop)) continue
     if (prop.name.getText(sourceFile) !== propName) continue
-    
+
     if (ts.isArrayLiteralExpression(prop.initializer)) {
       return prop.initializer
     }
   }
-  
+
   return null
 }
 
@@ -573,7 +584,7 @@ function extractValue(expr: ts.Expression, sourceFile: ts.SourceFile): unknown {
     return null
   }
   if (ts.isArrayLiteralExpression(expr)) {
-    return expr.elements.map(e => extractValue(e, sourceFile))
+    return expr.elements.map((e) => extractValue(e, sourceFile))
   }
   if (ts.isObjectLiteralExpression(expr)) {
     const obj: Record<string, unknown> = {}

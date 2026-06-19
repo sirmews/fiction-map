@@ -1,11 +1,13 @@
-import { GraphDefinition, NodeInstance, EdgeInstance } from "@fiction-map/core"
+import type { EdgeInstance, GraphDefinition, NodeInstance } from "@fiction-map/core"
 import { loadMetadata, selectGraphs } from "./query"
 
 function formatInstanceValue(value: unknown): string {
   return typeof value === "string" ? JSON.stringify(value) : String(value)
 }
 
-function formatInstances(items: Array<{ type: string; [key: string]: unknown }> | undefined): string {
+function formatInstances(
+  items: Array<{ type: string; [key: string]: unknown }> | undefined,
+): string {
   if (!items || items.length === 0) return ""
   return items
     .map((item) => {
@@ -36,7 +38,7 @@ export function generateTerminalMap(graph: GraphDefinition): string {
 
   const targeted = new Set(graph.edges.map((e) => e.target))
   const roots = graph.nodes.filter((n) => !targeted.has(n.id)).map((n) => n.id)
-  const startNodes = roots.length > 0 ? roots : (graph.nodes.length > 0 ? [graph.nodes[0].id] : [])
+  const startNodes = roots.length > 0 ? roots : graph.nodes.length > 0 ? [graph.nodes[0].id] : []
 
   let output = ""
   const visited = new Set<string>()
@@ -46,7 +48,7 @@ export function generateTerminalMap(graph: GraphDefinition): string {
     const title = typeof node.title === "string" ? node.title : ""
     const body = typeof node.body === "string" ? node.body : ""
     const titleLine = title ? ` "${title}"` : ""
-    const bodyLine = body ? `  ${body.length > 34 ? body.slice(0, 31) + "..." : body}` : ""
+    const bodyLine = body ? `  ${body.length > 34 ? `${body.slice(0, 31)}...` : body}` : ""
 
     const lines = [
       `┌──────────────────────────────────────┐`,
@@ -57,7 +59,7 @@ export function generateTerminalMap(graph: GraphDefinition): string {
     }
     lines.push(`└──────────────────────────────────────┘`)
 
-    return lines.map((l) => prefix + l).join("\n") + "\n"
+    return `${lines.map((l) => prefix + l).join("\n")}\n`
   }
 
   function traverse(nodeId: string, prefix: string, _isLast: boolean) {
@@ -121,7 +123,7 @@ export function generateLlmMap(graph: GraphDefinition): string {
     }
     if (typeof node.body === "string" && node.body) {
       const bodyClean = node.body.replace(/\n/g, " ")
-      output += `  * Body: "${bodyClean.length > 60 ? bodyClean.slice(0, 57) + "..." : bodyClean}"\n`
+      output += `  * Body: "${bodyClean.length > 60 ? `${bodyClean.slice(0, 57)}...` : bodyClean}"\n`
     }
 
     const nodeEdges = graph.edges.filter((e) => e.source === node.id)
@@ -141,7 +143,7 @@ export function generateLlmMap(graph: GraphDefinition): string {
     output += "\n"
   }
 
-  return output.trim() + "\n"
+  return `${output.trim()}\n`
 }
 
 // 3. MERMAID FORMATTER (Standard Flowchart)
@@ -158,13 +160,17 @@ export function generateMermaidMap(graph: GraphDefinition): string {
 
   for (const edge of graph.edges) {
     const textLabel = edge.text ?? (edge.metadata as any)?.text ?? edge.id
-    const conds = edge.conditions && edge.conditions.length > 0 ? ` [requires: ${formatInstances(edge.conditions)}]` : ""
-    const effs = edge.effects && edge.effects.length > 0 ? ` [grants: ${formatInstances(edge.effects)}]` : ""
+    const conds =
+      edge.conditions && edge.conditions.length > 0
+        ? ` [requires: ${formatInstances(edge.conditions)}]`
+        : ""
+    const effs =
+      edge.effects && edge.effects.length > 0 ? ` [grants: ${formatInstances(edge.effects)}]` : ""
     const label = `${edge.id}: "${textLabel}"${conds}${effs}`.replace(/"/g, "'")
     lines.push(`  ${edge.source} -->|"${label}"| ${edge.target}`)
   }
 
-  return "```mermaid\n" + lines.join("\n") + "\n```\n"
+  return `\`\`\`mermaid\n${lines.join("\n")}\n\`\`\`\n`
 }
 
 export interface AsciiOptions {
@@ -173,7 +179,10 @@ export interface AsciiOptions {
   format?: string
 }
 
-export async function ascii(graphId: string | undefined, options: AsciiOptions = {}): Promise<void> {
+export async function ascii(
+  graphId: string | undefined,
+  options: AsciiOptions = {},
+): Promise<void> {
   if (!graphId) {
     console.error("❌ Missing graph id. Usage: `fiction-map ascii <graph-id>`")
     process.exit(1)
@@ -194,7 +203,11 @@ export async function ascii(graphId: string | undefined, options: AsciiOptions =
   } else if (mode === "llm") {
     output = generateLlmMap(graphs[0])
   } else {
-    output = `Graph: ${graphId}\n` + "=".repeat(graphId.length + 7) + "\n\n" + generateTerminalMap(graphs[0])
+    output =
+      `Graph: ${graphId}\n` +
+      "=".repeat(graphId.length + 7) +
+      "\n\n" +
+      generateTerminalMap(graphs[0])
   }
 
   console.log(output)

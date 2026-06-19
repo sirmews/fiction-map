@@ -6,11 +6,7 @@
  * The default `GraphRuntime` combines both maps via `../default-bindings.ts`.
  */
 
-import type {
-  GraphRuntimeState,
-  Condition,
-  ConditionEvaluator,
-} from "../types"
+import type { Condition, ConditionEvaluator, GraphRuntimeState } from "../types"
 
 type EqualsCondition = Condition & { key: string; value: unknown }
 type NumericCondition = Condition & { key: string; value: number }
@@ -20,7 +16,7 @@ type NodeIdCondition = Condition & { nodeId: string }
 
 export const equalsEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key, value } = condition as EqualsCondition
   return state.variables[key] === value
@@ -28,7 +24,7 @@ export const equalsEvaluator: ConditionEvaluator = (
 
 export const notEqualsEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key, value } = condition as EqualsCondition
   return state.variables[key] !== value
@@ -36,7 +32,7 @@ export const notEqualsEvaluator: ConditionEvaluator = (
 
 export const greaterThanEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key, value } = condition as NumericCondition
   const current = state.variables[key]
@@ -48,7 +44,7 @@ export const greaterThanEvaluator: ConditionEvaluator = (
 
 export const greaterThanOrEqualEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key, value } = condition as NumericCondition
   const current = state.variables[key]
@@ -60,7 +56,7 @@ export const greaterThanOrEqualEvaluator: ConditionEvaluator = (
 
 export const lessThanEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key, value } = condition as NumericCondition
   const current = state.variables[key]
@@ -72,7 +68,7 @@ export const lessThanEvaluator: ConditionEvaluator = (
 
 export const lessThanOrEqualEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key, value } = condition as NumericCondition
   const current = state.variables[key]
@@ -84,7 +80,7 @@ export const lessThanOrEqualEvaluator: ConditionEvaluator = (
 
 export const hasFlagEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key } = condition as KeyCondition
   return key in state.flags
@@ -92,7 +88,7 @@ export const hasFlagEvaluator: ConditionEvaluator = (
 
 export const flagEqualsEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key, value } = condition as FlagCondition
   return state.flags[key] === value
@@ -100,7 +96,7 @@ export const flagEqualsEvaluator: ConditionEvaluator = (
 
 export const visitedEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { nodeId } = condition as NodeIdCondition
   return state.visited.has(nodeId)
@@ -108,7 +104,7 @@ export const visitedEvaluator: ConditionEvaluator = (
 
 export const notVisitedEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { nodeId } = condition as NodeIdCondition
   return !state.visited.has(nodeId)
@@ -116,7 +112,7 @@ export const notVisitedEvaluator: ConditionEvaluator = (
 
 export const currentNodeEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { nodeId } = condition as NodeIdCondition
   return state.currentNodeId === nodeId
@@ -124,7 +120,7 @@ export const currentNodeEvaluator: ConditionEvaluator = (
 
 export const hasVariableEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
-  condition: Condition
+  condition: Condition,
 ): boolean => {
   const { key } = condition as KeyCondition
   return key in state.variables

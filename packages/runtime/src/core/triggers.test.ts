@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
+import type { GraphBlueprint } from "../adapter"
+import { addResource, createInitialState, getResource } from "../core/state"
 import { GraphRuntime } from "../runtime"
-import { createInitialState, addResource, getResource } from "../core/state"
-import { GraphBlueprint } from "../adapter"
 
 describe("State Triggers & Reaction Engine", () => {
   const blueprint: GraphBlueprint = {

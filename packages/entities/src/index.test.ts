@@ -1,9 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest"
-import {
-  EntityRegistry,
-  defineEntityType,
-  defineWorld,
-} from "../src"
+import { defineEntityType, defineWorld, EntityRegistry } from "../src"
 
 describe("@fiction-map/entities", () => {
   let registry: EntityRegistry
@@ -109,9 +105,7 @@ describe("@fiction-map/entities", () => {
         entities: [{ id: "elf", type: "species" }],
       })
 
-      expect(world.errors).toContainEqual(
-        expect.objectContaining({ code: "UNKNOWN_ENTITY_TYPE" })
-      )
+      expect(world.errors).toContainEqual(expect.objectContaining({ code: "UNKNOWN_ENTITY_TYPE" }))
     })
 
     it("should detect missing required properties", () => {
@@ -128,7 +122,7 @@ describe("@fiction-map/entities", () => {
       })
 
       expect(world.errors).toContainEqual(
-        expect.objectContaining({ code: "MISSING_REQUIRED_PROPERTY" })
+        expect.objectContaining({ code: "MISSING_REQUIRED_PROPERTY" }),
       )
     })
 
@@ -155,7 +149,7 @@ describe("@fiction-map/entities", () => {
       })
 
       expect(world.errors).toContainEqual(
-        expect.objectContaining({ code: "UNKNOWN_ENTITY_REFERENCE_TARGET" })
+        expect.objectContaining({ code: "UNKNOWN_ENTITY_REFERENCE_TARGET" }),
       )
     })
 
@@ -184,7 +178,7 @@ describe("@fiction-map/entities", () => {
       })
 
       expect(world.errors).toContainEqual(
-        expect.objectContaining({ code: "INVALID_ENTITY_REFERENCE_TARGET_TYPE" })
+        expect.objectContaining({ code: "INVALID_ENTITY_REFERENCE_TARGET_TYPE" }),
       )
     })
 
@@ -208,9 +202,7 @@ describe("@fiction-map/entities", () => {
         ],
       })
 
-      expect(world.errors).toContainEqual(
-        expect.objectContaining({ code: "INVALID_MODIFIER" })
-      )
+      expect(world.errors).toContainEqual(expect.objectContaining({ code: "INVALID_MODIFIER" }))
     })
 
     it("should detect unknown entity prerequisite targets", () => {
@@ -234,7 +226,7 @@ describe("@fiction-map/entities", () => {
       })
 
       expect(world.errors).toContainEqual(
-        expect.objectContaining({ code: "UNKNOWN_PREREQUISITE_TARGET" })
+        expect.objectContaining({ code: "UNKNOWN_PREREQUISITE_TARGET" }),
       )
     })
 
@@ -253,7 +245,7 @@ describe("@fiction-map/entities", () => {
       })
 
       expect(world.errors).toContainEqual(
-        expect.objectContaining({ code: "UNKNOWN_UNLOCK_TARGET" })
+        expect.objectContaining({ code: "UNKNOWN_UNLOCK_TARGET" }),
       )
     })
   })

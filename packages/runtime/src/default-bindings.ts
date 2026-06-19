@@ -11,11 +11,11 @@
  * and `coreBuiltinHandlers` directly to the `GraphRuntime` constructor.
  */
 
-import type { ConditionEvaluator, EffectHandler } from "./types"
 import { coreBuiltinEvaluators } from "./conditions/builtin"
 import { coreBuiltinHandlers } from "./effects/builtin"
 import { entityBuiltinEvaluators } from "./entities/condition-evaluators"
 import { entityBuiltinHandlers } from "./entities/effect-handlers"
+import type { ConditionEvaluator, EffectHandler } from "./types"
 
 export const builtinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ...coreBuiltinEvaluators,

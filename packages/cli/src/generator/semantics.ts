@@ -60,7 +60,9 @@ function formatProperties(properties: PropertyDefinition, indent = INDENT): stri
   const entries = Object.entries(properties)
   if (entries.length === 0) return "{}"
 
-  const lines = entries.map(([name, schema]) => `${indent}${INDENT}${name}: ${formatPropertySchema(schema)},`)
+  const lines = entries.map(
+    ([name, schema]) => `${indent}${INDENT}${name}: ${formatPropertySchema(schema)},`,
+  )
   return `{\n${lines.join("\n")}\n${indent}}`
 }
 
@@ -126,7 +128,11 @@ function renderConditionBlock(cond: ConditionDefinition): string {
   if (cond.aiRule) lines.push(`> **AI rule:** ${cond.aiRule}`)
   if (cond.description || cond.aiRule) lines.push("")
 
-  const body: string[] = ["```typescript", `defineCondition(registry, {`, `${INDENT}id: ${JSON.stringify(cond.id)},`]
+  const body: string[] = [
+    "```typescript",
+    `defineCondition(registry, {`,
+    `${INDENT}id: ${JSON.stringify(cond.id)},`,
+  ]
   if (Object.keys(cond.parameters).length > 0) {
     body.push(`${INDENT}parameters: ${formatProperties(cond.parameters)},`)
   }
@@ -141,7 +147,11 @@ function renderEffectBlock(effect: EffectDefinition): string {
   if (effect.aiRule) lines.push(`> **AI rule:** ${effect.aiRule}`)
   if (effect.description || effect.aiRule) lines.push("")
 
-  const body: string[] = ["```typescript", `defineEffect(registry, {`, `${INDENT}id: ${JSON.stringify(effect.id)},`]
+  const body: string[] = [
+    "```typescript",
+    `defineEffect(registry, {`,
+    `${INDENT}id: ${JSON.stringify(effect.id)},`,
+  ]
   if (Object.keys(effect.parameters).length > 0) {
     body.push(`${INDENT}parameters: ${formatProperties(effect.parameters)},`)
   }
@@ -155,7 +165,7 @@ function renderGraphBlock(graph: GraphDefinition): string {
   if (graph.description) lines.push(`> ${graph.description}`, "")
 
   lines.push(
-    `- ${graph.nodeCount} node${graph.nodeCount === 1 ? "" : "s"}, ${graph.edgeCount} edge${graph.edgeCount === 1 ? "" : "s"}, max depth: ${graph.maxDepth}`
+    `- ${graph.nodeCount} node${graph.nodeCount === 1 ? "" : "s"}, ${graph.edgeCount} edge${graph.edgeCount === 1 ? "" : "s"}, max depth: ${graph.maxDepth}`,
   )
   if (graph.endings.length > 0) {
     lines.push(`- Endings: ${graph.endings.map((e) => `\`${e}\``).join(", ")}`)
@@ -170,7 +180,9 @@ function renderGraphBlock(graph: GraphDefinition): string {
     lines.push(`- ⚠️ ${graph.errors.length} validation error${graph.errors.length === 1 ? "" : "s"}`)
   }
   if (graph.warnings.length > 0) {
-    lines.push(`- ⚠️ ${graph.warnings.length} validation warning${graph.warnings.length === 1 ? "" : "s"}`)
+    lines.push(
+      `- ⚠️ ${graph.warnings.length} validation warning${graph.warnings.length === 1 ? "" : "s"}`,
+    )
   }
 
   if (graph.edges.length > 0) {
@@ -184,19 +196,23 @@ function renderGraphBlock(graph: GraphDefinition): string {
       "**Topology:**",
       "",
       "| Source | Edge | Target | Conditions | Effects |",
-      "|---|---|---|---|---|"
+      "|---|---|---|---|---|",
     )
     for (const edge of graph.edges) {
       const sourceType = nodeTypeById.get(edge.source) ?? "?"
       const targetType = nodeTypeById.get(edge.target) ?? "?"
-      const conditions = edge.conditions && edge.conditions.length > 0
-        ? edge.conditions.map((condition) => `\`${formatConditionInstance(condition)}\``).join("<br>")
-        : "—"
-      const effects = edge.effects && edge.effects.length > 0
-        ? edge.effects.map((effect) => `\`${formatEffectInstance(effect)}\``).join("<br>")
-        : "—"
+      const conditions =
+        edge.conditions && edge.conditions.length > 0
+          ? edge.conditions
+              .map((condition) => `\`${formatConditionInstance(condition)}\``)
+              .join("<br>")
+          : "—"
+      const effects =
+        edge.effects && edge.effects.length > 0
+          ? edge.effects.map((effect) => `\`${formatEffectInstance(effect)}\``).join("<br>")
+          : "—"
       lines.push(
-        `| \`${edge.source}\` (${sourceType}) | \`${edge.id}\` (${edge.type}) | \`${edge.target}\` (${targetType}) | ${conditions} | ${effects} |`
+        `| \`${edge.source}\` (${sourceType}) | \`${edge.id}\` (${edge.type}) | \`${edge.target}\` (${targetType}) | ${conditions} | ${effects} |`,
       )
     }
   }
@@ -205,11 +221,7 @@ function renderGraphBlock(graph: GraphDefinition): string {
   return lines.join("\n")
 }
 
-function renderSection<T>(
-  title: string,
-  items: T[],
-  render: (item: T) => string
-): string[] {
+function renderSection<T>(title: string, items: T[], render: (item: T) => string): string[] {
   if (items.length === 0) return []
   const heading = `## ${title} (${items.length})`
   const blocks = items.map(render).join("\n\n---\n\n")
@@ -260,5 +272,5 @@ export function renderSemantics(metadata: GraphMetadata): string {
     sections.push(block)
   }
 
-  return sections.join("\n").replace(/\n+$/, "") + "\n"
+  return `${sections.join("\n").replace(/\n+$/, "")}\n`
 }

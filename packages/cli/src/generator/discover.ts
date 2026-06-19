@@ -1,6 +1,6 @@
 /**
  * File discovery for Fiction Map
- * 
+ *
  * Discovers graph primitives from file conventions:
  * - nodes/*.node.ts
  * - edges/*.edge.ts
@@ -9,8 +9,8 @@
  * - graphs/*.graph.ts
  */
 
+import { basename, join } from "node:path"
 import { glob } from "glob"
-import { join, basename, extname } from "path"
 
 export interface DiscoveredFile {
   path: string
@@ -28,7 +28,7 @@ export interface DiscoveryResult {
 
 /**
  * Extract ID from filename
- * 
+ *
  * Examples:
  * - "scene.node.ts" → "scene"
  * - "has-item.condition.ts" → "has-item"
@@ -51,7 +51,7 @@ export async function discoverFiles(rootDir: string): Promise<DiscoveryResult> {
     effects: join(rootDir, "**/*.effect.ts"),
     graphs: join(rootDir, "**/*.graph.ts"),
   }
-  
+
   const [nodeFiles, edgeFiles, conditionFiles, effectFiles, graphFiles] = await Promise.all([
     glob(patterns.nodes, { ignore: ["**/node_modules/**", "**/dist/**"] }),
     glob(patterns.edges, { ignore: ["**/node_modules/**", "**/dist/**"] }),
@@ -59,29 +59,29 @@ export async function discoverFiles(rootDir: string): Promise<DiscoveryResult> {
     glob(patterns.effects, { ignore: ["**/node_modules/**", "**/dist/**"] }),
     glob(patterns.graphs, { ignore: ["**/node_modules/**", "**/dist/**"] }),
   ])
-  
+
   return {
-    nodes: nodeFiles.map(path => ({
+    nodes: nodeFiles.map((path) => ({
       path,
       type: "node" as const,
       id: extractId(path),
     })),
-    edges: edgeFiles.map(path => ({
+    edges: edgeFiles.map((path) => ({
       path,
       type: "edge" as const,
       id: extractId(path),
     })),
-    conditions: conditionFiles.map(path => ({
+    conditions: conditionFiles.map((path) => ({
       path,
       type: "condition" as const,
       id: extractId(path),
     })),
-    effects: effectFiles.map(path => ({
+    effects: effectFiles.map((path) => ({
       path,
       type: "effect" as const,
       id: extractId(path),
     })),
-    graphs: graphFiles.map(path => ({
+    graphs: graphFiles.map((path) => ({
       path,
       type: "graph" as const,
       id: extractId(path),

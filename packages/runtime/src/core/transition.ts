@@ -1,35 +1,35 @@
+import { evaluateCondition } from "../conditions"
+import { applyEffects } from "../effects"
 import type {
+  Condition,
+  ConditionEvaluator,
+  ConditionScope,
+  ConditionSet,
+  Consequence,
+  EffectContext,
+  EffectHandler,
+  EvaluationContext,
+  FailedCondition,
   GraphRuntimeState,
   Transition,
   TransitionAvailability,
   TransitionResult,
   TransitionTrace,
-  Consequence,
-  Condition,
-  ConditionEvaluator,
-  ConditionSet,
-  ConditionScope,
-  FailedCondition,
-  EffectHandler,
-  EvaluationContext,
-  EffectContext,
-} from "../types";
-import { evaluateCondition } from "../conditions";
-import { applyEffects } from "../effects";
-import { cloneState, navigateToNode } from "./state";
+} from "../types"
+import { cloneState, navigateToNode } from "./state"
 
-type CombinedContext = EvaluationContext & EffectContext;
+type CombinedContext = EvaluationContext & EffectContext
 
 interface ConditionEvaluation {
-  passed: boolean;
-  failedConditions: FailedCondition[];
+  passed: boolean
+  failedConditions: FailedCondition[]
 }
 
 /**
  * Check if a transition is available.
- * 
+ *
  * Evaluates both visibility and requirements conditions.
- * 
+ *
  * @param state - Current runtime state
  * @param transition - Transition to check
  * @param evaluators - Map of condition type → evaluator function
@@ -40,63 +40,63 @@ export function checkTransitionAvailability(
   state: GraphRuntimeState,
   transition: Transition,
   evaluators: Map<string, ConditionEvaluator>,
-  context?: CombinedContext
+  context?: CombinedContext,
 ): TransitionAvailability {
   const trace: TransitionTrace = {
     conditionsEvaluated: [],
     effectsApplied: [],
-  };
-  
-  const traceContext = { ...context, trace };
-  
+  }
+
+  const traceContext = { ...context, trace }
+
   const visibility = evaluateTransitionConditions(
     state,
     transition.visibility,
     evaluators,
     "visibility",
-    traceContext
-  );
-  
+    traceContext,
+  )
+
   if (!visibility.passed) {
     return {
       allowed: false,
       visible: false,
       reason: "Transition is not visible",
       failedConditions: visibility.failedConditions,
-    };
+    }
   }
-  
+
   const requirements = evaluateTransitionConditions(
     state,
     transition.requirements,
     evaluators,
     "requirements",
-    traceContext
-  );
-  
+    traceContext,
+  )
+
   if (!requirements.passed) {
     return {
       allowed: false,
       visible: true,
       reason: "Requirements not met",
       failedConditions: requirements.failedConditions,
-    };
+    }
   }
-  
+
   return {
     allowed: true,
     visible: true,
-  };
+  }
 }
 
 /**
  * Execute a transition.
- * 
+ *
  * 1. Check requirements
  * 2. Apply effects (success or failure)
  * 3. Navigate to target
  * 4. Return traceable result
- * 
+ *
  * @param state - Current runtime state
  * @param transition - Transition to execute
  * @param evaluators - Map of condition type → evaluator function
@@ -109,23 +109,23 @@ export function applyTransition(
   transition: Transition,
   evaluators: Map<string, ConditionEvaluator>,
   handlers: Map<string, EffectHandler>,
-  context?: CombinedContext
+  context?: CombinedContext,
 ): TransitionResult {
   const trace: TransitionTrace = {
     conditionsEvaluated: [],
     effectsApplied: [],
-  };
-  
-  const traceContext = { ...context, trace };
-  
+  }
+
+  const traceContext = { ...context, trace }
+
   const visibility = evaluateTransitionConditions(
     state,
     transition.visibility,
     evaluators,
     "visibility",
-    traceContext
-  );
-  
+    traceContext,
+  )
+
   if (!visibility.passed) {
     return {
       state,
@@ -134,36 +134,34 @@ export function applyTransition(
       failureReason: "Transition is not visible",
       failedConditions: visibility.failedConditions,
       trace,
-    };
+    }
   }
-  
+
   const requirements = evaluateTransitionConditions(
     state,
     transition.requirements,
     evaluators,
     "requirements",
-    traceContext
-  );
-  
-  const success = requirements.passed;
-  const effects = success ? transition.effects : transition.failureEffects;
-  const targetNodeId = success
-    ? transition.targetNodeId
-    : transition.failureTargetNodeId;
-  
-  let newState = cloneState(state);
-  let consequence: Consequence | undefined;
-  
+    traceContext,
+  )
+
+  const success = requirements.passed
+  const effects = success ? transition.effects : transition.failureEffects
+  const targetNodeId = success ? transition.targetNodeId : transition.failureTargetNodeId
+
+  let newState = cloneState(state)
+  let consequence: Consequence | undefined
+
   if (effects && effects.length > 0) {
-    newState = applyEffects(newState, effects, handlers, traceContext);
-    
+    newState = applyEffects(newState, effects, handlers, traceContext)
+
     for (const effect of effects) {
       trace.effectsApplied.push({
         effect,
         handler: effect.type,
-      });
+      })
     }
-    
+
     if (effects.length === 1) {
       const effect = effects[0]
       consequence = {
@@ -173,16 +171,16 @@ export function applyTransition(
       consequence = {
         type: "multi",
         count: effects.length,
-      };
+      }
     }
   }
-  
-  const shouldNavigate = targetNodeId !== undefined;
-  
+
+  const shouldNavigate = targetNodeId !== undefined
+
   if (shouldNavigate && targetNodeId) {
-    newState = navigateToNode(newState, targetNodeId);
+    newState = navigateToNode(newState, targetNodeId)
   }
-  
+
   return {
     state: newState,
     consequence,
@@ -192,7 +190,7 @@ export function applyTransition(
     failureReason: success ? undefined : "Requirements not met",
     failedConditions: success ? undefined : requirements.failedConditions,
     trace,
-  };
+  }
 }
 
 function evaluateTransitionConditions(
@@ -200,44 +198,23 @@ function evaluateTransitionConditions(
   conditionSet: ConditionSet | undefined,
   evaluators: Map<string, ConditionEvaluator>,
   scope: ConditionScope,
-  context?: EvaluationContext
+  context?: EvaluationContext,
 ): ConditionEvaluation {
   if (!conditionSet) {
-    return { passed: true, failedConditions: [] };
+    return { passed: true, failedConditions: [] }
   }
 
-  const { all, any, none } = conditionSet;
-  const failedConditions: FailedCondition[] = [];
+  const { all, any, none } = conditionSet
+  const failedConditions: FailedCondition[] = []
 
-  const allPassed = evaluateAllGroup(
-    state,
-    all,
-    evaluators,
-    scope,
-    failedConditions,
-    context
-  );
-  const anyPassed = evaluateAnyGroup(
-    state,
-    any,
-    evaluators,
-    scope,
-    failedConditions,
-    context
-  );
-  const nonePassed = evaluateNoneGroup(
-    state,
-    none,
-    evaluators,
-    scope,
-    failedConditions,
-    context
-  );
+  const allPassed = evaluateAllGroup(state, all, evaluators, scope, failedConditions, context)
+  const anyPassed = evaluateAnyGroup(state, any, evaluators, scope, failedConditions, context)
+  const nonePassed = evaluateNoneGroup(state, none, evaluators, scope, failedConditions, context)
 
   return {
     passed: allPassed && anyPassed && nonePassed,
     failedConditions,
-  };
+  }
 }
 
 function evaluateAllGroup(
@@ -246,23 +223,23 @@ function evaluateAllGroup(
   evaluators: Map<string, ConditionEvaluator>,
   scope: ConditionScope,
   failedConditions: FailedCondition[],
-  context?: EvaluationContext
+  context?: EvaluationContext,
 ): boolean {
   if (!conditions?.length) {
-    return true;
+    return true
   }
 
-  let passed = true;
+  let passed = true
 
   for (const condition of conditions) {
-    const result = evaluateCondition(state, condition, evaluators, context);
+    const result = evaluateCondition(state, condition, evaluators, context)
     if (!result) {
-      passed = false;
-      failedConditions.push({ scope, group: "all", condition });
+      passed = false
+      failedConditions.push({ scope, group: "all", condition })
     }
   }
 
-  return passed;
+  return passed
 }
 
 function evaluateAnyGroup(
@@ -271,25 +248,25 @@ function evaluateAnyGroup(
   evaluators: Map<string, ConditionEvaluator>,
   scope: ConditionScope,
   failedConditions: FailedCondition[],
-  context?: EvaluationContext
+  context?: EvaluationContext,
 ): boolean {
   if (!conditions?.length) {
-    return true;
+    return true
   }
 
   const results = conditions.map((condition) => ({
     condition,
     result: evaluateCondition(state, condition, evaluators, context),
-  }));
+  }))
 
-  const passed = results.some(({ result }) => result);
+  const passed = results.some(({ result }) => result)
   if (!passed) {
     for (const { condition } of results) {
-      failedConditions.push({ scope, group: "any", condition });
+      failedConditions.push({ scope, group: "any", condition })
     }
   }
 
-  return passed;
+  return passed
 }
 
 function evaluateNoneGroup(
@@ -298,31 +275,31 @@ function evaluateNoneGroup(
   evaluators: Map<string, ConditionEvaluator>,
   scope: ConditionScope,
   failedConditions: FailedCondition[],
-  context?: EvaluationContext
+  context?: EvaluationContext,
 ): boolean {
   if (!conditions?.length) {
-    return true;
+    return true
   }
 
-  let passed = true;
+  let passed = true
 
   for (const condition of conditions) {
-    const result = evaluateCondition(state, condition, evaluators, context);
+    const result = evaluateCondition(state, condition, evaluators, context)
     if (result) {
-      passed = false;
-      failedConditions.push({ scope, group: "none", condition });
+      passed = false
+      failedConditions.push({ scope, group: "none", condition })
     }
   }
 
-  return passed;
+  return passed
 }
 
 /**
  * Get all available transitions from the current node.
- * 
+ *
  * A transition is "available" if it is both visible AND allowed.
  * Use `getTransitionsByAvailability` to get grouped by status.
- * 
+ *
  * @param state - Current runtime state
  * @param transitions - All transitions in the graph
  * @param evaluators - Map of condition type → evaluator function
@@ -333,27 +310,22 @@ export function getAvailableTransitions(
   state: GraphRuntimeState,
   transitions: Transition[],
   evaluators: Map<string, ConditionEvaluator>,
-  context?: CombinedContext
+  context?: CombinedContext,
 ): Transition[] {
-  return transitions.filter(transition => {
+  return transitions.filter((transition) => {
     if (transition.sourceNodeId !== state.currentNodeId) {
-      return false;
+      return false
     }
-    
-    const availability = checkTransitionAvailability(
-      state,
-      transition,
-      evaluators,
-      context
-    );
-    
-    return availability.visible && availability.allowed;
-  });
+
+    const availability = checkTransitionAvailability(state, transition, evaluators, context)
+
+    return availability.visible && availability.allowed
+  })
 }
 
 /**
  * Get transitions grouped by availability status.
- * 
+ *
  * @param state - Current runtime state
  * @param transitions - All transitions in the graph
  * @param evaluators - Map of condition type → evaluator function
@@ -364,36 +336,31 @@ export function getTransitionsByAvailability(
   state: GraphRuntimeState,
   transitions: Transition[],
   evaluators: Map<string, ConditionEvaluator>,
-  context?: CombinedContext
+  context?: CombinedContext,
 ): {
-  available: Transition[];
-  blocked: Transition[];
-  hidden: Transition[];
+  available: Transition[]
+  blocked: Transition[]
+  hidden: Transition[]
 } {
-  const available: Transition[] = [];
-  const blocked: Transition[] = [];
-  const hidden: Transition[] = [];
-  
+  const available: Transition[] = []
+  const blocked: Transition[] = []
+  const hidden: Transition[] = []
+
   for (const transition of transitions) {
     if (transition.sourceNodeId !== state.currentNodeId) {
-      continue;
+      continue
     }
-    
-    const availability = checkTransitionAvailability(
-      state,
-      transition,
-      evaluators,
-      context
-    );
-    
+
+    const availability = checkTransitionAvailability(state, transition, evaluators, context)
+
     if (!availability.visible) {
-      hidden.push(transition);
+      hidden.push(transition)
     } else if (!availability.allowed) {
-      blocked.push(transition);
+      blocked.push(transition)
     } else {
-      available.push(transition);
+      available.push(transition)
     }
   }
-  
-  return { available, blocked, hidden };
+
+  return { available, blocked, hidden }
 }

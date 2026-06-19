@@ -1,31 +1,24 @@
-import type {
-  GraphRuntimeState,
-  Transition,
-  TransitionResult,
-  ConditionEvaluator,
-  EffectHandler,
-  NodeDefinition,
-  ValidationResult,
-  EvaluationContext,
-  EffectContext,
-  StateTrigger,
-} from "./types"
+import { type GraphBlueprint, type ParsedGraph, parseGraph } from "./adapter"
+import { cloneState, createInitialState } from "./core/state"
 import {
-  createInitialState,
-  cloneState,
-} from "./core/state"
-import {
+  applyTransition,
   getAvailableTransitions,
   getTransitionsByAvailability,
-  applyTransition,
 } from "./core/transition"
 import { validateGraph } from "./core/validation"
 import { builtinEvaluators, builtinHandlers } from "./default-bindings"
-import {
-  parseGraph,
-  type GraphBlueprint,
-  type ParsedGraph,
-} from "./adapter"
+import type {
+  ConditionEvaluator,
+  EffectContext,
+  EffectHandler,
+  EvaluationContext,
+  GraphRuntimeState,
+  NodeDefinition,
+  StateTrigger,
+  Transition,
+  TransitionResult,
+  ValidationResult,
+} from "./types"
 
 export interface StepResult {
   state: GraphRuntimeState
@@ -57,7 +50,7 @@ export class GraphRuntime {
   constructor(
     blueprint: GraphBlueprint,
     evaluators?: Map<string, ConditionEvaluator>,
-    handlers?: Map<string, EffectHandler>
+    handlers?: Map<string, EffectHandler>,
   ) {
     this.parsed = parseGraph(blueprint)
     this.evaluators = evaluators ?? builtinEvaluators
@@ -90,51 +83,28 @@ export class GraphRuntime {
 
   createState(
     initialVariables?: Record<string, unknown>,
-    initialExtensions?: Record<string, unknown>
+    initialExtensions?: Record<string, unknown>,
   ): GraphRuntimeState {
-    return createInitialState(
-      this.parsed.startNodeId,
-      initialVariables,
-      initialExtensions
-    )
+    return createInitialState(this.parsed.startNodeId, initialVariables, initialExtensions)
   }
 
-  getAvailable(
-    state: GraphRuntimeState,
-    context?: EvaluationContext
-  ): Transition[] {
-    return getAvailableTransitions(
-      state,
-      this.parsed.transitions,
-      this.evaluators,
-      context
-    )
+  getAvailable(state: GraphRuntimeState, context?: EvaluationContext): Transition[] {
+    return getAvailableTransitions(state, this.parsed.transitions, this.evaluators, context)
   }
 
   getByAvailability(
     state: GraphRuntimeState,
-    context?: EvaluationContext
+    context?: EvaluationContext,
   ): { available: Transition[]; blocked: Transition[]; hidden: Transition[] } {
-    return getTransitionsByAvailability(
-      state,
-      this.parsed.transitions,
-      this.evaluators,
-      context
-    )
+    return getTransitionsByAvailability(state, this.parsed.transitions, this.evaluators, context)
   }
 
   step(
     state: GraphRuntimeState,
     transition: Transition,
-    context?: EvaluationContext & EffectContext
+    context?: EvaluationContext & EffectContext,
   ): TransitionResult {
-    const result = applyTransition(
-      state,
-      transition,
-      this.evaluators,
-      this.handlers,
-      context
-    )
+    const result = applyTransition(state, transition, this.evaluators, this.handlers, context)
 
     if (!result.success || !result.state) {
       return result
@@ -148,7 +118,9 @@ export class GraphRuntime {
 
     do {
       triggerFired = false
-      const currentContext = context ? { ...context, derivedState: context.derivedState } : undefined
+      const currentContext = context
+        ? { ...context, derivedState: context.derivedState }
+        : undefined
 
       for (const trigger of this.triggers) {
         if (firedTriggerIds.has(trigger.id)) {
@@ -158,7 +130,7 @@ export class GraphRuntime {
         let passed = true
         for (const cond of trigger.conditions) {
           const condEvaluator = this.evaluators.get(cond.type)
-          if (!condEvaluator || !condEvaluator(updatedState, cond, currentContext)) {
+          if (!condEvaluator?.(updatedState, cond, currentContext)) {
             passed = false
             break
           }
@@ -191,7 +163,7 @@ export class GraphRuntime {
    * Traverse the graph continuously until no more transitions are available.
    * Useful for derived-state scenarios where the context needs to be recomputed
    * after every step (e.g. updating character stats or entities).
-   * 
+   *
    * @param state - The starting state
    * @param makeContext - A callback invoked before each step to provide the context
    * @param maxSteps - Safety limit (default 100)
@@ -199,7 +171,7 @@ export class GraphRuntime {
   walkWithContext(
     state: GraphRuntimeState,
     makeContext: (state: GraphRuntimeState) => EvaluationContext & EffectContext,
-    maxSteps: number = 100
+    maxSteps: number = 100,
   ): StepResult[] {
     const steps: StepResult[] = []
 
@@ -218,16 +190,16 @@ export class GraphRuntime {
       }
 
       const result = this.step(state, available[0], context)
-      
+
       const stepResult: StepResult = {
         state: result.state,
         nodeId: result.state.currentNodeId,
         available,
-        applied: result
+        applied: result,
       }
-      
+
       steps.push(stepResult)
-      
+
       // Update state for the next iteration
       state = result.state
     }
@@ -239,7 +211,7 @@ export class GraphRuntime {
    * Traverse the graph continuously until no more transitions are available.
    * Uses a static context object for the entire walk. For derived-state usage,
    * prefer `walkWithContext`.
-   * 
+   *
    * @param state - The starting state
    * @param maxSteps - Safety limit (default 100)
    * @param context - Static context for the evaluation and effects
@@ -247,7 +219,7 @@ export class GraphRuntime {
   walk(
     state: GraphRuntimeState,
     maxSteps: number = 100,
-    context?: EvaluationContext & EffectContext
+    context?: EvaluationContext & EffectContext,
   ): StepResult[] {
     const steps: StepResult[] = []
 
@@ -281,7 +253,7 @@ export class GraphRuntime {
   enumeratePaths(
     maxDepth: number = 50,
     maxPaths: number = 100,
-    context?: EvaluationContext & EffectContext
+    context?: EvaluationContext & EffectContext,
   ): TraversalPath[] {
     const paths: TraversalPath[] = []
     const startState = this.createState()
@@ -351,10 +323,6 @@ export class GraphRuntime {
   }
 
   validate(): ValidationResult {
-    return validateGraph(
-      this.parsed.nodes,
-      this.parsed.transitions,
-      this.parsed.startNodeId
-    )
+    return validateGraph(this.parsed.nodes, this.parsed.transitions, this.parsed.startNodeId)
   }
 }

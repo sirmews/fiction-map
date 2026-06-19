@@ -1,25 +1,21 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import {
-  EntityRegistry,
-  defineEntityType,
-  defineWorld,
-} from "@fiction-map/entities";
-import type { Transition } from "../types";
-import { validateEntityTransitionReferences } from "./validation";
+import { defineEntityType, defineWorld, EntityRegistry } from "@fiction-map/entities"
+import { beforeEach, describe, expect, it } from "vitest"
+import type { Transition } from "../types"
+import { validateEntityTransitionReferences } from "./validation"
 
 describe("validateEntityTransitionReferences", () => {
-  let registry: EntityRegistry;
+  let registry: EntityRegistry
 
   beforeEach(() => {
-    registry = new EntityRegistry();
-  });
+    registry = new EntityRegistry()
+  })
 
   it("reports entity-aware conditions that reference unknown entities", () => {
-    defineEntityType(registry, { id: "item" });
+    defineEntityType(registry, { id: "item" })
     const world = defineWorld(registry, {
       id: "test-world",
       entities: [{ id: "lantern", type: "item" }],
-    });
+    })
 
     const transitions: Transition[] = [
       {
@@ -33,11 +29,11 @@ describe("validateEntityTransitionReferences", () => {
           ],
         },
       },
-    ];
+    ]
 
-    const result = validateEntityTransitionReferences(transitions, world);
+    const result = validateEntityTransitionReferences(transitions, world)
 
-    expect(result.valid).toBe(false);
+    expect(result.valid).toBe(false)
     expect(result.errors).toEqual([
       {
         type: "unknown-entity-reference",
@@ -48,15 +44,15 @@ describe("validateEntityTransitionReferences", () => {
         message:
           "Transition 'enter-cave' condition 'hasEntity' references unknown entity 'missing-key'",
       },
-    ]);
-  });
+    ])
+  })
 
   it("reports entity-aware effects that reference unknown entities", () => {
-    defineEntityType(registry, { id: "item" });
+    defineEntityType(registry, { id: "item" })
     const world = defineWorld(registry, {
       id: "test-world",
       entities: [{ id: "lantern", type: "item" }],
-    });
+    })
 
     const transitions: Transition[] = [
       {
@@ -69,11 +65,11 @@ describe("validateEntityTransitionReferences", () => {
         ],
         failureEffects: [{ type: "unlockEntity", entityId: "hidden-door" }],
       },
-    ];
+    ]
 
-    const result = validateEntityTransitionReferences(transitions, world);
+    const result = validateEntityTransitionReferences(transitions, world)
 
-    expect(result.valid).toBe(false);
+    expect(result.valid).toBe(false)
     expect(result.errors).toEqual([
       {
         type: "unknown-entity-reference",
@@ -93,19 +89,19 @@ describe("validateEntityTransitionReferences", () => {
         message:
           "Transition 'take-reward' failure effect 'unlockEntity' references unknown entity 'hidden-door'",
       },
-    ]);
-  });
+    ])
+  })
 
   it("passes when entity-aware references exist and resources are unconstrained", () => {
-    defineEntityType(registry, { id: "item" });
-    defineEntityType(registry, { id: "location" });
+    defineEntityType(registry, { id: "item" })
+    defineEntityType(registry, { id: "location" })
     const world = defineWorld(registry, {
       id: "test-world",
       entities: [
         { id: "lantern", type: "item" },
         { id: "dark-cave", type: "location" },
       ],
-    });
+    })
 
     const transitions: Transition[] = [
       {
@@ -126,11 +122,10 @@ describe("validateEntityTransitionReferences", () => {
           { type: "activateEntity", entityId: "lantern" },
         ],
       },
-    ];
+    ]
 
-    const result = validateEntityTransitionReferences(transitions, world);
+    const result = validateEntityTransitionReferences(transitions, world)
 
-    expect(result).toEqual({ valid: true, errors: [] });
-  });
-});
-
+    expect(result).toEqual({ valid: true, errors: [] })
+  })
+})

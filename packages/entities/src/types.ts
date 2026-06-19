@@ -36,12 +36,7 @@ export interface EntityTypeConfig {
 
 export type EntityReferenceValue = string | string[]
 
-export type EntityModifierOperation =
-  | "set"
-  | "add"
-  | "remove"
-  | "grant"
-  | "revoke"
+export type EntityModifierOperation = "set" | "add" | "remove" | "grant" | "revoke"
 
 export interface EntityModifier {
   target: string

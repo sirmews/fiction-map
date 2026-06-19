@@ -1,6 +1,6 @@
-import { writeFile, chmod, mkdir, access } from "fs/promises"
-import { join, resolve, dirname } from "path"
-import { constants } from "fs"
+import { constants } from "node:fs"
+import { access, chmod, mkdir, writeFile } from "node:fs/promises"
+import { join, resolve } from "node:path"
 
 const HOOK_SCRIPT = `#!/usr/bin/env bash
 #
@@ -48,7 +48,7 @@ exit 0
 
 export async function installHooks(rootDir: string = process.cwd()): Promise<void> {
   const gitDir = join(resolve(rootDir), ".git")
-  
+
   try {
     await access(gitDir, constants.F_OK)
   } catch {
@@ -61,10 +61,10 @@ export async function installHooks(rootDir: string = process.cwd()): Promise<voi
 
   try {
     await mkdir(hooksDir, { recursive: true })
-    
+
     let existingHook = ""
     try {
-      const { readFile } = await import("fs/promises")
+      const { readFile } = await import("node:fs/promises")
       existingHook = await readFile(preCommitPath, "utf8")
     } catch {
       // File doesn't exist, which is fine

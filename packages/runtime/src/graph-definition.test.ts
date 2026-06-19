@@ -1,10 +1,6 @@
-import { describe, expect, it } from "vitest";
-import type { GraphDefinition } from "@fiction-map/core";
-import {
-  createInitialState,
-  graphDefinitionToBlueprint,
-  createRuntimeFromGraph,
-} from "./index";
+import type { GraphDefinition } from "@fiction-map/core"
+import { describe, expect, it } from "vitest"
+import { createInitialState, createRuntimeFromGraph, graphDefinitionToBlueprint } from "./index"
 
 function makeGraph(): GraphDefinition {
   return {
@@ -45,12 +41,12 @@ function makeGraph(): GraphDefinition {
     effectsUsed: ["grantEntity"],
     errors: [],
     warnings: [],
-  };
+  }
 }
 
 describe("graphDefinitionToBlueprint", () => {
   it("maps a core graph definition into the runtime blueprint shape", () => {
-    const blueprint = graphDefinitionToBlueprint(makeGraph());
+    const blueprint = graphDefinitionToBlueprint(makeGraph())
 
     expect(blueprint).toEqual({
       nodes: [
@@ -77,18 +73,18 @@ describe("graphDefinitionToBlueprint", () => {
         },
       ],
       endings: ["dark-chapter"],
-    });
-  });
+    })
+  })
 
   it("creates a runtime that can execute graph-definition edges", () => {
-    const runtime = createRuntimeFromGraph(makeGraph());
-    const state = createInitialState("entrance");
+    const runtime = createRuntimeFromGraph(makeGraph())
+    const state = createInitialState("entrance")
 
-    const enterHall = runtime.getAvailable(state)[0];
-    const result = runtime.step(state, enterHall);
+    const enterHall = runtime.getAvailable(state)[0]
+    const result = runtime.step(state, enterHall)
 
-    expect(result.success).toBe(true);
-    expect(result.state.currentNodeId).toBe("main-hall");
-    expect(result.state.entityState?.owned.has("lantern")).toBe(true);
-  });
-});
+    expect(result.success).toBe(true)
+    expect(result.state.currentNodeId).toBe("main-hall")
+    expect(result.state.entityState?.owned.has("lantern")).toBe(true)
+  })
+})
