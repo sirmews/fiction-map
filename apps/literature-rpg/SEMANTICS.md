@@ -57,7 +57,7 @@ Source: `edges/choice.edge.ts:4`
 
 ### `library-mystery`
 
-- 9 nodes, 20 edges, max depth: 5
+- 11 nodes, 26 edges, max depth: 6
 - Endings: `victory`, `death`
 - Conditions used: `notVisited`, `resourceAtLeast`, `hasEntity`, `resourceLessThan`
 - Effects used: `grantEntity`, `addResource`, `markVisited`, `spendResource`, `revokeEntity`
@@ -86,5 +86,11 @@ Source: `edges/choice.edge.ts:4`
 | `forgotten-crypt` (scene) | `unlock-casket` (choice) | `victory` (scene) | `hasEntity(entityId="key")` | — |
 | `forgotten-crypt` (scene) | `lockpick-casket` (choice) | `victory` (scene) | `hasEntity(entityId="lockpick")` | — |
 | `forgotten-crypt` (scene) | `die-at-crypt` (choice) | `death` (scene) | — | — |
+| `archives` (scene) | `enter-lab` (choice) | `alchemists-lab` (scene) | `notVisited(nodeId="alchemists-lab")` | — |
+| `alchemists-lab` (scene) | `brew-elixir` (choice) | `alchemists-lab` (scene) | `notVisited(nodeId="brew-elixir")`<br>`resourceAtLeast(key="gold", value=10)` | `spendResource(key="gold", amount=10, clampToZero=true)`<br>`grantEntity(entityId="elixir")`<br>`markVisited(nodeId="brew-elixir")` |
+| `alchemists-lab` (scene) | `descend-trapdoor` (choice) | `sunken-passage` (scene) | — | — |
+| `sunken-passage` (scene) | `swim-passage` (choice) | `forgotten-crypt` (scene) | — | `spendResource(key="health", amount=30, clampToZero=true)` |
+| `sunken-passage` (scene) | `cast-water-walk` (choice) | `forgotten-crypt` (scene) | `hasEntity(entityId="mage-light")`<br>`resourceAtLeast(key="mana", value=10)` | `spendResource(key="mana", amount=10, clampToZero=true)` |
+| `alchemists-lab` (scene) | `return-to-archives` (choice) | `archives` (scene) | — | — |
 
 Source: `graphs/story.graph.ts:4`

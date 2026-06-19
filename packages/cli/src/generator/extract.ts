@@ -21,7 +21,7 @@ import type {
   PropertySchema,
   SourceLocation,
 } from "@fiction-map/core"
-import { Node, Project, type SourceFile, SyntaxKind } from "ts-morph"
+import { type CallExpression, Node, Project, type SourceFile, SyntaxKind } from "ts-morph"
 
 const project = new Project()
 
@@ -161,7 +161,7 @@ function extractObjectProperties(obj: Node): PropertyDefinition {
 /**
  * Extract config object property
  */
-function extractConfigProperty(callExpr: Node, propertyName: string): PropertyDefinition {
+function extractConfigProperty(callExpr: CallExpression, propertyName: string): PropertyDefinition {
   const properties: PropertyDefinition = {}
 
   const args = callExpr.getArguments()
@@ -180,7 +180,7 @@ function extractConfigProperty(callExpr: Node, propertyName: string): PropertyDe
 /**
  * Extract string array from call expression property
  */
-function extractStringArray(callExpr: Node, propName: string): string[] {
+function extractStringArray(callExpr: CallExpression, propName: string): string[] {
   const result: string[] = []
 
   const args = callExpr.getArguments()
@@ -205,7 +205,7 @@ function extractStringArray(callExpr: Node, propName: string): string[] {
 /**
  * Extract id from call expression
  */
-function extractId(callExpr: Node): string | null {
+function extractId(callExpr: CallExpression): string | null {
   const args = callExpr.getArguments()
   const arg = args[args.length - 1]
   if (!arg || !Node.isObjectLiteralExpression(arg)) return null
@@ -411,7 +411,7 @@ export function extractGraph(filePath: string, rootDir: string): GraphDefinition
 /**
  * Extract nodes array from defineGraph call
  */
-function extractNodesArray(callExpr: Node): NodeInstance[] {
+function extractNodesArray(callExpr: CallExpression): NodeInstance[] {
   const result: NodeInstance[] = []
   const nodes = extractArrayProperty(callExpr, "nodes")
 
@@ -451,7 +451,7 @@ function extractNodesArray(callExpr: Node): NodeInstance[] {
 /**
  * Extract edges array from defineGraph call
  */
-function extractEdgesArray(callExpr: Node): EdgeInstance[] {
+function extractEdgesArray(callExpr: CallExpression): EdgeInstance[] {
   const result: EdgeInstance[] = []
   const edges = extractArrayProperty(callExpr, "edges")
 
@@ -495,7 +495,7 @@ function extractEdgesArray(callExpr: Node): EdgeInstance[] {
 /**
  * Extract array property from object literal
  */
-function extractArrayProperty(callExpr: Node, propName: string): Node | null {
+function extractArrayProperty(callExpr: CallExpression, propName: string): Node | null {
   const args = callExpr.getArguments()
   const arg = args[args.length - 1]
   if (!arg || !Node.isObjectLiteralExpression(arg)) return null
