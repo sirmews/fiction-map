@@ -115,6 +115,27 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
   const cooldown = state.entityState?.resources?.heal_cooldown ?? 0
   const inventory = Array.from(context.derivedState.ownedEntityIds)
 
+  const getEntityLabelAndIcon = (id: string): string => {
+    const entity = world.entities.find((e) => e.id === id)
+    const label = (entity as any)?.label ?? id
+    const icon = id.includes("spell")
+      ? "✨"
+      : id === "lantern"
+        ? "🔦"
+        : id === "elixir"
+          ? "🧪"
+          : id === "lockpick"
+            ? "⚙️"
+            : id === "silver-shield"
+              ? "🛡️"
+              : id === "spirit-elixir"
+                ? "🔮"
+                : id === "rune-of-water"
+                  ? "💧"
+                  : "🔑"
+    return `${icon} ${label}`
+  }
+
   const activeBlocks = currentNode.blocks ? currentNode.blocks.slice(0, pacingIndex + 1) : []
 
   return (
@@ -221,7 +242,7 @@ export function GameController({ runtime }: { runtime: GraphRuntime }) {
             {inventory.length > 0 ? (
               inventory.map((id) => (
                 <Text key={id} color="green">
-                  • {id}
+                  • {getEntityLabelAndIcon(id)}
                 </Text>
               ))
             ) : (
