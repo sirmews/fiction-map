@@ -67,6 +67,7 @@
       },
       "dependencies": {
         "@fiction-map/core": "workspace:*",
+        "@fiction-map/entities": "workspace:*",
         "@fiction-map/runtime": "workspace:*",
         "glob": "^10.0.0",
       },

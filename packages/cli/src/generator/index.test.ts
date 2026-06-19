@@ -98,7 +98,6 @@ export const TestGraph = defineGraph({
       type: "link",
       source: "start",
       target: "end",
-      conditions: [{ type: "hasFlag", key: "opened" }],
     },
   ],
 })
@@ -260,7 +259,7 @@ describe("generator", () => {
       expect(metadata.graphs[0].errors).toEqual([])
       expect(metadata.graphs[0].maxDepth).toBe(1)
       expect(metadata.graphs[0].endings).toEqual(["end"])
-      expect(metadata.graphs[0].conditionsUsed).toEqual(["hasFlag"])
+      expect(metadata.graphs[0].conditionsUsed).toEqual([])
       await expect(access(join(TEST_DIR, ".fiction-map", "metadata.json"))).rejects.toThrow()
     })
 

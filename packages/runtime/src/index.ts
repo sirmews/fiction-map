@@ -178,3 +178,12 @@ export {
   type StepResult,
   type TraversalPath,
 } from "./runtime"
+// Semantic validation
+export {
+  type SemanticError,
+  type SemanticValidationOptions,
+  type SemanticValidationResult,
+  SymbolicState,
+  solveGraphSemantics,
+  validateGraphSemantics,
+} from "./validation"

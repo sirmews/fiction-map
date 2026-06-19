@@ -16,7 +16,13 @@ import {
   type NodeTypeDefinition,
   ProjectRegistry,
 } from "@fiction-map/core"
-import { builtinConditionConfigs, builtinEffectConfigs } from "@fiction-map/runtime"
+import { defineWorld, EntityRegistry } from "@fiction-map/entities"
+import {
+  builtinConditionConfigs,
+  builtinEffectConfigs,
+  createRuntimeFromGraph,
+  validateGraphSemantics,
+} from "@fiction-map/runtime"
 import { discoverFiles } from "./discover"
 import {
   extractCondition,
@@ -186,6 +192,25 @@ export async function buildMetadata(
 
   for (const graph of graphs) {
     Object.assign(graph, analyzeGraph(registry, graph.nodes, graph.edges))
+
+    // Run semantic validation
+    try {
+      const runtime = createRuntimeFromGraph(graph)
+      const emptyWorld = defineWorld(new EntityRegistry(), { id: "empty", entities: [] })
+      const semanticResult = validateGraphSemantics(runtime, emptyWorld)
+
+      for (const err of semanticResult.errors) {
+        graph.errors.push({
+          code: "SEMANTIC_ERROR",
+          message: `[${err.type}] ${err.message} (Path: ${err.path.join(" -> ")})`,
+        })
+      }
+    } catch (e: any) {
+      graph.warnings.push({
+        code: "SEMANTIC_VALIDATION_SKIPPED",
+        message: `Could not run semantic validation: ${e.message}`,
+      })
+    }
   }
 
   return {
