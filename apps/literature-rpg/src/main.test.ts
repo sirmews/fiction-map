@@ -152,4 +152,65 @@ describe("literature-rpg consumer app", () => {
     state = step(state, "lockpick-casket")
     expect(state.currentNodeId).toBe("victory")
   })
+
+  it("walks the magic-user pathway to victory using spells and mana", () => {
+    let state = createInitialState(runtime.startNodeId)
+    const makeContext = (s: any) => ({ derivedState: deriveEntityState(world, s) })
+
+    const step = (s: any, transitionId: string) => {
+      const ctx = makeContext(s)
+      const available = runtime.getAvailable(s, ctx)
+      const transition = available.find((t) => t.id === transitionId)
+      if (!transition) {
+        throw new Error(`Transition ${transitionId} not available from ${s.currentNodeId}`)
+      }
+      const result = runtime.step(s, transition, ctx)
+      if (!result.success) {
+        throw new Error(`Transition ${transitionId} failed: ${result.failureReason}`)
+      }
+      return result.state
+    }
+
+    // 1. Courtyard -> Entrance
+    state = step(state, "enter-entrance")
+    expect(state.currentNodeId).toBe("entrance")
+
+    // 2. Entrance -> Main Hall (grants lantern, 100 HP, 50 MP, 30 gold)
+    state = step(state, "enter-hall")
+    expect(state.currentNodeId).toBe("main-hall")
+    expect(state.entityState?.resources?.mana).toBe(50)
+
+    // 3. Main Hall -> Archives
+    state = step(state, "explore-archives")
+    expect(state.currentNodeId).toBe("archives")
+
+    // 4. Archives -> Archives (Study Heal Spell)
+    state = step(state, "study-heal")
+    expect(state.currentNodeId).toBe("archives")
+
+    // 5. Archives -> Archives (Study Mage Light Spell)
+    state = step(state, "study-mage-light")
+    expect(state.currentNodeId).toBe("archives")
+
+    // 6. Archives -> Main Hall
+    state = step(state, "return-from-archives")
+    expect(state.currentNodeId).toBe("main-hall")
+
+    // 7. Main Hall -> Dark Chapter
+    state = step(state, "descend")
+    expect(state.currentNodeId).toBe("dark-chapter")
+
+    // 8. Dark Chapter -> Chamber of Runes (Cast Mage Light Spell, spends 15 MP, leaves 35 MP, then regenerates +5 MP to 40 MP)
+    state = step(state, "cast-mage-light")
+    expect(state.currentNodeId).toBe("chamber-of-runes")
+    expect(state.entityState?.resources?.mana).toBe(40)
+
+    // 9. Chamber of Runes -> Forgotten Crypt (Translate runes, grants key)
+    state = step(state, "translate-runes")
+    expect(state.currentNodeId).toBe("forgotten-crypt")
+
+    // 10. Forgotten Crypt -> Victory (Unlock casket using key)
+    state = step(state, "unlock-casket")
+    expect(state.currentNodeId).toBe("victory")
+  })
 })
