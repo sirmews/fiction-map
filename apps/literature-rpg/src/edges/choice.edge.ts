@@ -6,6 +6,6 @@ export const ChoiceEdge = defineEdgeType(registry, {
   properties: {
     text: { type: "string", required: true },
   },
-  sourceTypes: ["scene"],
-  targetTypes: ["scene"],
+  sourceTypes: ["scene", "compute", "chest"],
+  targetTypes: ["scene", "compute", "chest"],
 })

@@ -14,7 +14,26 @@ This file describes the graph primitives discovered in this project. It is inten
 
 Each entry shows its source location and (where present) author-supplied `@description` and `@ai-rule` annotations. Run `fiction-map validate` to check that the current graphs satisfy their declared types.
 
-## Node Types (1)
+## Structs (1)
+
+### `loot-entry`
+
+
+```typescript
+defineStruct(registry, {
+  id: "loot-entry",
+  properties: {
+    itemId: { type: "string", required: true },
+    dropChance: { type: "number", required: true },
+  },
+})
+```
+
+Source: `structs/loot.struct.ts:4`
+
+---
+
+## Node Types (3)
 
 ### `scene`
 
@@ -34,6 +53,36 @@ Source: `nodes/scene.node.ts:4`
 
 ---
 
+### `compute`
+
+```typescript
+defineNodeType(registry, {
+  id: "compute",
+  properties: {},
+})
+```
+
+Source: `nodes/compute.node.ts:4`
+
+---
+
+### `chest`
+
+```typescript
+defineNodeType(registry, {
+  id: "chest",
+  properties: {
+    possibleLoot: { type: "array", items: { type: "struct", structId: "loot-entry" } },
+  },
+  outgoingEdges: ["choice"],
+  incomingEdges: ["choice"],
+})
+```
+
+Source: `nodes/chest.node.ts:4`
+
+---
+
 ## Edge Types (1)
 
 ### `choice`
@@ -41,8 +90,8 @@ Source: `nodes/scene.node.ts:4`
 ```typescript
 defineEdgeType(registry, {
   id: "choice",
-  sourceTypes: ["scene"],
-  targetTypes: ["scene"],
+  sourceTypes: ["scene", "compute", "chest"],
+  targetTypes: ["scene", "compute", "chest"],
   properties: {
     text: { type: "string", required: true },
   },
@@ -57,9 +106,9 @@ Source: `edges/choice.edge.ts:4`
 
 ### `library-mystery`
 
-- 20 nodes, 54 edges, max depth: 7
+- 23 nodes, 60 edges, max depth: 8
 - Endings: `victory`, `death`
-- Conditions used: `notVisited`, `hasEntity`, `notFlag`, `hasFlag`, `resourceAtLeast`, `resourceLessThan`
+- Conditions used: `notVisited`, `greaterThanOrEqual`, `lessThan`, `hasEntity`, `notFlag`, `hasFlag`, `resourceAtLeast`, `resourceLessThan`
 - Effects used: `addResource`, `grantEntity`, `setFlag`, `markVisited`, `revokeEntity`, `spendResource`
 - ⚠️ 18 validation errors
 
@@ -77,6 +126,12 @@ Source: `edges/choice.edge.ts:4`
 | `observatory` (scene) | `align-telescope` (choice) | `observatory` (scene) | `notVisited(nodeId="align-telescope")` | `setFlag(key="observatory-switch", value=true)`<br>`grantEntity(entityId="spirit-elixir")`<br>`markVisited(nodeId="align-telescope")` |
 | `observatory` (scene) | `return-to-stairs-from-observatory` (choice) | `grand-staircase` (scene) | — | — |
 | `gallery-of-kings` (scene) | `go-to-armory` (choice) | `armory` (scene) | — | — |
+| `armory` (scene) | `search-armory-choice` (choice) | `search-armory` (compute) | — | — |
+| `search-armory` (compute) | `search-success` (choice) | `secret-alcove` (scene) | `greaterThanOrEqual(key="searchRoll", value=15)` | — |
+| `search-armory` (compute) | `search-fail` (choice) | `armory` (scene) | `lessThan(key="searchRoll", value=15)` | — |
+| `secret-chest` (chest) | `open-chest` (choice) | `armory` (scene) | — | `grantEntity(entityId="spirit-elixir")` |
+| `secret-alcove` (scene) | `enter-alcove` (choice) | `secret-chest` (chest) | — | — |
+| `secret-alcove` (scene) | `return-from-alcove` (choice) | `armory` (scene) | — | — |
 | `gallery-of-kings` (scene) | `place-shield` (choice) | `gallery-of-kings` (scene) | `hasEntity(entityId="silver-shield")`<br>`notVisited(nodeId="place-shield")` | `setFlag(key="statues-deactivated", value=true)`<br>`revokeEntity(entityId="silver-shield")`<br>`markVisited(nodeId="place-shield")` |
 | `gallery-of-kings` (scene) | `run-past-statues` (choice) | `riddle-chamber` (scene) | `notFlag(key="statues-deactivated")` | `spendResource(key="health", amount=40, clampToZero=true)` |
 | `gallery-of-kings` (scene) | `walk-past-statues-safely` (choice) | `riddle-chamber` (scene) | `hasFlag(key="statues-deactivated")` | — |
