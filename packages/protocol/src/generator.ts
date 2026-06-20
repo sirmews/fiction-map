@@ -52,6 +52,7 @@ export interface Intent {
   type: "selectChoice" | "skipPacing" | "save" | "load" | "quit"
   choiceId?: string
   saveSlot?: string
+  serializedState?: string
 }
 `
 
@@ -100,9 +101,10 @@ type Frame struct {
 }
 
 type Intent struct {
-	Type     string \`json:"type"\`
-	ChoiceID string \`json:"choiceId,omitempty"\`
-	SaveSlot string \`json:"saveSlot,omitempty"\`
+	Type            string \`json:"type"\`
+	ChoiceID        string \`json:"choiceId,omitempty"\`
+	SaveSlot        string \`json:"saveSlot,omitempty"\`
+	SerializedState string \`json:"serializedState,omitempty"\`
 }
 `
 

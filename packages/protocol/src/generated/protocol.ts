@@ -45,4 +45,5 @@ export interface Intent {
   type: "selectChoice" | "skipPacing" | "save" | "load" | "quit"
   choiceId?: string
   saveSlot?: string
+  serializedState?: string
 }

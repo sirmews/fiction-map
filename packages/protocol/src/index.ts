@@ -8,4 +8,5 @@ export type {
   Intent,
 } from "./generated/protocol"
 export { computeFrame } from "./presenter"
+export { applyIntent } from "./reducer"
 export { schema } from "./schema"
