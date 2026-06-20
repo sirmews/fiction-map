@@ -12,6 +12,12 @@ It applies Encore's "infrastructure from code" approach to graphs:
 - Metadata feeds agents, CI, and runtimes
 - Runtime executes traversals with full traceability
 
+The principle underneath is **a single source of truth plus machine-readable, agent-legible
+artifacts** — generation is a means, applied per the decision rule in
+[ADR 2026-06-20: LLM-Friendly Artifact Strategy](decisions/2026-06-20-llm-friendly-artifact-strategy.md)
+(generate for authored content or cross-language contracts; annotate + test stable single-language
+types).
+
 The key boundary is:
 
 - Fiction Map owns the engine/framework layer
