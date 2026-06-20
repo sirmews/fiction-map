@@ -100,6 +100,19 @@
         "vitest": "^1.0.0",
       },
     },
+    "packages/protocol": {
+      "name": "@fiction-map/protocol",
+      "version": "0.1.0",
+      "dependencies": {
+        "@fiction-map/core": "workspace:*",
+        "@fiction-map/runtime": "workspace:*",
+      },
+      "devDependencies": {
+        "tsup": "^8.0.0",
+        "typescript": "^5.4.0",
+        "vitest": "^1.0.0",
+      },
+    },
     "packages/runtime": {
       "name": "@fiction-map/runtime",
       "version": "0.1.0",
@@ -281,6 +294,8 @@
     "@fiction-map/core": ["@fiction-map/core@workspace:packages/core"],
 
     "@fiction-map/entities": ["@fiction-map/entities@workspace:packages/entities"],
+
+    "@fiction-map/protocol": ["@fiction-map/protocol@workspace:packages/protocol"],
 
     "@fiction-map/runtime": ["@fiction-map/runtime@workspace:packages/runtime"],
 
