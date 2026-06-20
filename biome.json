@@ -12,6 +12,7 @@
       "!**/node_modules",
       "!**/coverage",
       "!**/.fiction-map",
+      "!**/generated",
       "!**/tsconfig.tsbuildinfo",
       "!**/*.svg"
     ]

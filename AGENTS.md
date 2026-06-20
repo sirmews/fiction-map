@@ -22,6 +22,7 @@ Welcome to the `fiction-map` repository. As an AI agent working in this codebase
 *   **Generate** a structured artifact only when **(a)** the content is per-consumer/authored/dynamic (e.g. graphs → `metadata.json` + `SEMANTICS.md`), **or (b)** it crosses a language/process boundary where divergence fails silently at runtime.
 *   **Cross-language contracts** (e.g. the `Frame`/`Intent` presentation protocol) must be **schema-as-source-of-truth with generated bindings** for each language, pinned by a golden-fixture conformance test. Do **not** hand-port a code-first type across languages and trust an LLM to keep copies in sync — that is the drift trap.
 *   **Stable, single-language, in-process types** use annotations (`@description` / `@ai-rule`) + tests — **not** a bespoke extractor.
+*   **Enforcement**: These rules are deterministically enforced by our CI pipeline and architecture conformance tests (see `packages/protocol/src/conformance.test.ts`), which assert that no hand-written `Frame` or `Intent` type declarations exist outside of `generated/` directories, and that all generated files carry the appropriate DO-NOT-EDIT banners.
 *   See [ADR 2026-06-20: LLM-Friendly Artifact Strategy](docs/decisions/2026-06-20-llm-friendly-artifact-strategy.md).
 
 ## 5. Git Workflow (PRS ONLY)
