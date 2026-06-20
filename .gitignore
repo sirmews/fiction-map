@@ -42,5 +42,8 @@ pnpm-lock.yaml
 *.temp
 .cache/
 
+# Go binaries
+/apps/literature-rpg-tui/literature-rpg-tui
+
 # Gemini review artifacts
 .gemini-review/
