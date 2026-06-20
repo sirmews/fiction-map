@@ -57,12 +57,14 @@ jobs:
         with:
           version: v1.64.8
           working-directory: apps/literature-rpg-tui
+          install-mode: go
 
       - name: Run golangci-lint (protocol)
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.8
           working-directory: packages/protocol/go
+          install-mode: go
 
       - name: Check generated protocol bindings are current
         working-directory: packages/protocol
