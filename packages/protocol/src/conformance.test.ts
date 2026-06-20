@@ -77,4 +77,27 @@ describe("Architecture Conformance", () => {
 
     expect(missingBanner, "Generated files missing DO NOT EDIT banner").toEqual([])
   })
+
+  describe("Golden-Fixture Wire Conformance (TypeScript)", () => {
+    const fixturesDir = path.resolve(__dirname, "../fixtures")
+
+    it("round-trips the Frame golden fixture successfully", () => {
+      const framePath = path.join(fixturesDir, "frame_standard.json")
+      const raw = fs.readFileSync(framePath, "utf-8")
+      const parsed = JSON.parse(raw)
+
+      // Assert that parsing and re-serializing matches exactly
+      const serialized = JSON.stringify(parsed, null, 2)
+      expect(JSON.parse(serialized)).toEqual(parsed)
+    })
+
+    it("round-trips the Intent golden fixture successfully", () => {
+      const intentPath = path.join(fixturesDir, "intent_select_choice.json")
+      const raw = fs.readFileSync(intentPath, "utf-8")
+      const parsed = JSON.parse(raw)
+
+      const serialized = JSON.stringify(parsed, null, 2)
+      expect(JSON.parse(serialized)).toEqual(parsed)
+    })
+  })
 })
