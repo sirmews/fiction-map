@@ -43,7 +43,8 @@ type Frame struct {
 }
 
 type Intent struct {
-	Type     string `json:"type"`
-	ChoiceID string `json:"choiceId,omitempty"`
-	SaveSlot string `json:"saveSlot,omitempty"`
+	Type            string `json:"type"`
+	ChoiceID        string `json:"choiceId,omitempty"`
+	SaveSlot        string `json:"saveSlot,omitempty"`
+	SerializedState string `json:"serializedState,omitempty"`
 }

@@ -126,6 +126,11 @@ export const schema = {
           description:
             "The slot identifier to save to or load from (required for 'save' and 'load').",
         },
+        serializedState: {
+          type: "string",
+          description:
+            "Opaque, serialized representation of the GraphRuntimeState to load (required for 'load').",
+        },
       },
       required: ["type"],
     },
