@@ -46,7 +46,11 @@ jobs:
         run: bun test
 
       - name: Run Go tests
-        run: go test -v ./...
+        run: |
+          for module_dir in "apps/literature-rpg-tui" "packages/protocol/go"; do
+            echo "Running go test in ${module_dir}"
+            (cd "${module_dir}" && go test -v ./...)
+          done
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
