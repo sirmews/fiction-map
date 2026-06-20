@@ -1,0 +1,41 @@
+{
+  "currentNode": {
+    "id": "entrance",
+    "type": "scene",
+    "blocks": [
+      {
+        "id": "b1",
+        "type": "paragraph",
+        "text": "You stand at the entrance."
+      }
+    ]
+  },
+  "choices": [
+    {
+      "id": "proceed",
+      "label": "Proceed"
+    }
+  ],
+  "resources": {
+    "health": 100,
+    "mana": 50,
+    "gold": 30,
+    "turns": 1
+  },
+  "inventory": [
+    {
+      "id": "lantern",
+      "label": "Brass Lantern"
+    }
+  ],
+  "flags": {
+    "has_key": true,
+    "puzzles_solved": 2
+  },
+  "warnings": ["THE CAVERN IS COLLAPSING! (-25 HP per turn!)"],
+  "pacing": {
+    "pacingIndex": 0,
+    "isComplete": false
+  },
+  "serializedState": "{\"currentNodeId\":\"entrance\",\"history\":[],\"variables\":{},\"flags\":{},\"visited\":[\"entrance\"]}"
+}
