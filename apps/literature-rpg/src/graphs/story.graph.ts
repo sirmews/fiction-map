@@ -115,7 +115,10 @@ export const story = defineGraph(registry, {
       id: "search-armory",
       type: "compute",
       autoResolve: true,
-      enterEffects: [{ type: "setVariable", key: "searchRoll", value: 20 }],
+      enterEffects: [
+        { type: "setVariable", key: "searchRoll", value: 20 },
+        { type: "setFlag", key: "searchRoll", value: 20 },
+      ],
     },
     {
       id: "secret-alcove",

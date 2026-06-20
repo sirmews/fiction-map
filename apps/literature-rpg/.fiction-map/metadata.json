@@ -218,6 +218,11 @@
               "type": "setVariable",
               "key": "searchRoll",
               "value": 20
+            },
+            {
+              "type": "setFlag",
+              "key": "searchRoll",
+              "value": 20
             }
           ]
         },
