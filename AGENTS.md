@@ -15,6 +15,7 @@ Welcome to the `fiction-map` repository. As an AI agent working in this codebase
 ## 3. Architecture Boundary
 *   **The Engine is Headless:** The packages (`@fiction-map/core`, `@fiction-map/entities`, `@fiction-map/runtime`) own the logic, schemas, and state derivation. They **do not** own the UI.
 *   **The Consumer App owns the UI:** Consumer applications (like `apps/literature-rpg` and `apps/literature-rpg-web`) are completely responsible for styling, rendering, and gameplay loops. Keep engine concerns completely separated from the UI logic.
+*   **Presentation is forbidden in engine layers:** `@fiction-map/core`, `@fiction-map/entities`, `@fiction-map/runtime`, and `@fiction-map/protocol` must never define, style, or hardcode visual presentation concerns such as icons, colors, emoji, progress bars, CSS classes, layouts, panels, or widget selection. If presentation behavior is needed, it must be implemented only in consumer apps (`apps/*`) via presentational configuration.
 *   **Singletons are Banned:** Always use `ProjectRegistry` or `EntityRegistry` instances. Do not rely on global mutable state for schema definitions.
 
 ## 4. LLM-Friendly Artifacts (SINGLE SOURCE OF TRUTH > GENERATION)

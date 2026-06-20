@@ -36,6 +36,9 @@ jobs:
       - name: Run Biome linter
         run: bun run lint
 
+      - name: Run UI boundary guardrails
+        run: bun run lint:boundaries
+
       - name: Run TypeScript typecheck
         run: bun run typecheck
 
