@@ -35,6 +35,7 @@ type model struct {
 	statusMessage string
 	host          string
 	sessionId     string
+	actionLog     []string
 }
 
 var (
@@ -120,6 +121,175 @@ func renderProgressBar(current, max int, fillChar, emptyChar string, length int)
 	return fmt.Sprintf("[%s%s]", strings.Repeat(fillChar, filledLength), strings.Repeat(emptyChar, emptyLength))
 }
 
+func getASCIIArt(nodeId string) string {
+	switch nodeId {
+	case "courtyard":
+		return `   /\___/\
+  |  _ _  |
+  | | | | |
+  |_|_|_|_|`
+	case "entrance":
+		return `   ______
+  |  ||  |
+  |  ||  |
+  |__||__|`
+	case "main-hall":
+		return `  /_________\
+  | []   [] |
+  |   _|_   |
+  |__|___|__|`
+	case "grand-staircase":
+		return `      _
+    _|_|
+  _|_|
+_|_|`
+	case "observatory":
+		return `    .  *  .
+  __\ /__  *
+  \  O  /
+   \___/`
+	case "gallery-of-kings":
+		return `     +++
+    (o o)
+   /  ^  \
+  /|__|__|\`
+	case "armory":
+		return `   |\   /|
+   | \_/ |
+   |  |  |
+   |  |  |`
+	case "riddle-chamber":
+		return `   /\  /\
+  (  oo  )
+   \ == /
+  /      \`
+	case "forgotten-crypt":
+		return `   .-----.
+  /  RIP  \
+  |       |
+  |_______|`
+	case "victory":
+		return `    * * *
+   \_|_|_/
+    |   |
+   (_____)`
+	case "archives":
+		return `   [||][||]
+   [||][||]
+   [||][||]`
+	case "alchemists-lab":
+		return `     /\
+    /  \
+   /    \
+  (======)`
+	case "sunken-passage":
+		return `  ~~~~~~~~~~
+   ~ ~ ~ ~
+  ~~~~~~~~~~`
+	case "dark-chapter":
+		return `   (\ /)
+  -( o )-
+   (/ \)`
+	case "chamber-of-runes":
+		return `   * * * *
+   |X|Y|Z|
+   *-*-*-*`
+	case "death":
+		return `   ☠  ☠  ☠
+   GAME OVER
+   ☠  ☠  ☠`
+	default:
+		return `    /\_/\
+   ( o.o )
+    > ^ <`
+	}
+}
+
+func (m model) getPlayerClass() string {
+	hasSpell := false
+	hasShield := false
+	hasLockpick := false
+
+	for _, item := range m.frame.Inventory {
+		if strings.Contains(item.ID, "spell") {
+			hasSpell = true
+		} else if item.ID == "silver-shield" {
+			hasShield = true
+		} else if item.ID == "lockpick" {
+			hasLockpick = true
+		}
+	}
+
+	if hasSpell {
+		return "MAGE"
+	}
+	if hasShield {
+		return "PALADIN"
+	}
+	if hasLockpick {
+		return "ROGUE"
+	}
+	return "ADVENTURER"
+}
+
+func (m model) getPlayerLevelAndXP() (int, int) {
+	turns := int(m.frame.Resources["turns"])
+	level := 1 + (turns / 5)
+	xp := (turns % 5) * 20
+	return level, xp
+}
+
+func (m *model) updateActionLog(newFrame generated.Frame) {
+	if m.frame.CurrentNode.ID == "" {
+		m.actionLog = append(m.actionLog, "🎬 Started a new adventure!")
+		return
+	}
+
+	// Detect location change
+	if newFrame.CurrentNode.ID != m.frame.CurrentNode.ID {
+		m.actionLog = append(m.actionLog, fmt.Sprintf("🗺 Entered: %s", strings.Title(strings.ReplaceAll(newFrame.CurrentNode.ID, "-", " "))))
+	}
+
+	// Detect HP changes
+	oldHP := m.frame.Resources["health"]
+	newHP := newFrame.Resources["health"]
+	if newHP < oldHP {
+		m.actionLog = append(m.actionLog, fmt.Sprintf("💥 Took %g damage!", oldHP-newHP))
+	} else if newHP > oldHP {
+		m.actionLog = append(m.actionLog, fmt.Sprintf("💖 Healed %g HP!", newHP-oldHP))
+	}
+
+	// Detect Gold changes
+	oldGold := m.frame.Resources["gold"]
+	newGold := newFrame.Resources["gold"]
+	if newGold > oldGold {
+		m.actionLog = append(m.actionLog, fmt.Sprintf("🪙 Looted %g gold!", newGold-oldGold))
+	} else if newGold < oldGold {
+		m.actionLog = append(m.actionLog, fmt.Sprintf("💸 Spent %g gold!", oldGold-newGold))
+	}
+
+	// Detect Inventory changes
+	if len(newFrame.Inventory) > len(m.frame.Inventory) {
+		for _, newItem := range newFrame.Inventory {
+			found := false
+			for _, oldItem := range m.frame.Inventory {
+				if newItem.ID == oldItem.ID {
+					found = true
+					break
+				}
+			}
+			if !found {
+				m.actionLog = append(m.actionLog, fmt.Sprintf("🎒 Acquired: %s", newItem.Label))
+			}
+		}
+	}
+
+	// Limit log to 3 entries
+	if len(m.actionLog) > 3 {
+		m.actionLog = m.actionLog[len(m.actionLog)-3:]
+	}
+}
+
 func sendIntentCmd(host string, sessionId string, intent *generated.Intent) tea.Cmd {
 	return func() tea.Msg {
 		reqBody := map[string]interface{}{
@@ -180,12 +350,16 @@ func (m model) handleIntent(intent generated.Intent) tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case frameMsg:
-		m.frame = generated.Frame(msg)
+		newFrame := generated.Frame(msg)
+		m.updateActionLog(newFrame)
+		m.frame = newFrame
 		m.selected = 0
 		return m, nil
 
 	case httpResponseMsg:
-		m.frame = msg.frame
+		newFrame := msg.frame
+		m.updateActionLog(newFrame)
+		m.frame = newFrame
 		m.sessionId = msg.sessionId
 		m.selected = 0
 		return m, nil
@@ -237,6 +411,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMessage = fmt.Sprintf("Failed to save: %v", err)
 				} else {
 					m.statusMessage = "Game saved to Slot 1!"
+					m.actionLog = append(m.actionLog, "💾 Saved game state to Slot 1.")
+					if len(m.actionLog) > 3 {
+						m.actionLog = m.actionLog[len(m.actionLog)-3:]
+					}
 				}
 			}
 			return m, nil
@@ -251,6 +429,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					SerializedState: string(data),
 				})
 				m.statusMessage = "Game loaded from Slot 1!"
+				m.actionLog = append(m.actionLog, "🔮 Loaded game state from Slot 1.")
+				if len(m.actionLog) > 3 {
+					m.actionLog = m.actionLog[len(m.actionLog)-3:]
+				}
 				return m, cmd
 			}
 			return m, nil
@@ -314,6 +496,24 @@ func (m model) View() string {
 	// 3. Right Panel: Player Status HUD
 	var rightBuilder strings.Builder
 	rightBuilder.WriteString(hudTitleStyle.Render("PLAYER STATUS") + "\n")
+
+	// Location Portrait
+	art := getASCIIArt(m.frame.CurrentNode.ID)
+	portraitStyle := lipgloss.NewStyle().
+		Foreground(yellow).
+		Align(lipgloss.Center).
+		MarginBottom(1)
+	rightBuilder.WriteString(portraitStyle.Render(art) + "\n")
+
+	// Class & Level
+	class := m.getPlayerClass()
+	level, xp := m.getPlayerLevelAndXP()
+	rightBuilder.WriteString(fmt.Sprintf("\033[35mCLASS\033[0m : %s\n", class))
+	rightBuilder.WriteString(fmt.Sprintf("\033[32mLEVEL\033[0m : %d\n", level))
+
+	// XP Bar
+	xpBar := renderProgressBar(xp, 100, "█", "░", 10)
+	rightBuilder.WriteString(fmt.Sprintf("\033[32mXP\033[0m    %s %d%%\n\n", xpBar, xp))
 
 	hp := int(m.frame.Resources["health"])
 	mp := int(m.frame.Resources["mana"])
@@ -379,7 +579,25 @@ func (m model) View() string {
 	rightPanel := hudBoxStyle.Render(rightBuilder.String())
 	mainContent := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, "    ", rightPanel) + "\n\n"
 
-	// 5. Bottom Panel: Choices & Help
+	// 5. Action Log Box
+	var logBuilder strings.Builder
+	logBuilder.WriteString(lipgloss.NewStyle().Bold(true).Foreground(magenta).Render("📜 ACTION LOG") + "\n")
+	if len(m.actionLog) > 0 {
+		for _, entry := range m.actionLog {
+			logBuilder.WriteString(entry + "\n")
+		}
+	} else {
+		logBuilder.WriteString("\033[90mNo actions yet...\033[0m\n")
+	}
+	actionLogBox := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(gray).
+		Padding(0, 2).
+		Width(77).
+		MarginBottom(1).
+		Render(logBuilder.String())
+
+	// 6. Bottom Panel: Choices & Help
 	var bottomBuilder strings.Builder
 	if len(m.frame.Choices) > 0 {
 		bottomBuilder.WriteString(choiceTitleStyle.Render("What do you do?") + "\n")
@@ -398,8 +616,8 @@ func (m model) View() string {
 
 	bottomBuilder.WriteString(footerStyle.Render("[↑/↓] Navigate • [1-9] Quick Hotkey • [S] Save • [L] Load • [Enter] Confirm • [Q] Quit"))
 
-	// 6. Combine everything inside a gorgeous rounded border
-	screen := lipgloss.JoinVertical(lipgloss.Left, header, mainContent, bottomBuilder.String())
+	// 7. Combine everything inside a gorgeous rounded border
+	screen := lipgloss.JoinVertical(lipgloss.Left, header, mainContent, actionLogBox, bottomBuilder.String())
 	return lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(magenta).
