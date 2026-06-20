@@ -6,7 +6,7 @@
 
 # Interface: ValidationError
 
-Defined in: [core/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L207)
+Defined in: [packages/core/src/types.ts:243](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L243)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:207](https://github.com/sirmews/fiction-map/blob/
 
 > **code**: `string`
 
-Defined in: [core/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L208)
+Defined in: [packages/core/src/types.ts:244](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L244)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:208](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **edgeId?**: `string`
 
-Defined in: [core/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L212)
+Defined in: [packages/core/src/types.ts:248](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L248)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [core/src/types.ts:212](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **location?**: [`SourceLocation`](SourceLocation.md)
 
-Defined in: [core/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L210)
+Defined in: [packages/core/src/types.ts:246](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L246)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [core/src/types.ts:210](https://github.com/sirmews/fiction-map/blob/
 
 > **message**: `string`
 
-Defined in: [core/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L209)
+Defined in: [packages/core/src/types.ts:245](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L245)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [core/src/types.ts:209](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **nodeId?**: `string`
 
-Defined in: [core/src/types.ts:211](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L211)
+Defined in: [packages/core/src/types.ts:247](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L247)

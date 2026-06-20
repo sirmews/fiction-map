@@ -29,6 +29,7 @@ export type PropertyType =
   | "map"
   | "set"
   | "reference"
+  | "struct"
 
 export interface PropertySchema {
   type: PropertyType
@@ -48,10 +49,30 @@ export interface PropertySchema {
 
   // For references
   referenceTo?: string
+
+  // For structs
+  structId?: string
 }
 
 export interface PropertyDefinition {
   [name: string]: PropertySchema
+}
+
+// ============================================================================
+// Struct Types
+// ============================================================================
+
+export interface StructDefinition {
+  id: string
+  name: string
+  location: SourceLocation
+  description?: string
+  properties: PropertyDefinition
+}
+
+export interface StructConfig {
+  id: string
+  properties?: PropertyDefinition
 }
 
 // ============================================================================
@@ -67,6 +88,7 @@ export interface NodeTypeDefinition {
   properties: PropertyDefinition
   outgoingEdges: string[]
   incomingEdges: string[]
+  autoResolve?: boolean
 }
 
 export interface NodeTypeConfig {
@@ -74,6 +96,7 @@ export interface NodeTypeConfig {
   properties?: PropertyDefinition
   outgoingEdges?: string[]
   incomingEdges?: string[]
+  autoResolve?: boolean
 }
 
 // ============================================================================
@@ -162,6 +185,7 @@ export interface NodeInstance {
   id: string
   type: string
   blocks?: ContentBlock[]
+  autoResolve?: boolean
   [property: string]: unknown
 }
 
@@ -242,6 +266,7 @@ export interface GraphMetadata {
   conditions: ConditionDefinition[]
   effects: EffectDefinition[]
   graphs: GraphDefinition[]
+  structs?: StructDefinition[]
   validation: {
     errors: ValidationError[]
     warnings: ValidationWarning[]

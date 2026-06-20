@@ -21,6 +21,7 @@ import type {
   NodeTypeDefinition,
   PropertyDefinition,
   PropertySchema,
+  StructDefinition,
 } from "@fiction-map/core"
 
 const INDENT = "  "
@@ -53,6 +54,21 @@ function formatPropertySchema(schema: PropertySchema): string {
   if (schema.values && schema.values.length > 0) {
     fields.push(`values: [${schema.values.map((v) => JSON.stringify(v)).join(", ")}]`)
   }
+  if (schema.structId) {
+    fields.push(`structId: "${schema.structId}"`)
+  }
+  if (schema.items) {
+    fields.push(`items: ${formatPropertySchema(schema.items)}`)
+  }
+  if (schema.keyType) {
+    fields.push(`keyType: "${schema.keyType}"`)
+  }
+  if (schema.valueType) {
+    fields.push(`valueType: ${formatPropertySchema(schema.valueType)}`)
+  }
+  if (schema.referenceTo) {
+    fields.push(`referenceTo: "${schema.referenceTo}"`)
+  }
   return `{ ${fields.join(", ")} }`
 }
 
@@ -72,6 +88,25 @@ function formatStringArray(values: string[]): string {
 
 function formatLocation(location: { file: string; line: number }): string {
   return `${location.file}:${location.line}`
+}
+
+function renderStructBlock(st: StructDefinition): string {
+  const lines: string[] = [`### \`${st.id}\``, ""]
+
+  if (st.description) lines.push(`> ${st.description}`)
+  lines.push("")
+
+  const body: string[] = [
+    "```typescript",
+    `defineStruct(registry, {`,
+    `${INDENT}id: ${JSON.stringify(st.id)},`,
+    `${INDENT}properties: ${formatProperties(st.properties)},`,
+    "})",
+    "```",
+  ]
+
+  lines.push(...body, "", `Source: \`${formatLocation(st.location)}\``)
+  return lines.join("\n")
 }
 
 function renderNodeTypeBlock(nt: NodeTypeDefinition): string {
@@ -247,6 +282,13 @@ export function renderSemantics(metadata: GraphMetadata): string {
     "Each entry shows its source location and (where present) author-supplied `@description` and `@ai-rule` annotations. Run `fiction-map validate` to check that the current graphs satisfy their declared types.",
     "",
   ]
+
+  if (metadata.structs && metadata.structs.length > 0) {
+    for (const block of renderSection("Structs", metadata.structs, renderStructBlock)) {
+      sections.push(block)
+    }
+    sections.push("", "---", "")
+  }
 
   for (const block of renderSection("Node Types", metadata.nodeTypes, renderNodeTypeBlock)) {
     sections.push(block)

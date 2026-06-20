@@ -6,7 +6,7 @@
 
 # Interface: WorldDefinition
 
-Defined in: [entities/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L72)
+Defined in: [packages/entities/src/types.ts:67](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L67)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [entities/src/types.ts:72](https://github.com/sirmews/fiction-map/bl
 
 > **entities**: [`EntityInstance`](EntityInstance.md)[]
 
-Defined in: [entities/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L76)
+Defined in: [packages/entities/src/types.ts:71](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L71)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [entities/src/types.ts:76](https://github.com/sirmews/fiction-map/bl
 
 > **entityCount**: `number`
 
-Defined in: [entities/src/types.ts:77](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L77)
+Defined in: [packages/entities/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L72)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [entities/src/types.ts:77](https://github.com/sirmews/fiction-map/bl
 
 > **entityTypesUsed**: `string`[]
 
-Defined in: [entities/src/types.ts:78](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L78)
+Defined in: [packages/entities/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L73)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [entities/src/types.ts:78](https://github.com/sirmews/fiction-map/bl
 
 > **errors**: `ValidationError`[]
 
-Defined in: [entities/src/types.ts:79](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L79)
+Defined in: [packages/entities/src/types.ts:74](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L74)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [entities/src/types.ts:79](https://github.com/sirmews/fiction-map/bl
 
 > **id**: `string`
 
-Defined in: [entities/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L73)
+Defined in: [packages/entities/src/types.ts:68](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L68)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [entities/src/types.ts:73](https://github.com/sirmews/fiction-map/bl
 
 > **location**: `SourceLocation`
 
-Defined in: [entities/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L75)
+Defined in: [packages/entities/src/types.ts:70](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L70)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [entities/src/types.ts:75](https://github.com/sirmews/fiction-map/bl
 
 > **name**: `string`
 
-Defined in: [entities/src/types.ts:74](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L74)
+Defined in: [packages/entities/src/types.ts:69](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L69)
 
 ***
 
@@ -70,4 +70,4 @@ Defined in: [entities/src/types.ts:74](https://github.com/sirmews/fiction-map/bl
 
 > **warnings**: `ValidationWarning`[]
 
-Defined in: [entities/src/types.ts:80](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L80)
+Defined in: [packages/entities/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L75)

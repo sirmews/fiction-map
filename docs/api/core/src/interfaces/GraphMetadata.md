@@ -6,7 +6,7 @@
 
 # Interface: GraphMetadata
 
-Defined in: [core/src/types.ts:227](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L227)
+Defined in: [packages/core/src/types.ts:263](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L263)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:227](https://github.com/sirmews/fiction-map/blob/
 
 > **conditions**: [`ConditionDefinition`](ConditionDefinition.md)[]
 
-Defined in: [core/src/types.ts:230](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L230)
+Defined in: [packages/core/src/types.ts:266](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L266)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:230](https://github.com/sirmews/fiction-map/blob/
 
 > **edgeTypes**: [`EdgeTypeDefinition`](EdgeTypeDefinition.md)[]
 
-Defined in: [core/src/types.ts:229](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L229)
+Defined in: [packages/core/src/types.ts:265](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L265)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [core/src/types.ts:229](https://github.com/sirmews/fiction-map/blob/
 
 > **effects**: [`EffectDefinition`](EffectDefinition.md)[]
 
-Defined in: [core/src/types.ts:231](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L231)
+Defined in: [packages/core/src/types.ts:267](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L267)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [core/src/types.ts:231](https://github.com/sirmews/fiction-map/blob/
 
 > **graphs**: [`GraphDefinition`](GraphDefinition.md)[]
 
-Defined in: [core/src/types.ts:232](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L232)
+Defined in: [packages/core/src/types.ts:268](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L268)
 
 ***
 
@@ -46,7 +46,15 @@ Defined in: [core/src/types.ts:232](https://github.com/sirmews/fiction-map/blob/
 
 > **nodeTypes**: [`NodeTypeDefinition`](NodeTypeDefinition.md)[]
 
-Defined in: [core/src/types.ts:228](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L228)
+Defined in: [packages/core/src/types.ts:264](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L264)
+
+***
+
+### structs?
+
+> `optional` **structs?**: [`StructDefinition`](StructDefinition.md)[]
+
+Defined in: [packages/core/src/types.ts:269](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L269)
 
 ***
 
@@ -54,7 +62,7 @@ Defined in: [core/src/types.ts:228](https://github.com/sirmews/fiction-map/blob/
 
 > **validation**: `object`
 
-Defined in: [core/src/types.ts:233](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L233)
+Defined in: [packages/core/src/types.ts:270](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L270)
 
 #### errors
 

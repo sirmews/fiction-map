@@ -6,7 +6,7 @@
 
 # Interface: EdgeInstance
 
-Defined in: [core/src/types.ts:157](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L157)
+Defined in: [packages/core/src/types.ts:192](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L192)
 
 ## Indexable
 
@@ -14,11 +14,19 @@ Defined in: [core/src/types.ts:157](https://github.com/sirmews/fiction-map/blob/
 
 ## Properties
 
+### anchorBlockId?
+
+> `optional` **anchorBlockId?**: `string`
+
+Defined in: [packages/core/src/types.ts:197](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L197)
+
+***
+
 ### conditions?
 
 > `optional` **conditions?**: [`ConditionInstance`](ConditionInstance.md)[]
 
-Defined in: [core/src/types.ts:162](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L162)
+Defined in: [packages/core/src/types.ts:198](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L198)
 
 ***
 
@@ -26,7 +34,7 @@ Defined in: [core/src/types.ts:162](https://github.com/sirmews/fiction-map/blob/
 
 > `optional` **effects?**: [`EffectInstance`](EffectInstance.md)[]
 
-Defined in: [core/src/types.ts:163](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L163)
+Defined in: [packages/core/src/types.ts:199](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L199)
 
 ***
 
@@ -34,7 +42,7 @@ Defined in: [core/src/types.ts:163](https://github.com/sirmews/fiction-map/blob/
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:158](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L158)
+Defined in: [packages/core/src/types.ts:193](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L193)
 
 ***
 
@@ -42,7 +50,7 @@ Defined in: [core/src/types.ts:158](https://github.com/sirmews/fiction-map/blob/
 
 > **source**: `string`
 
-Defined in: [core/src/types.ts:160](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L160)
+Defined in: [packages/core/src/types.ts:195](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L195)
 
 ***
 
@@ -50,7 +58,7 @@ Defined in: [core/src/types.ts:160](https://github.com/sirmews/fiction-map/blob/
 
 > **target**: `string`
 
-Defined in: [core/src/types.ts:161](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L161)
+Defined in: [packages/core/src/types.ts:196](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L196)
 
 ***
 
@@ -58,4 +66,4 @@ Defined in: [core/src/types.ts:161](https://github.com/sirmews/fiction-map/blob/
 
 > **type**: `string`
 
-Defined in: [core/src/types.ts:159](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L159)
+Defined in: [packages/core/src/types.ts:194](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L194)

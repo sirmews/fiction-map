@@ -6,7 +6,7 @@
 
 # Interface: GraphConfig
 
-Defined in: [core/src/types.ts:197](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L197)
+Defined in: [packages/core/src/types.ts:233](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L233)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:197](https://github.com/sirmews/fiction-map/blob/
 
 > **edges**: [`EdgeInstance`](EdgeInstance.md)[]
 
-Defined in: [core/src/types.ts:200](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L200)
+Defined in: [packages/core/src/types.ts:236](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L236)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:200](https://github.com/sirmews/fiction-map/blob/
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:198](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L198)
+Defined in: [packages/core/src/types.ts:234](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L234)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [core/src/types.ts:198](https://github.com/sirmews/fiction-map/blob/
 
 > **nodes**: [`NodeInstance`](NodeInstance.md)[]
 
-Defined in: [core/src/types.ts:199](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L199)
+Defined in: [packages/core/src/types.ts:235](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L235)

@@ -14,7 +14,7 @@ import { glob } from "glob"
 
 export interface DiscoveredFile {
   path: string
-  type: "node" | "edge" | "condition" | "effect" | "graph"
+  type: "node" | "edge" | "condition" | "effect" | "graph" | "struct"
   id: string
 }
 
@@ -24,6 +24,7 @@ export interface DiscoveryResult {
   conditions: DiscoveredFile[]
   effects: DiscoveredFile[]
   graphs: DiscoveredFile[]
+  structs: DiscoveredFile[]
 }
 
 /**
@@ -37,7 +38,7 @@ export interface DiscoveryResult {
 function extractId(filename: string): string {
   const base = basename(filename)
   // Remove extensions like .node.ts, .condition.ts, etc.
-  return base.replace(/\.(node|edge|condition|effect|graph)\.ts$/, "")
+  return base.replace(/\.(node|edge|condition|effect|graph|struct)\.ts$/, "")
 }
 
 /**
@@ -50,15 +51,18 @@ export async function discoverFiles(rootDir: string): Promise<DiscoveryResult> {
     conditions: join(rootDir, "**/*.condition.ts"),
     effects: join(rootDir, "**/*.effect.ts"),
     graphs: join(rootDir, "**/*.graph.ts"),
+    structs: join(rootDir, "**/*.struct.ts"),
   }
 
-  const [nodeFiles, edgeFiles, conditionFiles, effectFiles, graphFiles] = await Promise.all([
-    glob(patterns.nodes, { ignore: ["**/node_modules/**", "**/dist/**"] }),
-    glob(patterns.edges, { ignore: ["**/node_modules/**", "**/dist/**"] }),
-    glob(patterns.conditions, { ignore: ["**/node_modules/**", "**/dist/**"] }),
-    glob(patterns.effects, { ignore: ["**/node_modules/**", "**/dist/**"] }),
-    glob(patterns.graphs, { ignore: ["**/node_modules/**", "**/dist/**"] }),
-  ])
+  const [nodeFiles, edgeFiles, conditionFiles, effectFiles, graphFiles, structFiles] =
+    await Promise.all([
+      glob(patterns.nodes, { ignore: ["**/node_modules/**", "**/dist/**"] }),
+      glob(patterns.edges, { ignore: ["**/node_modules/**", "**/dist/**"] }),
+      glob(patterns.conditions, { ignore: ["**/node_modules/**", "**/dist/**"] }),
+      glob(patterns.effects, { ignore: ["**/node_modules/**", "**/dist/**"] }),
+      glob(patterns.graphs, { ignore: ["**/node_modules/**", "**/dist/**"] }),
+      glob(patterns.structs, { ignore: ["**/node_modules/**", "**/dist/**"] }),
+    ])
 
   return {
     nodes: nodeFiles.map((path) => ({
@@ -86,6 +90,11 @@ export async function discoverFiles(rootDir: string): Promise<DiscoveryResult> {
       type: "graph" as const,
       id: extractId(path),
     })),
+    structs: structFiles.map((path) => ({
+      path,
+      type: "struct" as const,
+      id: extractId(path),
+    })),
   }
 }
 
@@ -99,5 +108,6 @@ export function printDiscoverySummary(result: DiscoveryResult): void {
   console.log(`   Conditions:  ${result.conditions.length}`)
   console.log(`   Effects:     ${result.effects.length}`)
   console.log(`   Graphs:      ${result.graphs.length}`)
+  console.log(`   Structs:     ${result.structs.length}`)
   console.log("")
 }

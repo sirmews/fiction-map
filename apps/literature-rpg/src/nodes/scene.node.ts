@@ -4,7 +4,7 @@ import { registry } from "../project"
 export const SceneNode = defineNodeType(registry, {
   id: "scene",
   properties: {
-    title: { type: "string", required: true },
+    title: { type: "string" },
     body: { type: "string" },
   },
   outgoingEdges: ["choice"],

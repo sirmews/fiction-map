@@ -71,8 +71,8 @@ function graphEdgeToBlueprint(edge: EdgeInstance): EdgeBlueprint {
 export function graphDefinitionToBlueprint(graph: GraphDefinition): GraphBlueprint {
   return {
     nodes: graph.nodes.map((node) => {
-      const { id, type, blocks, ...properties } = node as any
-      return { id, type, blocks, ...properties }
+      const { id, type, blocks, autoResolve, enterEffects, ...properties } = node as any
+      return { id, type, blocks, autoResolve, enterEffects, ...properties }
     }),
     edges: graph.edges.map(graphEdgeToBlueprint),
     endings: graph.endings,

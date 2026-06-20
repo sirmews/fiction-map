@@ -8,4 +8,4 @@
 
 > **EntityPrerequisiteKind** = `"entity"` \| `"state"` \| `"tag"`
 
-Defined in: [entities/src/types.ts:52](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L52)
+Defined in: [packages/entities/src/types.ts:47](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L47)

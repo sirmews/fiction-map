@@ -8,7 +8,7 @@
 
 > **defineGraph**(`registry`, `config`): [`GraphDefinition`](../interfaces/GraphDefinition.md)
 
-Defined in: [core/src/graph.ts:361](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/graph.ts#L361)
+Defined in: [packages/core/src/graph.ts:493](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/graph.ts#L493)
 
 Define a graph
 

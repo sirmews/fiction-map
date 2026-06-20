@@ -32,7 +32,7 @@ function getCallSite(): SourceLocation {
   return { file: "unknown", line: 0, column: 0 }
 }
 
-function validatePropertyValue(value: unknown, schema: PropertySchema): boolean {
+function validatePropertyValue(value: unknown, schema: PropertySchema, registry?: any): boolean {
   switch (schema.type) {
     case "string":
     case "richtext":
@@ -49,7 +49,7 @@ function validatePropertyValue(value: unknown, schema: PropertySchema): boolean 
     case "array":
       if (!Array.isArray(value)) return false
       if (!schema.items) return true
-      return value.every((item) => validatePropertyValue(item, schema.items!))
+      return value.every((item) => validatePropertyValue(item, schema.items!, registry))
     case "set":
       if (value instanceof Set) return true
       return Array.isArray(value)
@@ -58,7 +58,27 @@ function validatePropertyValue(value: unknown, schema: PropertySchema): boolean 
         return false
       }
       if (!schema.valueType) return true
-      return Object.values(value).every((item) => validatePropertyValue(item, schema.valueType!))
+      return Object.values(value).every((item) =>
+        validatePropertyValue(item, schema.valueType!, registry),
+      )
+    case "struct": {
+      if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false
+      }
+      if (!schema.structId || !registry) return false
+      const structDef = registry.structs?.get(schema.structId)
+      if (!structDef) return false
+      for (const [propName, propSchema] of Object.entries(structDef.properties) as [string, PropertySchema][]) {
+        const propValue = (value as Record<string, unknown>)[propName]
+        if (propSchema.required && propValue === undefined) {
+          return false
+        }
+        if (propValue !== undefined && !validatePropertyValue(propValue, propSchema, registry)) {
+          return false
+        }
+      }
+      return true
+    }
     default:
       return true
   }
@@ -122,7 +142,7 @@ function validateWorld(
         continue
       }
 
-      if (value !== undefined && !validatePropertyValue(value, schema)) {
+      if (value !== undefined && !validatePropertyValue(value, schema, registry)) {
         errors.push({
           code: "INVALID_PROPERTY_TYPE",
           message: `Entity "${entity.id}" has invalid value for property "${propertyName}"`,
