@@ -9,6 +9,7 @@
     "build": "bun run --filter '*' build",
     "test": "bun run --filter '*' test",
     "typecheck": "bun run --filter '*' typecheck",
+    "lint:boundaries": "bun run ./scripts/check-boundary.ts",
     "docs:api": "typedoc",
     "format": "biome format --write .",
     "lint": "biome lint .",

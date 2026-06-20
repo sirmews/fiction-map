@@ -82,8 +82,10 @@ function validatePropertyValue(value: unknown, schema: PropertySchema, registry?
       }
       return true
     }
-    default:
-      return true
+    default: {
+      const _exhaustiveCheck: never = schema.type
+      return _exhaustiveCheck
+    }
   }
 }
 

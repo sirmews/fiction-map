@@ -61,6 +61,14 @@ others. Two reasons drove us to adopt this for the `Frame`/`Intent` protocol spe
 
 ## Adopt
 
+### Presentation boundary
+
+Presentation logic is out-of-scope for all engine and protocol layers. That means `@fiction-map/core`,
+`@fiction-map/entities`, `@fiction-map/runtime`, and `@fiction-map/protocol` must only transport
+game state and transitions (keys/flags/inventory/counters). Iconography, color choices, bars, panel
+composition, and choice formatting are all consumer-layer responsibilities (`apps/*`), driven by
+consumer-owned render configuration.
+
 1. **Authored domain content** (nodes, edges, conditions, effects, graphs) → full extraction:
    `metadata.json` + `SEMANTICS.md`. Unchanged.
 2. **Stable, single-language, in-process framework types** → TypeScript types with

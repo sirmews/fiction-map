@@ -51,6 +51,10 @@ We are explicitly adopting these principles:
    Metadata generation, semantics generation, and validation CLI flows should support consumer
    apps, CI, and AI workflows without becoming a workspace platform.
 
+6. **Presentation stays in consumer space**
+   Visual semantics and render behavior are never authored in engine-facing types.
+   Icons, colors, layout slots, fonts, panels, and widget selection belong to consumer app configuration.
+
 ## Reject
 
 We are explicitly rejecting these directions inside the Fiction Map package surface:
@@ -131,6 +135,7 @@ Should not own:
 - built-in story schemas
 - app-specific domain ontology
 - UI concerns
+- visual semantics or rendering metadata (icons/colors/labels/layout)
 
 ### `@fiction-map/runtime`
 
@@ -147,6 +152,7 @@ Should not own:
 - editor UI state
 - canvas coordinates
 - visual graph interactions
+- any UI/rendering logic or presentational defaults
 
 ### `fiction-map` CLI
 
