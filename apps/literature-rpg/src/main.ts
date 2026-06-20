@@ -1,13 +1,11 @@
-/**
- * Runtime entry point for the literature-rpg consumer app.
- *
- * Builds a `GraphRuntime` from the authored graph in `graphs/story.graph.ts`
- * and renders a React-based interactive TUI dashboard using Ink.
- */
-
-import { createRuntimeFromGraph, registerBuiltins } from "@fiction-map/runtime"
-import { render } from "ink"
-import { GameController } from "./components/GameController"
+import readline from "node:readline"
+import { applyIntent, computeFrame } from "@fiction-map/protocol"
+import {
+  createInitialState,
+  createRuntimeFromGraph,
+  deriveEntityState,
+  registerBuiltins,
+} from "@fiction-map/runtime"
 import { story } from "./graphs/story.graph"
 import { registry } from "./project"
 import { world } from "./world"
@@ -47,21 +45,40 @@ runtime.addTrigger({
   effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
 })
 
-export async function playInteractive() {
-  if (!process.stdin.isTTY) {
-    console.error(`
-❌ Error: Interactive TUI requires a direct TTY terminal input (Raw Mode).
-When running via "bun run --filter", standard input is redirected, which breaks keyboard navigation.
+export function startSidecar() {
+  let state = createInitialState(runtime.startNodeId)
 
-👉 Please run the game directly using either:
-   1. bun --cwd apps/literature-rpg start
-   2. cd apps/literature-rpg && bun run start
-`)
-    process.exit(1)
-  }
+  // Output initial frame immediately
+  const initialContext = { derivedState: deriveEntityState(world, state) }
+  const initialFrame = computeFrame(runtime, state, initialContext, world)
+  console.log(JSON.stringify(initialFrame))
 
-  const { waitUntilExit } = render(<GameController runtime={runtime} />)
-  await waitUntilExit()
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false,
+  })
+
+  rl.on("line", (line) => {
+    const trimmed = line.trim()
+    if (!trimmed) return
+
+    try {
+      const intent = JSON.parse(trimmed)
+      const result = applyIntent(runtime, state, intent, world)
+
+      state = result.state
+
+      // Output next frame
+      console.log(JSON.stringify(result.frame))
+
+      if (result.exit) {
+        process.exit(0)
+      }
+    } catch (e) {
+      console.error(JSON.stringify({ error: `Sidecar error: ${(e as Error).message}` }))
+    }
+  })
 }
 
 // Only run when invoked directly
@@ -71,5 +88,5 @@ if ((import.meta as { main?: boolean }).main) {
     process.exit(1)
   }
 
-  await playInteractive()
+  startSidecar()
 }
