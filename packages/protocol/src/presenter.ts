@@ -89,7 +89,7 @@ export function computeFrame(
   return {
     currentNode: {
       id: currentNodeId,
-      type: currentNode.type,
+      type: currentNode.type ?? "",
       blocks: activeBlocks,
     },
     choices,

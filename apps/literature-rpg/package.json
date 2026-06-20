@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:deps": "bun run --filter @fiction-map/core build && bun run --filter @fiction-map/entities build && bun run --filter @fiction-map/runtime build && bun run --filter fiction-map build",
+    "build:deps": "bun run --filter @fiction-map/core build && bun run --filter @fiction-map/entities build && bun run --filter @fiction-map/runtime build && bun run --filter @fiction-map/protocol build && bun run --filter fiction-map build",
     "prestart": "bun run build:deps",
-    "start": "bun run src/main.tsx",
+    "start": "bun run src/main.ts",
     "pregenerate": "bun run build:deps",
     "generate": "bun node_modules/fiction-map/dist/cli.js generate --root-dir src",
     "prevalidate": "bun run build:deps",
@@ -19,14 +19,11 @@
   "dependencies": {
     "@fiction-map/core": "workspace:*",
     "@fiction-map/entities": "workspace:*",
+    "@fiction-map/protocol": "workspace:*",
     "@fiction-map/runtime": "workspace:*",
-    "fiction-map": "workspace:*",
-    "ink": "^4.4.1",
-    "picocolors": "^1.1.1",
-    "react": "^18.2.0"
+    "fiction-map": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
     "typescript": "^5.4.0",
     "vitest": "^1.0.0"
   }
