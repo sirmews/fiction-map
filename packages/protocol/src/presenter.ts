@@ -42,7 +42,7 @@ export function computeFrame(
   const availableChoices = runtime.getAvailable(state, context)
   const choices: FrameChoice[] = availableChoices.map((choice) => ({
     id: choice.id,
-    label: choice.label ?? choice.metadata?.text ?? choice.id,
+    label: (choice.label ?? (choice as any).metadata?.text ?? choice.id) as string,
   }))
 
   // 5. Map resources
