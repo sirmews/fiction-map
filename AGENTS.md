@@ -17,7 +17,14 @@ Welcome to the `fiction-map` repository. As an AI agent working in this codebase
 *   **The Consumer App owns the UI:** Consumer applications (like `apps/literature-rpg` and `apps/literature-rpg-web`) are completely responsible for styling, rendering, and gameplay loops. Keep engine concerns completely separated from the UI logic.
 *   **Singletons are Banned:** Always use `ProjectRegistry` or `EntityRegistry` instances. Do not rely on global mutable state for schema definitions.
 
-## 4. Git Workflow (PRS ONLY)
+## 4. LLM-Friendly Artifacts (SINGLE SOURCE OF TRUTH > GENERATION)
+*   The goal is a **single source of truth + agent-legible artifacts**; generation is a *means*, not the goal.
+*   **Generate** a structured artifact only when **(a)** the content is per-consumer/authored/dynamic (e.g. graphs → `metadata.json` + `SEMANTICS.md`), **or (b)** it crosses a language/process boundary where divergence fails silently at runtime.
+*   **Cross-language contracts** (e.g. the `Frame`/`Intent` presentation protocol) must be **schema-as-source-of-truth with generated bindings** for each language, pinned by a golden-fixture conformance test. Do **not** hand-port a code-first type across languages and trust an LLM to keep copies in sync — that is the drift trap.
+*   **Stable, single-language, in-process types** use annotations (`@description` / `@ai-rule`) + tests — **not** a bespoke extractor.
+*   See [ADR 2026-06-20: LLM-Friendly Artifact Strategy](docs/decisions/2026-06-20-llm-friendly-artifact-strategy.md).
+
+## 5. Git Workflow (PRS ONLY)
 *   **NEVER push directly to `main`.**
 *   All changes must be made on a new branch (e.g., `feature/xyz`, `fix/abc`, `docs/123`).
 *   When work is complete, push the branch and use the `gh` CLI to create a Pull Request.
