@@ -28,14 +28,16 @@ type httpResponseMsg struct {
 }
 
 type model struct {
-	frame         generated.Frame
-	stdin         io.WriteCloser
-	err           error
-	selected      int
-	statusMessage string
-	host          string
-	sessionId     string
-	actionLog     []string
+	frame          generated.Frame
+	stdin          io.WriteCloser
+	err            error
+	selected       int
+	statusMessage  string
+	host           string
+	sessionId      string
+	actionLog      []string
+	terminalWidth  int
+	terminalHeight int
 }
 
 var (
@@ -83,9 +85,23 @@ var (
 			Underline(true).
 			MarginBottom(1)
 
+	beveledBorder = lipgloss.Border{
+		Top:         "▄",
+		Bottom:      "▀",
+		Left:        "▐",
+		Right:       "▌",
+		TopLeft:     "▗",
+		TopRight:    "▖",
+		BottomLeft:  "▝",
+		BottomRight: "▘",
+	}
+
 	hudBoxStyle = lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(cyan).
+			Border(beveledBorder).
+			BorderTopForeground(lipgloss.Color("#FFF")).    // Bright white highlight
+			BorderLeftForeground(lipgloss.Color("#FFF")).   // Bright white highlight
+			BorderBottomForeground(lipgloss.Color("#555")). // Dark gray shadow
+			BorderRightForeground(lipgloss.Color("#555")).  // Dark gray shadow
 			Padding(1, 2).
 			Width(32)
 
@@ -349,6 +365,11 @@ func (m model) handleIntent(intent generated.Intent) tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.terminalWidth = msg.Width
+		m.terminalHeight = msg.Height
+		return m, nil
+
 	case frameMsg:
 		newFrame := generated.Frame(msg)
 		m.updateActionLog(newFrame)
@@ -456,6 +477,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func add3DShadow(content string) string {
+	lines := strings.Split(content, "\n")
+	// Remove trailing empty line if present
+	if len(lines) > 0 && lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+	for i, line := range lines {
+		lines[i] = line + "\033[90m▐\033[0m" // Dark gray vertical shadow
+	}
+	width := lipgloss.Width(content)
+	bottomShadow := "\033[90m  " + strings.Repeat("▀", width-2) + "\033[0m"
+	return strings.Join(lines, "\n") + "\n" + bottomShadow
+}
+
 func (m model) View() string {
 	if m.err != nil {
 		return fmt.Sprintf("Error: %v\n", m.err)
@@ -464,6 +499,16 @@ func (m model) View() string {
 	if m.frame.CurrentNode.ID == "" {
 		return "Connecting to story engine...\n"
 	}
+
+	// Calculate adaptive heights, but keep widths stable and hand-crafted
+	height := m.terminalHeight
+	if height == 0 {
+		height = 24
+	}
+
+	leftWidth := 45
+	hudWidth := 28
+	availableWidth := 77
 
 	// 1. Header
 	header := lipgloss.JoinHorizontal(
@@ -509,13 +554,15 @@ func (m model) View() string {
 	var rightBuilder strings.Builder
 	rightBuilder.WriteString(hudTitleStyle.Render("PLAYER STATUS") + "\n")
 
-	// Location Portrait
-	art := getASCIIArt(m.frame.CurrentNode.ID)
-	portraitStyle := lipgloss.NewStyle().
-		Foreground(yellow).
-		Align(lipgloss.Center).
-		MarginBottom(1)
-	rightBuilder.WriteString(portraitStyle.Render(art) + "\n")
+	// Location Portrait (only if terminal height is at least 40 lines)
+	if height >= 40 {
+		art := getASCIIArt(m.frame.CurrentNode.ID)
+		portraitStyle := lipgloss.NewStyle().
+			Foreground(yellow).
+			Align(lipgloss.Center).
+			MarginBottom(1)
+		rightBuilder.WriteString(portraitStyle.Render(art) + "\n")
+	}
 
 	// Class & Level
 	class := m.getPlayerClass()
@@ -587,9 +634,10 @@ func (m model) View() string {
 	}
 
 	// 4. Join Panels Side-by-Side
-	leftPanel := lipgloss.NewStyle().Width(45).Render(leftBuilder.String())
-	rightPanel := hudBoxStyle.Render(rightBuilder.String())
-	mainContent := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, "    ", rightPanel) + "\n\n"
+	leftPanel := lipgloss.NewStyle().Width(leftWidth).Render(leftBuilder.String())
+	rightPanel := hudBoxStyle.Width(hudWidth).Render(rightBuilder.String())
+	rightPanel3D := add3DShadow(rightPanel)
+	mainContent := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, "    ", rightPanel3D) + "\n\n"
 
 	// 5. Action Log Box
 	var logBuilder strings.Builder
@@ -605,7 +653,7 @@ func (m model) View() string {
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(gray).
 		Padding(0, 2).
-		Width(77).
+		Width(availableWidth).
 		MarginBottom(1).
 		Render(logBuilder.String())
 
