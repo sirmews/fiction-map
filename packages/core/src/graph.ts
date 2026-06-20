@@ -9,6 +9,7 @@ import type {
   GraphConfig,
   GraphDefinition,
   NodeInstance,
+  PropertySchema,
   SourceLocation,
   ValidationError,
   ValidationWarning,
@@ -38,6 +39,63 @@ function getCallSite(): SourceLocation {
   }
 
   return { file: "unknown", line: 0, column: 0 }
+}
+
+function validatePropertyValue(
+  value: unknown,
+  schema: PropertySchema,
+  registry: ProjectRegistry,
+): boolean {
+  switch (schema.type) {
+    case "string":
+    case "richtext":
+    case "date":
+      return typeof value === "string"
+    case "number":
+      return typeof value === "number"
+    case "boolean":
+      return typeof value === "boolean"
+    case "enum":
+      return typeof value === "string" && !!schema.values?.includes(value)
+    case "reference":
+      return typeof value === "string"
+    case "array":
+      if (!Array.isArray(value)) return false
+      if (!schema.items) return true
+      return value.every((item) => validatePropertyValue(item, schema.items!, registry))
+    case "set":
+      if (value instanceof Set) return true
+      return Array.isArray(value)
+    case "map":
+      if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false
+      }
+      if (!schema.valueType) return true
+      return Object.values(value).every((item) =>
+        validatePropertyValue(item, schema.valueType!, registry),
+      )
+    case "struct": {
+      if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false
+      }
+      if (!schema.structId) return false
+      const structDef = registry.structs.get(schema.structId)
+      if (!structDef) return false
+      // Recursively validate each property of the struct
+      for (const [propName, propSchema] of Object.entries(structDef.properties)) {
+        const propValue = (value as Record<string, unknown>)[propName]
+        if (propSchema.required && propValue === undefined) {
+          return false
+        }
+        if (propValue !== undefined && !validatePropertyValue(propValue, propSchema, registry)) {
+          return false
+        }
+      }
+      return true
+    }
+    default:
+      return true
+  }
 }
 
 /**
@@ -76,6 +134,51 @@ export function validateGraph(
           formatKnownValues(Array.from(registry.nodeTypes.keys()), "node types"),
         nodeId: node.id,
       })
+      continue
+    }
+
+    // Validate node properties
+    for (const [propertyName, schema] of Object.entries(nodeType.properties)) {
+      const value = node[propertyName]
+
+      if (schema.required && value === undefined) {
+        errors.push({
+          code: "MISSING_REQUIRED_PROPERTY",
+          message: `Node "${node.id}" is missing required property "${propertyName}"`,
+          nodeId: node.id,
+        })
+        continue
+      }
+
+      if (value !== undefined) {
+        // If it's a struct, check if structId exists and is registered
+        if (schema.type === "struct") {
+          if (!schema.structId) {
+            errors.push({
+              code: "MISSING_STRUCT_ID",
+              message: `Property "${propertyName}" on node type "${node.type}" is of type "struct" but is missing "structId"`,
+              nodeId: node.id,
+            })
+            continue
+          }
+          if (!registry.structs.has(schema.structId)) {
+            errors.push({
+              code: "UNKNOWN_STRUCT",
+              message: `Property "${propertyName}" on node type "${node.type}" references unknown struct "${schema.structId}"`,
+              nodeId: node.id,
+            })
+            continue
+          }
+        }
+
+        if (!validatePropertyValue(value, schema, registry)) {
+          errors.push({
+            code: "INVALID_PROPERTY_TYPE",
+            message: `Node "${node.id}" has invalid value for property "${propertyName}"`,
+            nodeId: node.id,
+          })
+        }
+      }
     }
   }
 

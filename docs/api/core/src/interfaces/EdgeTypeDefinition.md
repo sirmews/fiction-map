@@ -6,7 +6,7 @@
 
 # Interface: EdgeTypeDefinition
 
-Defined in: [core/src/types.ts:83](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L83)
+Defined in: [packages/core/src/types.ts:106](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L106)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [core/src/types.ts:83](https://github.com/sirmews/fiction-map/blob/7
 
 > `optional` **aiRule?**: `string`
 
-Defined in: [core/src/types.ts:88](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L88)
+Defined in: [packages/core/src/types.ts:111](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L111)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [core/src/types.ts:88](https://github.com/sirmews/fiction-map/blob/7
 
 > `optional` **description?**: `string`
 
-Defined in: [core/src/types.ts:87](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L87)
+Defined in: [packages/core/src/types.ts:110](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L110)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [core/src/types.ts:87](https://github.com/sirmews/fiction-map/blob/7
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:84](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L84)
+Defined in: [packages/core/src/types.ts:107](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L107)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [core/src/types.ts:84](https://github.com/sirmews/fiction-map/blob/7
 
 > **location**: [`SourceLocation`](SourceLocation.md)
 
-Defined in: [core/src/types.ts:86](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L86)
+Defined in: [packages/core/src/types.ts:109](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L109)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [core/src/types.ts:86](https://github.com/sirmews/fiction-map/blob/7
 
 > **name**: `string`
 
-Defined in: [core/src/types.ts:85](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L85)
+Defined in: [packages/core/src/types.ts:108](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L108)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [core/src/types.ts:85](https://github.com/sirmews/fiction-map/blob/7
 
 > **properties**: [`PropertyDefinition`](PropertyDefinition.md)
 
-Defined in: [core/src/types.ts:89](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L89)
+Defined in: [packages/core/src/types.ts:112](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L112)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [core/src/types.ts:89](https://github.com/sirmews/fiction-map/blob/7
 
 > **sourceTypes**: `string`[]
 
-Defined in: [core/src/types.ts:90](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L90)
+Defined in: [packages/core/src/types.ts:113](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L113)
 
 ***
 
@@ -70,4 +70,4 @@ Defined in: [core/src/types.ts:90](https://github.com/sirmews/fiction-map/blob/7
 
 > **targetTypes**: `string`[]
 
-Defined in: [core/src/types.ts:91](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L91)
+Defined in: [packages/core/src/types.ts:114](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L114)

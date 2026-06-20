@@ -5,6 +5,7 @@ import {
   defineEffect,
   defineGraph,
   defineNodeType,
+  defineStruct,
   ProjectRegistry,
 } from "../src"
 
@@ -13,6 +14,121 @@ describe("@fiction-map/core", () => {
 
   beforeEach(() => {
     registry = new ProjectRegistry()
+  })
+
+  describe("defineStruct", () => {
+    it("should define a struct type", () => {
+      const coordinate = defineStruct(registry, {
+        id: "coordinate",
+        properties: {
+          x: { type: "number", required: true },
+          y: { type: "number", required: true },
+        },
+      })
+
+      expect(coordinate.id).toBe("coordinate")
+      expect(coordinate.name).toBe("coordinateStruct")
+      expect(coordinate.properties.x.type).toBe("number")
+      expect(registry.structs.get("coordinate")).toBeDefined()
+    })
+
+    it("should not allow duplicate struct ids", () => {
+      defineStruct(registry, { id: "coordinate" })
+
+      expect(() => {
+        defineStruct(registry, { id: "coordinate" })
+      }).toThrow("already defined")
+    })
+  })
+
+  describe("struct validation", () => {
+    it("should validate a node property against a struct schema", () => {
+      defineStruct(registry, {
+        id: "coordinate",
+        properties: {
+          x: { type: "number", required: true },
+          y: { type: "number", required: true },
+        },
+      })
+
+      defineNodeType(registry, {
+        id: "location-node",
+        properties: {
+          pos: { type: "struct", structId: "coordinate", required: true },
+        },
+      })
+
+      // Valid pos property
+      const validGraph = defineGraph(registry, {
+        id: "valid-story",
+        nodes: [{ id: "start", type: "location-node", pos: { x: 10, y: 20 } }],
+        edges: [],
+      })
+      expect(validGraph.errors).toHaveLength(0)
+
+      // Invalid pos property (wrong type for x)
+      const invalidGraph = defineGraph(registry, {
+        id: "invalid-story",
+        nodes: [{ id: "start", type: "location-node", pos: { x: "10", y: 20 } }],
+        edges: [],
+      })
+      expect(invalidGraph.errors).toContainEqual(
+        expect.objectContaining({ code: "INVALID_PROPERTY_TYPE" }),
+      )
+    })
+
+    it("should recursively validate an array of structs", () => {
+      defineStruct(registry, {
+        id: "loot-entry",
+        properties: {
+          itemId: { type: "string", required: true },
+          dropChance: { type: "number", required: true },
+        },
+      })
+
+      defineNodeType(registry, {
+        id: "chest-node",
+        properties: {
+          loot: {
+            type: "array",
+            items: { type: "struct", structId: "loot-entry" },
+          },
+        },
+      })
+
+      // Valid array of structs
+      const validGraph = defineGraph(registry, {
+        id: "valid-chest",
+        nodes: [
+          {
+            id: "start",
+            type: "chest-node",
+            loot: [
+              { itemId: "sword", dropChance: 0.5 },
+              { itemId: "shield", dropChance: 0.2 },
+            ],
+          },
+        ],
+        edges: [],
+      })
+      expect(validGraph.errors).toHaveLength(0)
+
+      // Invalid array of structs (wrong type for dropChance)
+      const invalidGraph = defineGraph(registry, {
+        id: "invalid-chest",
+        nodes: [
+          {
+            id: "start",
+            type: "chest-node",
+            loot: [{ itemId: "sword", dropChance: "high" }],
+          },
+        ],
+        edges: [],
+      })
+      expect(invalidGraph.errors).toContainEqual(
+        expect.objectContaining({ code: "INVALID_PROPERTY_TYPE" }),
+      )
+    })
   })
 
   describe("defineNodeType", () => {

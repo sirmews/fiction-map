@@ -15,6 +15,7 @@ import {
   type GraphMetadata,
   type NodeTypeDefinition,
   ProjectRegistry,
+  type StructDefinition,
 } from "@fiction-map/core"
 import { defineWorld, EntityRegistry } from "@fiction-map/entities"
 import {
@@ -30,6 +31,7 @@ import {
   extractEffect,
   extractGraph,
   extractNodeType,
+  extractStruct,
 } from "./extract"
 import { renderSemantics } from "./semantics"
 
@@ -153,6 +155,12 @@ export async function buildMetadata(
   const conditions: ConditionDefinition[] = []
   const effects: EffectDefinition[] = []
   const graphs: GraphDefinition[] = []
+  const structs: StructDefinition[] = []
+
+  for (const file of discovered.structs) {
+    const def = extractStruct(file.path, rootDir)
+    if (def) structs.push(def)
+  }
 
   for (const file of discovered.nodes) {
     const def = extractNodeType(file.path, rootDir)
@@ -181,6 +189,7 @@ export async function buildMetadata(
 
   // Validate graphs against the extracted types
   const registry = new ProjectRegistry()
+  for (const st of structs) registry.structs.set(st.id, st)
   for (const nt of nodeTypes) registry.nodeTypes.set(nt.id, nt)
   for (const et of edgeTypes) registry.edgeTypes.set(et.id, et)
   seedBuiltins(registry)
@@ -219,6 +228,7 @@ export async function buildMetadata(
     conditions,
     effects,
     graphs,
+    structs,
     validation: {
       errors: topLevelErrors,
       warnings: topLevelWarnings,

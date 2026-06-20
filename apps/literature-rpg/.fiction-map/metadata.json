@@ -10,8 +10,7 @@
       },
       "properties": {
         "title": {
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "body": {
           "type": "string"
@@ -22,7 +21,8 @@
       ],
       "incomingEdges": [
         "choice"
-      ]
+      ],
+      "autoResolve": false
     }
   ],
   "edgeTypes": [
@@ -1361,6 +1361,7 @@
       "warnings": []
     }
   ],
+  "structs": [],
   "validation": {
     "errors": [],
     "warnings": []

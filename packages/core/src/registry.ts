@@ -4,6 +4,7 @@ import type {
   EffectDefinition,
   GraphDefinition,
   NodeTypeDefinition,
+  StructDefinition,
 } from "./types"
 
 export class ProjectRegistry {
@@ -12,6 +13,7 @@ export class ProjectRegistry {
   public conditions = new Map<string, ConditionDefinition>()
   public effects = new Map<string, EffectDefinition>()
   public graphs = new Map<string, GraphDefinition>()
+  public structs = new Map<string, StructDefinition>()
 
   public clear(): void {
     this.nodeTypes.clear()
@@ -19,5 +21,6 @@ export class ProjectRegistry {
     this.conditions.clear()
     this.effects.clear()
     this.graphs.clear()
+    this.structs.clear()
   }
 }

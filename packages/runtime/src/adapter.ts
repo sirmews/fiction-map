@@ -58,8 +58,18 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
 
   const nodes = new Map<string, NodeDefinition>(
     blueprint.nodes.map((n) => {
-      const { id, type, blocks, ...properties } = n
-      return [id, { id, type, blocks, properties }]
+      const { id, type, blocks, autoResolve, enterEffects, ...properties } = n
+      return [
+        id,
+        {
+          id,
+          type,
+          blocks,
+          autoResolve: autoResolve as boolean | undefined,
+          enterEffects: enterEffects as Effect[] | undefined,
+          properties,
+        },
+      ]
     }),
   )
 

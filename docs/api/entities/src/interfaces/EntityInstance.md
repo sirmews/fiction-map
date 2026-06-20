@@ -6,7 +6,7 @@
 
 # Interface: EntityInstance
 
-Defined in: [entities/src/types.ts:62](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L62)
+Defined in: [packages/entities/src/types.ts:57](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L57)
 
 ## Indexable
 
@@ -18,7 +18,7 @@ Defined in: [entities/src/types.ts:62](https://github.com/sirmews/fiction-map/bl
 
 > **id**: `string`
 
-Defined in: [entities/src/types.ts:63](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L63)
+Defined in: [packages/entities/src/types.ts:58](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L58)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [entities/src/types.ts:63](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **modifiers?**: [`EntityModifier`](EntityModifier.md)[]
 
-Defined in: [entities/src/types.ts:66](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L66)
+Defined in: [packages/entities/src/types.ts:61](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L61)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [entities/src/types.ts:66](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **prerequisites?**: [`EntityPrerequisite`](EntityPrerequisite.md)[]
 
-Defined in: [entities/src/types.ts:67](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L67)
+Defined in: [packages/entities/src/types.ts:62](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L62)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [entities/src/types.ts:67](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **references?**: `Record`\<`string`, [`EntityReferenceValue`](../type-aliases/EntityReferenceValue.md)\>
 
-Defined in: [entities/src/types.ts:65](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L65)
+Defined in: [packages/entities/src/types.ts:60](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L60)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [entities/src/types.ts:65](https://github.com/sirmews/fiction-map/bl
 
 > **type**: `string`
 
-Defined in: [entities/src/types.ts:64](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L64)
+Defined in: [packages/entities/src/types.ts:59](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L59)
 
 ***
 
@@ -58,4 +58,4 @@ Defined in: [entities/src/types.ts:64](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **unlocks?**: `string`[]
 
-Defined in: [entities/src/types.ts:68](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L68)
+Defined in: [packages/entities/src/types.ts:63](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L63)

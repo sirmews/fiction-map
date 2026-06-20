@@ -22,7 +22,7 @@ Each entry shows its source location and (where present) author-supplied `@descr
 defineNodeType(registry, {
   id: "scene",
   properties: {
-    title: { type: "string", required: true },
+    title: { type: "string" },
     body: { type: "string" },
   },
   outgoingEdges: ["choice"],

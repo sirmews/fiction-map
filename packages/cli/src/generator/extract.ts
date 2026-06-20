@@ -20,6 +20,7 @@ import type {
   PropertyDefinition,
   PropertySchema,
   SourceLocation,
+  StructDefinition,
 } from "@fiction-map/core"
 import { type CallExpression, Node, Project, type SourceFile, SyntaxKind } from "ts-morph"
 
@@ -127,6 +128,35 @@ function parsePropertySchema(node: Node): PropertySchema | null {
       case "values":
         if (Node.isArrayLiteralExpression(value)) {
           schema.values = value.getElements().map((e) => e.getText().replace(/['"]/g, ""))
+        }
+        break
+      case "structId":
+        if (Node.isStringLiteral(value)) {
+          schema.structId = value.getLiteralValue()
+        }
+        break
+      case "items": {
+        const parsed = parsePropertySchema(value)
+        if (parsed) {
+          schema.items = parsed
+        }
+        break
+      }
+      case "keyType":
+        if (Node.isStringLiteral(value)) {
+          schema.keyType = value.getLiteralValue() as PropertySchema["keyType"]
+        }
+        break
+      case "valueType": {
+        const parsed = parsePropertySchema(value)
+        if (parsed) {
+          schema.valueType = parsed
+        }
+        break
+      }
+      case "referenceTo":
+        if (Node.isStringLiteral(value)) {
+          schema.referenceTo = value.getLiteralValue()
         }
         break
     }
@@ -240,6 +270,19 @@ export function extractNodeType(filePath: string, rootDir: string): NodeTypeDefi
       const location = getSourceLocation(callExpr, sourceFile)
       location.file = relative(rootDir, location.file)
 
+      const args = callExpr.getArguments()
+      const arg = args[args.length - 1]
+      let autoResolve = false
+      if (arg && Node.isObjectLiteralExpression(arg)) {
+        const autoResolveProp = arg.getProperty("autoResolve")
+        if (autoResolveProp && Node.isPropertyAssignment(autoResolveProp)) {
+          const init = autoResolveProp.getInitializer()
+          if (init && init.getText() === "true") {
+            autoResolve = true
+          }
+        }
+      }
+
       definition = {
         id,
         name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Node`,
@@ -249,6 +292,40 @@ export function extractNodeType(filePath: string, rootDir: string): NodeTypeDefi
         properties: extractConfigProperty(callExpr, "properties"),
         outgoingEdges: extractStringArray(callExpr, "outgoingEdges"),
         incomingEdges: extractStringArray(callExpr, "incomingEdges"),
+        autoResolve,
+      }
+      break
+    }
+  }
+
+  return definition
+}
+
+/**
+ * Extract struct definition from file
+ */
+export function extractStruct(filePath: string, rootDir: string): StructDefinition | null {
+  const sourceFile = getSourceFile(filePath)
+  if (!sourceFile) return null
+
+  let definition: StructDefinition | null = null
+
+  for (const callExpr of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+    const expr = callExpr.getExpression()
+    if (Node.isIdentifier(expr) && expr.getText() === "defineStruct") {
+      const id = extractId(callExpr)
+      if (!id) continue
+
+      const jsDoc = extractLeadingJSDoc(callExpr)
+      const location = getSourceLocation(callExpr, sourceFile)
+      location.file = relative(rootDir, location.file)
+
+      definition = {
+        id,
+        name: `${id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Struct`,
+        location,
+        description: jsDoc.description,
+        properties: extractConfigProperty(callExpr, "properties"),
       }
       break
     }

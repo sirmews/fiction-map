@@ -6,15 +6,23 @@
 
 # Interface: NodeTypeConfig
 
-Defined in: [core/src/types.ts:72](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L72)
+Defined in: [packages/core/src/types.ts:94](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L94)
 
 ## Properties
+
+### autoResolve?
+
+> `optional` **autoResolve?**: `boolean`
+
+Defined in: [packages/core/src/types.ts:99](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L99)
+
+***
 
 ### id
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L73)
+Defined in: [packages/core/src/types.ts:95](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L95)
 
 ***
 
@@ -22,7 +30,7 @@ Defined in: [core/src/types.ts:73](https://github.com/sirmews/fiction-map/blob/7
 
 > `optional` **incomingEdges?**: `string`[]
 
-Defined in: [core/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L76)
+Defined in: [packages/core/src/types.ts:98](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L98)
 
 ***
 
@@ -30,7 +38,7 @@ Defined in: [core/src/types.ts:76](https://github.com/sirmews/fiction-map/blob/7
 
 > `optional` **outgoingEdges?**: `string`[]
 
-Defined in: [core/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L75)
+Defined in: [packages/core/src/types.ts:97](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L97)
 
 ***
 
@@ -38,4 +46,4 @@ Defined in: [core/src/types.ts:75](https://github.com/sirmews/fiction-map/blob/7
 
 > `optional` **properties?**: [`PropertyDefinition`](PropertyDefinition.md)
 
-Defined in: [core/src/types.ts:74](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L74)
+Defined in: [packages/core/src/types.ts:96](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L96)

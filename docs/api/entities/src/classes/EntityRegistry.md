@@ -6,7 +6,7 @@
 
 # Class: EntityRegistry
 
-Defined in: [entities/src/registry.ts:4](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L4)
+Defined in: [packages/entities/src/registry.ts:4](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/registry.ts#L4)
 
 ## Extends
 
@@ -32,7 +32,7 @@ Defined in: [entities/src/registry.ts:4](https://github.com/sirmews/fiction-map/
 
 > **conditions**: `Map`\<`string`, `ConditionDefinition`\>
 
-Defined in: core/dist/index.d.ts:157
+Defined in: packages/core/dist/index.d.ts:184
 
 #### Inherited from
 
@@ -44,7 +44,7 @@ Defined in: core/dist/index.d.ts:157
 
 > **edgeTypes**: `Map`\<`string`, `EdgeTypeDefinition`\>
 
-Defined in: core/dist/index.d.ts:156
+Defined in: packages/core/dist/index.d.ts:183
 
 #### Inherited from
 
@@ -56,7 +56,7 @@ Defined in: core/dist/index.d.ts:156
 
 > **effects**: `Map`\<`string`, `EffectDefinition`\>
 
-Defined in: core/dist/index.d.ts:158
+Defined in: packages/core/dist/index.d.ts:185
 
 #### Inherited from
 
@@ -68,7 +68,7 @@ Defined in: core/dist/index.d.ts:158
 
 > **entityTypes**: `Map`\<`string`, [`EntityTypeDefinition`](../interfaces/EntityTypeDefinition.md)\>
 
-Defined in: [entities/src/registry.ts:5](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L5)
+Defined in: [packages/entities/src/registry.ts:5](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/registry.ts#L5)
 
 ***
 
@@ -76,7 +76,7 @@ Defined in: [entities/src/registry.ts:5](https://github.com/sirmews/fiction-map/
 
 > **graphs**: `Map`\<`string`, `GraphDefinition`\>
 
-Defined in: core/dist/index.d.ts:159
+Defined in: packages/core/dist/index.d.ts:186
 
 #### Inherited from
 
@@ -88,7 +88,7 @@ Defined in: core/dist/index.d.ts:159
 
 > **nodeTypes**: `Map`\<`string`, `NodeTypeDefinition`\>
 
-Defined in: core/dist/index.d.ts:155
+Defined in: packages/core/dist/index.d.ts:182
 
 #### Inherited from
 
@@ -96,11 +96,23 @@ Defined in: core/dist/index.d.ts:155
 
 ***
 
+### structs
+
+> **structs**: `Map`\<`string`, `StructDefinition`\>
+
+Defined in: packages/core/dist/index.d.ts:187
+
+#### Inherited from
+
+`ProjectRegistry.structs`
+
+***
+
 ### worlds
 
 > **worlds**: `Map`\<`string`, [`WorldDefinition`](../interfaces/WorldDefinition.md)\>
 
-Defined in: [entities/src/registry.ts:6](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L6)
+Defined in: [packages/entities/src/registry.ts:6](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/registry.ts#L6)
 
 ## Methods
 
@@ -108,7 +120,7 @@ Defined in: [entities/src/registry.ts:6](https://github.com/sirmews/fiction-map/
 
 > **clear**(): `void`
 
-Defined in: [entities/src/registry.ts:8](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/registry.ts#L8)
+Defined in: [packages/entities/src/registry.ts:8](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/registry.ts#L8)
 
 #### Returns
 

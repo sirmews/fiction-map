@@ -6,7 +6,7 @@
 
 # Interface: WorldConfig
 
-Defined in: [entities/src/types.ts:83](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L83)
+Defined in: [packages/entities/src/types.ts:78](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L78)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [entities/src/types.ts:83](https://github.com/sirmews/fiction-map/bl
 
 > **entities**: [`EntityInstance`](EntityInstance.md)[]
 
-Defined in: [entities/src/types.ts:85](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L85)
+Defined in: [packages/entities/src/types.ts:80](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L80)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [entities/src/types.ts:85](https://github.com/sirmews/fiction-map/bl
 
 > **id**: `string`
 
-Defined in: [entities/src/types.ts:84](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L84)
+Defined in: [packages/entities/src/types.ts:79](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L79)

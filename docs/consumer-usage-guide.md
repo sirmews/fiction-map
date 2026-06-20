@@ -254,6 +254,95 @@ if (result.success) {
 
 Note that `dark-cave` was never explicitly stored as `unlocked` in runtime state — it was reachable purely because the derived state computed the cascade from the Lantern's schema. See [docs/decisions/2026-05-18-derived-unlock-semantics.md](decisions/2026-05-18-derived-unlock-semantics.md) for the rationale.
 
+## 7. Defining Reusable Structs
+
+To avoid flattening complex properties (e.g., repeating `strength`, `agility`, `intelligence` across multiple node types or entities), you can define reusable data shapes called **Structs** using `defineStruct`.
+
+```typescript
+import { defineStruct, defineNodeType } from "@fiction-map/core";
+
+// Define the reusable struct shape once
+export const StatBlock = defineStruct(registry, {
+  id: "stat-block",
+  properties: {
+    strength: { type: "number", default: 10, required: true },
+    agility: { type: "number", default: 10, required: true },
+    intelligence: { type: "number", default: 10, required: true },
+  },
+});
+
+// Reference the struct in your Node or Entity definitions
+export const EnemyNode = defineNodeType(registry, {
+  id: "enemy-encounter",
+  properties: {
+    enemyName: { type: "string", required: true },
+    stats: { type: "struct", structId: "stat-block", required: true },
+  },
+});
+```
+
+The static validator (`fiction-map validate`) recursively validates the values provided in your graph definitions against the referenced struct schema, ensuring complete type safety.
+
+## 8. Dynamic Routing with Compute Nodes
+
+For scenarios where you want the story to route automatically based on player state (e.g., rolling a dice, checking stats, or weather checks) without pausing for user input, you can use **Compute Nodes** with `autoResolve: true`.
+
+```typescript
+import { defineNodeType } from "@fiction-map/core";
+
+export const ComputeNode = defineNodeType(registry, {
+  id: "compute-node",
+  properties: {},
+  autoResolve: true, // Tells the engine to resolve this node instantly
+});
+```
+
+When the `GraphRuntime` enters an auto-resolving node, it:
+1. Instantly applies any `enterEffects` defined on the node.
+2. Evaluates the conditions on all outgoing edges.
+3. Automatically traverses the first valid edge.
+
+### Example: A Skill Check Routing Node
+
+```typescript
+const story = defineGraph(registry, {
+  id: "skill-check-story",
+  nodes: [
+    { id: "start", type: "scene" },
+    {
+      id: "check-perception",
+      type: "compute-node",
+      autoResolve: true,
+      enterEffects: [
+        // Pluggable computation effect
+        { type: "rollDice", stat: "perception", saveAs: "rollResult" },
+      ],
+    },
+    { id: "success-room", type: "scene" },
+    { id: "failure-room", type: "scene" },
+  ],
+  edges: [
+    { id: "try-search", type: "choice", source: "start", target: "check-perception" },
+    {
+      id: "pass-check",
+      type: "choice",
+      source: "check-perception",
+      target: "success-room",
+      conditions: [{ type: "greaterThanOrEqual", key: "rollResult", value: 15 }],
+    },
+    {
+      id: "fail-check",
+      type: "choice",
+      source: "check-perception",
+      target: "failure-room",
+      conditions: [{ type: "lessThan", key: "rollResult", value: 15 }],
+    },
+  ],
+});
+```
+
+To prevent infinite loops (e.g., Node A auto-resolving to Node B, which auto-resolves back to Node A), the engine implements a safety guard that throws a `RuntimeError` if more than 100 automatic transitions occur in a single tick.
+
 ## Summary
 
 1. Instantiate an `EntityRegistry`.

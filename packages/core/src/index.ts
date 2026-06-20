@@ -18,5 +18,7 @@ export { analyzeGraph, defineGraph, validateGraph } from "./graph"
 export { defineNodeType } from "./node-type"
 // Registry
 export { ProjectRegistry } from "./registry"
+// Structs
+export { defineStruct } from "./struct"
 // Types
 export * from "./types"

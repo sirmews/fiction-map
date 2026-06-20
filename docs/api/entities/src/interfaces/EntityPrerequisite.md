@@ -6,7 +6,7 @@
 
 # Interface: EntityPrerequisite
 
-Defined in: [entities/src/types.ts:55](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L55)
+Defined in: [packages/entities/src/types.ts:50](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L50)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [entities/src/types.ts:55](https://github.com/sirmews/fiction-map/bl
 
 > **kind**: [`EntityPrerequisiteKind`](../type-aliases/EntityPrerequisiteKind.md)
 
-Defined in: [entities/src/types.ts:56](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L56)
+Defined in: [packages/entities/src/types.ts:51](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L51)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [entities/src/types.ts:56](https://github.com/sirmews/fiction-map/bl
 
 > **operator**: [`EntityPrerequisiteOperator`](../type-aliases/EntityPrerequisiteOperator.md)
 
-Defined in: [entities/src/types.ts:58](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L58)
+Defined in: [packages/entities/src/types.ts:53](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L53)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [entities/src/types.ts:58](https://github.com/sirmews/fiction-map/bl
 
 > **target**: `string`
 
-Defined in: [entities/src/types.ts:57](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L57)
+Defined in: [packages/entities/src/types.ts:52](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L52)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [entities/src/types.ts:57](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **value?**: `unknown`
 
-Defined in: [entities/src/types.ts:59](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L59)
+Defined in: [packages/entities/src/types.ts:54](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L54)

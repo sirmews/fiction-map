@@ -6,7 +6,7 @@
 
 # Interface: NodeInstance
 
-Defined in: [core/src/types.ts:151](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L151)
+Defined in: [packages/core/src/types.ts:184](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L184)
 
 ## Indexable
 
@@ -14,11 +14,27 @@ Defined in: [core/src/types.ts:151](https://github.com/sirmews/fiction-map/blob/
 
 ## Properties
 
+### autoResolve?
+
+> `optional` **autoResolve?**: `boolean`
+
+Defined in: [packages/core/src/types.ts:188](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L188)
+
+***
+
+### blocks?
+
+> `optional` **blocks?**: [`ContentBlock`](ContentBlock.md)[]
+
+Defined in: [packages/core/src/types.ts:187](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L187)
+
+***
+
 ### id
 
 > **id**: `string`
 
-Defined in: [core/src/types.ts:152](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L152)
+Defined in: [packages/core/src/types.ts:185](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L185)
 
 ***
 
@@ -26,4 +42,4 @@ Defined in: [core/src/types.ts:152](https://github.com/sirmews/fiction-map/blob/
 
 > **type**: `string`
 
-Defined in: [core/src/types.ts:153](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/core/src/types.ts#L153)
+Defined in: [packages/core/src/types.ts:186](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/core/src/types.ts#L186)

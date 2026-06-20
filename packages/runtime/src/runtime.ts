@@ -1,3 +1,4 @@
+import { RuntimeError } from "@fiction-map/core"
 import { type GraphBlueprint, type ParsedGraph, parseGraph } from "./adapter"
 import { cloneState, createInitialState } from "./core/state"
 import {
@@ -7,6 +8,7 @@ import {
 } from "./core/transition"
 import { validateGraph } from "./core/validation"
 import { builtinEvaluators, builtinHandlers } from "./default-bindings"
+import { applyEffects } from "./effects"
 import type {
   ConditionEvaluator,
   EffectContext,
@@ -151,6 +153,56 @@ export class GraphRuntime {
 
       iterations++
     } while (triggerFired && iterations < maxIterations)
+
+    // Auto-resolve loop for Compute Nodes
+    const maxAutoSteps = 100
+    let autoSteps = 0
+
+    while (true) {
+      const currentNode = this.nodes.get(updatedState.currentNodeId)
+      if (!currentNode?.autoResolve) {
+        break
+      }
+
+      if (autoSteps >= maxAutoSteps) {
+        throw new RuntimeError(
+          `Infinite loop detected: exceeded ${maxAutoSteps} automatic transitions at node "${updatedState.currentNodeId}"`,
+          "ERR_RUNTIME_INFINITE_LOOP",
+        )
+      }
+      autoSteps++
+
+      // a) Apply any enterEffects
+      if (currentNode.enterEffects && currentNode.enterEffects.length > 0) {
+        const currentContext = context ? { ...context } : undefined
+        updatedState = applyEffects(
+          updatedState,
+          currentNode.enterEffects,
+          this.handlers,
+          currentContext,
+        )
+      }
+
+      // b) Evaluate requirements on outgoing edges & c) Automatically traverse the first valid edge
+      const available = this.getAvailable(updatedState, context)
+      if (available.length === 0) {
+        break
+      }
+
+      const autoTransition = available[0]
+      const autoResult = applyTransition(
+        updatedState,
+        autoTransition,
+        this.evaluators,
+        this.handlers,
+        context,
+      )
+      if (!autoResult.success || !autoResult.state) {
+        break
+      }
+
+      updatedState = autoResult.state
+    }
 
     return {
       ...result,

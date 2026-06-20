@@ -6,7 +6,7 @@
 
 # Interface: EntityModifier
 
-Defined in: [entities/src/types.ts:46](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L46)
+Defined in: [packages/entities/src/types.ts:41](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L41)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [entities/src/types.ts:46](https://github.com/sirmews/fiction-map/bl
 
 > **operation**: [`EntityModifierOperation`](../type-aliases/EntityModifierOperation.md)
 
-Defined in: [entities/src/types.ts:48](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L48)
+Defined in: [packages/entities/src/types.ts:43](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L43)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [entities/src/types.ts:48](https://github.com/sirmews/fiction-map/bl
 
 > **target**: `string`
 
-Defined in: [entities/src/types.ts:47](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L47)
+Defined in: [packages/entities/src/types.ts:42](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L42)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [entities/src/types.ts:47](https://github.com/sirmews/fiction-map/bl
 
 > `optional` **value?**: `unknown`
 
-Defined in: [entities/src/types.ts:49](https://github.com/sirmews/fiction-map/blob/735999b977a84e38bea36c388f129cf2fea90529/packages/entities/src/types.ts#L49)
+Defined in: [packages/entities/src/types.ts:44](https://github.com/sirmews/fiction-map/blob/6022fe6f260accf641b1d9ae99d958096a8f0450/packages/entities/src/types.ts#L44)

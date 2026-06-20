@@ -164,6 +164,8 @@ export interface NodeDefinition {
   type?: string
   blocks?: ContentBlock[]
   properties?: Record<string, unknown>
+  autoResolve?: boolean
+  enterEffects?: Effect[]
 }
 
 export type GraphErrorType =
