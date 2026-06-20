@@ -93,8 +93,10 @@ function validatePropertyValue(
       }
       return true
     }
-    default:
-      return true
+    default: {
+      const _exhaustiveCheck: never = schema.type
+      return _exhaustiveCheck
+    }
   }
 }
 
