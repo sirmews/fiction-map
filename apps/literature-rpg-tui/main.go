@@ -20,10 +20,11 @@ type frameMsg generated.Frame
 type errMsg error
 
 type model struct {
-	frame    generated.Frame
-	stdin    io.WriteCloser
-	err      error
-	selected int
+	frame         generated.Frame
+	stdin         io.WriteCloser
+	err           error
+	selected      int
+	statusMessage string
 }
 
 var (
@@ -131,6 +132,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "up":
+			m.statusMessage = ""
 			if m.selected > 0 {
 				m.selected--
 			} else {
@@ -138,6 +140,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "down":
+			m.statusMessage = ""
 			if m.selected < len(m.frame.Choices)-1 {
 				m.selected++
 			} else {
@@ -145,6 +148,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "enter":
+			m.statusMessage = ""
 			if len(m.frame.Choices) > 0 && m.selected >= 0 && m.selected < len(m.frame.Choices) {
 				choice := m.frame.Choices[m.selected]
 				m.sendIntent(generated.Intent{
@@ -155,6 +159,30 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.sendIntent(generated.Intent{Type: "quit"})
 				return m, tea.Quit
 			}
+
+		case "s", "S":
+			if m.frame.SerializedState != "" {
+				err := os.WriteFile("save_slot1.json", []byte(m.frame.SerializedState), 0644)
+				if err != nil {
+					m.statusMessage = fmt.Sprintf("Failed to save: %v", err)
+				} else {
+					m.statusMessage = "Game saved to Slot 1!"
+				}
+			}
+			return m, nil
+
+		case "l", "L":
+			data, err := os.ReadFile("save_slot1.json")
+			if err != nil {
+				m.statusMessage = "No save file found in Slot 1."
+			} else {
+				m.sendIntent(generated.Intent{
+					Type:            "load",
+					SerializedState: string(data),
+				})
+				m.statusMessage = "Game loaded from Slot 1!"
+			}
+			return m, nil
 
 		default:
 			// Handle numeric hotkeys 1-9
@@ -212,6 +240,11 @@ func (m model) View() string {
 	// Warnings
 	for _, warning := range m.frame.Warnings {
 		leftBuilder.WriteString("\n" + warningStyle.Render("⚠ "+warning) + "\n")
+	}
+
+	// Status Message
+	if m.statusMessage != "" {
+		leftBuilder.WriteString("\n" + lipgloss.NewStyle().Foreground(green).Bold(true).Render(m.statusMessage) + "\n")
 	}
 
 	// 3. Right Panel: Player Status HUD
@@ -299,7 +332,7 @@ func (m model) View() string {
 		bottomBuilder.WriteString(lipgloss.NewStyle().Foreground(green).Bold(true).Render("★ Traversal complete! Press [Enter] or [Q] to exit. ★") + "\n")
 	}
 
-	bottomBuilder.WriteString(footerStyle.Render("[↑/↓] Navigate • [1-9] Quick Hotkey • [Enter] Confirm • [Q] Quit"))
+	bottomBuilder.WriteString(footerStyle.Render("[↑/↓] Navigate • [1-9] Quick Hotkey • [S] Save • [L] Load • [Enter] Confirm • [Q] Quit"))
 
 	// 6. Combine everything inside a gorgeous rounded border
 	screen := lipgloss.JoinVertical(lipgloss.Left, header, mainContent, bottomBuilder.String())
