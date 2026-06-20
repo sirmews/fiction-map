@@ -95,7 +95,10 @@ export function startHttpServer(port = Number(process.env.PORT) || 8080) {
 
   app.post("/intent", async (c) => {
     try {
-      const body = await c.req.json()
+      let body: any = {}
+      try {
+        body = await c.req.json()
+      } catch (_) {}
       let sessionId = body.sessionId
       const intent = body.intent
 

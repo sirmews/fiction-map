@@ -166,7 +166,7 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func (m *model) handleIntent(intent generated.Intent) tea.Cmd {
+func (m model) handleIntent(intent generated.Intent) tea.Cmd {
 	if m.host != "" {
 		return sendIntentCmd(m.host, m.sessionId, &intent)
 	}
@@ -412,6 +412,9 @@ func main() {
 	flag.Parse()
 
 	host := *hostFlag
+	if host != "" {
+		host = strings.TrimSuffix(host, "/")
+	}
 
 	var m model
 	m.host = host
