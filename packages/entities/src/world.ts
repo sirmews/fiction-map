@@ -68,7 +68,10 @@ function validatePropertyValue(value: unknown, schema: PropertySchema, registry?
       if (!schema.structId || !registry) return false
       const structDef = registry.structs?.get(schema.structId)
       if (!structDef) return false
-      for (const [propName, propSchema] of Object.entries(structDef.properties) as [string, PropertySchema][]) {
+      for (const [propName, propSchema] of Object.entries(structDef.properties) as [
+        string,
+        PropertySchema,
+      ][]) {
         const propValue = (value as Record<string, unknown>)[propName]
         if (propSchema.required && propValue === undefined) {
           return false

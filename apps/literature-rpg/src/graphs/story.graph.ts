@@ -112,6 +112,35 @@ export const story = defineGraph(registry, {
       ],
     },
     {
+      id: "search-armory",
+      type: "compute",
+      autoResolve: true,
+      enterEffects: [{ type: "setVariable", key: "searchRoll", value: 20 }],
+    },
+    {
+      id: "secret-alcove",
+      type: "scene",
+      blocks: [
+        {
+          id: "alcove-desc",
+          type: "paragraph",
+          text: "You find a hidden stone alcove behind a loose weapon rack!",
+        },
+      ],
+    },
+    {
+      id: "secret-chest",
+      type: "chest",
+      possibleLoot: [{ itemId: "spirit-elixir", dropChance: 1.0 }],
+      blocks: [
+        {
+          id: "chest-desc",
+          type: "paragraph",
+          text: "A small wooden chest sits in the alcove, covered in cobwebs.",
+        },
+      ],
+    },
+    {
       id: "riddle-chamber",
       type: "scene",
       blocks: [
@@ -374,6 +403,53 @@ export const story = defineGraph(registry, {
       target: "armory",
       text: "Enter the dusty Armory",
       anchorBlockId: "gallery-desc",
+    },
+    {
+      id: "search-armory-choice",
+      type: "choice",
+      source: "armory",
+      target: "search-armory",
+      text: "Search the weapon racks",
+      anchorBlockId: "armory-desc",
+    },
+    {
+      id: "search-success",
+      type: "choice",
+      source: "search-armory",
+      target: "secret-alcove",
+      conditions: [{ type: "greaterThanOrEqual", key: "searchRoll", value: 15 }],
+    },
+    {
+      id: "search-fail",
+      type: "choice",
+      source: "search-armory",
+      target: "armory",
+      conditions: [{ type: "lessThan", key: "searchRoll", value: 15 }],
+    },
+    {
+      id: "open-chest",
+      type: "choice",
+      source: "secret-chest",
+      target: "armory",
+      text: "Open the chest and return",
+      effects: [{ type: "grantEntity", entityId: "spirit-elixir" }],
+      anchorBlockId: "chest-desc",
+    },
+    {
+      id: "enter-alcove",
+      type: "choice",
+      source: "secret-alcove",
+      target: "secret-chest",
+      text: "Examine the glowing chest",
+      anchorBlockId: "alcove-desc",
+    },
+    {
+      id: "return-from-alcove",
+      type: "choice",
+      source: "secret-alcove",
+      target: "armory",
+      text: "Go back to the Armory",
+      anchorBlockId: "alcove-desc",
     },
     {
       id: "place-shield",

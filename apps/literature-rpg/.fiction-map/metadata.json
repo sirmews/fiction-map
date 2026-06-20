@@ -23,6 +23,44 @@
         "choice"
       ],
       "autoResolve": false
+    },
+    {
+      "id": "compute",
+      "name": "computeNode",
+      "location": {
+        "file": "nodes/compute.node.ts",
+        "line": 4,
+        "column": 28
+      },
+      "properties": {},
+      "outgoingEdges": [],
+      "incomingEdges": [],
+      "autoResolve": true
+    },
+    {
+      "id": "chest",
+      "name": "chestNode",
+      "location": {
+        "file": "nodes/chest.node.ts",
+        "line": 4,
+        "column": 26
+      },
+      "properties": {
+        "possibleLoot": {
+          "type": "array",
+          "items": {
+            "type": "struct",
+            "structId": "loot-entry"
+          }
+        }
+      },
+      "outgoingEdges": [
+        "choice"
+      ],
+      "incomingEdges": [
+        "choice"
+      ],
+      "autoResolve": false
     }
   ],
   "edgeTypes": [
@@ -41,10 +79,14 @@
         }
       },
       "sourceTypes": [
-        "scene"
+        "scene",
+        "compute",
+        "chest"
       ],
       "targetTypes": [
-        "scene"
+        "scene",
+        "compute",
+        "chest"
       ]
     }
   ],
@@ -164,6 +206,46 @@
               "id": "armory-desc",
               "type": "paragraph",
               "text": "A dusty, long-abandoned armory. Racks of rusted weapons line the walls, but a pristine Silver Shield hangs on a central plaque."
+            }
+          ]
+        },
+        {
+          "id": "search-armory",
+          "type": "compute",
+          "autoResolve": true,
+          "enterEffects": [
+            {
+              "type": "setVariable",
+              "key": "searchRoll",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "id": "secret-alcove",
+          "type": "scene",
+          "blocks": [
+            {
+              "id": "alcove-desc",
+              "type": "paragraph",
+              "text": "You find a hidden stone alcove behind a loose weapon rack!"
+            }
+          ]
+        },
+        {
+          "id": "secret-chest",
+          "type": "chest",
+          "possibleLoot": [
+            {
+              "itemId": "spirit-elixir",
+              "dropChance": 1
+            }
+          ],
+          "blocks": [
+            {
+              "id": "chest-desc",
+              "type": "paragraph",
+              "text": "A small wooden chest sits in the alcove, covered in cobwebs."
             }
           ]
         },
@@ -471,6 +553,70 @@
           "target": "armory",
           "text": "Enter the dusty Armory",
           "anchorBlockId": "gallery-desc"
+        },
+        {
+          "id": "search-armory-choice",
+          "type": "choice",
+          "source": "armory",
+          "target": "search-armory",
+          "text": "Search the weapon racks",
+          "anchorBlockId": "armory-desc"
+        },
+        {
+          "id": "search-success",
+          "type": "choice",
+          "source": "search-armory",
+          "target": "secret-alcove",
+          "conditions": [
+            {
+              "type": "greaterThanOrEqual",
+              "key": "searchRoll",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "id": "search-fail",
+          "type": "choice",
+          "source": "search-armory",
+          "target": "armory",
+          "conditions": [
+            {
+              "type": "lessThan",
+              "key": "searchRoll",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "id": "open-chest",
+          "type": "choice",
+          "source": "secret-chest",
+          "target": "armory",
+          "text": "Open the chest and return",
+          "effects": [
+            {
+              "type": "grantEntity",
+              "entityId": "spirit-elixir"
+            }
+          ],
+          "anchorBlockId": "chest-desc"
+        },
+        {
+          "id": "enter-alcove",
+          "type": "choice",
+          "source": "secret-alcove",
+          "target": "secret-chest",
+          "text": "Examine the glowing chest",
+          "anchorBlockId": "alcove-desc"
+        },
+        {
+          "id": "return-from-alcove",
+          "type": "choice",
+          "source": "secret-alcove",
+          "target": "armory",
+          "text": "Go back to the Armory",
+          "anchorBlockId": "alcove-desc"
         },
         {
           "id": "place-shield",
@@ -1255,21 +1401,25 @@
           "anchorBlockId": "lab-desc"
         }
       ],
-      "nodeCount": 20,
-      "edgeCount": 54,
-      "maxDepth": 7,
+      "nodeCount": 23,
+      "edgeCount": 60,
+      "maxDepth": 8,
       "endings": [
         "victory",
         "death"
       ],
       "nodeTypesUsed": [
-        "scene"
+        "scene",
+        "compute",
+        "chest"
       ],
       "edgeTypesUsed": [
         "choice"
       ],
       "conditionsUsed": [
         "notVisited",
+        "greaterThanOrEqual",
+        "lessThan",
         "hasEntity",
         "notFlag",
         "hasFlag",
@@ -1361,7 +1511,27 @@
       "warnings": []
     }
   ],
-  "structs": [],
+  "structs": [
+    {
+      "id": "loot-entry",
+      "name": "lootEntryStruct",
+      "location": {
+        "file": "structs/loot.struct.ts",
+        "line": 4,
+        "column": 26
+      },
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "required": true
+        },
+        "dropChance": {
+          "type": "number",
+          "required": true
+        }
+      }
+    }
+  ],
   "validation": {
     "errors": [],
     "warnings": []
