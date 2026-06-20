@@ -493,6 +493,18 @@ func (m model) View() string {
 		leftBuilder.WriteString("\n" + lipgloss.NewStyle().Foreground(green).Bold(true).Render(m.statusMessage) + "\n")
 	}
 
+	// Search Roll Alert
+	if rollVal, ok := m.frame.Flags["searchRoll"]; ok {
+		rollStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#FFD700")). // Gold
+			Bold(true).
+			Border(lipgloss.RoundedBorder()).
+			Padding(0, 1).
+			MarginTop(1).
+			MarginBottom(1)
+		leftBuilder.WriteString("\n" + rollStyle.Render(fmt.Sprintf("🎲 SEARCH CHECK: Rolled %v (Required: 15) - SUCCESS!", rollVal)) + "\n")
+	}
+
 	// 3. Right Panel: Player Status HUD
 	var rightBuilder strings.Builder
 	rightBuilder.WriteString(hudTitleStyle.Render("PLAYER STATUS") + "\n")
