@@ -13,6 +13,9 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/sirmews/fiction-map/packages/protocol/go/generated"
@@ -46,7 +49,6 @@ var (
 	cyan    = lipgloss.Color("86")
 	yellow  = lipgloss.Color("220")
 	red     = lipgloss.Color("196")
-	blue    = lipgloss.Color("33")
 	green   = lipgloss.Color("120")
 	gray    = lipgloss.Color("240")
 	white   = lipgloss.Color("255")
@@ -263,7 +265,7 @@ func (m *model) updateActionLog(newFrame generated.Frame) {
 
 	// Detect location change
 	if newFrame.CurrentNode.ID != m.frame.CurrentNode.ID {
-		m.actionLog = append(m.actionLog, fmt.Sprintf("🗺 Entered: %s", strings.Title(strings.ReplaceAll(newFrame.CurrentNode.ID, "-", " "))))
+		m.actionLog = append(m.actionLog, fmt.Sprintf("🗺 Entered: %s", cases.Title(language.English).String(strings.ReplaceAll(newFrame.CurrentNode.ID, "-", " "))))
 	}
 
 	// Detect HP changes

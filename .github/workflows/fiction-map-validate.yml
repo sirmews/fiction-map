@@ -55,13 +55,13 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.59
+          version: v1.64.8
           working-directory: apps/literature-rpg-tui
 
       - name: Run golangci-lint (protocol)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.59
+          version: v1.64.8
           working-directory: packages/protocol/go
 
       - name: Check generated protocol bindings are current
