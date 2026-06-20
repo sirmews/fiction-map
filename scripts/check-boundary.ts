@@ -59,6 +59,13 @@ const BANNED_TS_DEPENDENCY_KEYS = [
 
 const GO_CHARMBRACELET_IMPORT_PREFIX = "github.com/charmbracelet/"
 const GO_TUI_ALLOWED_DIR = "apps/literature-rpg-tui"
+const GO_HEADLESS_DIRS = [
+  "packages/cli",
+  "packages/core",
+  "packages/entities",
+  "packages/protocol",
+  "packages/runtime",
+]
 
 const violations: Violation[] = []
 
@@ -220,9 +227,14 @@ function getLineNumber(content: string, columnOffset: number): number {
 
 function checkGoCharmbraceletBoundaries() {
   const goFiles = listFiles(ROOT_DIR, [".go"])
+  const normalizedGoTuiDir = path.normalize(GO_TUI_ALLOWED_DIR)
+  const normalizedHeadlessDirs = GO_HEADLESS_DIRS.map((dir) => path.normalize(dir))
   for (const filePath of goFiles) {
     const normalizedPath = path.normalize(filePath)
-    if (!normalizedPath.includes(GO_TUI_ALLOWED_DIR) && !normalizedPath.includes("packages")) {
+    const isTuiConsumer = normalizedPath.includes(normalizedGoTuiDir)
+    const isHeadlessGoFile = normalizedHeadlessDirs.some((dir) => normalizedPath.includes(dir))
+
+    if (isTuiConsumer || !isHeadlessGoFile) {
       continue
     }
 
@@ -233,11 +245,15 @@ function checkGoCharmbraceletBoundaries() {
 
     const lines = content.split(/\r?\n/g)
     for (let i = 0; i < lines.length; i += 1) {
-      if (lines[i].includes(GO_CHARMBRACELET_IMPORT_PREFIX)) {
+      if (lines[i].trimStart().startsWith("//")) {
+        continue
+      }
+
+      if (lines[i].includes(`"${GO_CHARMBRACELET_IMPORT_PREFIX}`)) {
         addViolation(
           path.relative(ROOT_DIR, filePath),
           i + 1,
-          "Banned non-TUI charmbracelet import in Go source",
+          "Banned charmbracelet import in headless Go source",
         )
       }
     }
