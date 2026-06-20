@@ -2,9 +2,12 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -19,12 +22,19 @@ import (
 type frameMsg generated.Frame
 type errMsg error
 
+type httpResponseMsg struct {
+	frame     generated.Frame
+	sessionId string
+}
+
 type model struct {
 	frame         generated.Frame
 	stdin         io.WriteCloser
 	err           error
 	selected      int
 	statusMessage string
+	host          string
+	sessionId     string
 }
 
 var (
@@ -110,7 +120,60 @@ func renderProgressBar(current, max int, fillChar, emptyChar string, length int)
 	return fmt.Sprintf("[%s%s]", strings.Repeat(fillChar, filledLength), strings.Repeat(emptyChar, emptyLength))
 }
 
+func sendIntentCmd(host string, sessionId string, intent *generated.Intent) tea.Cmd {
+	return func() tea.Msg {
+		reqBody := map[string]interface{}{
+			"sessionId": sessionId,
+		}
+		if intent != nil {
+			reqBody["intent"] = intent
+		}
+		data, err := json.Marshal(reqBody)
+		if err != nil {
+			return errMsg(err)
+		}
+
+		resp, err := http.Post(host+"/intent", "application/json", bytes.NewBuffer(data))
+		if err != nil {
+			return errMsg(err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			return errMsg(fmt.Errorf("HTTP error %d: %s", resp.StatusCode, string(body)))
+		}
+
+		var result struct {
+			Frame     generated.Frame `json:"frame"`
+			SessionID string          `json:"sessionId"`
+		}
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return errMsg(err)
+		}
+
+		return httpResponseMsg{
+			frame:     result.Frame,
+			sessionId: result.SessionID,
+		}
+	}
+}
+
 func (m model) Init() tea.Cmd {
+	if m.host != "" {
+		return sendIntentCmd(m.host, "", nil)
+	}
+	return nil
+}
+
+func (m model) handleIntent(intent generated.Intent) tea.Cmd {
+	if m.host != "" {
+		return sendIntentCmd(m.host, m.sessionId, &intent)
+	}
+	data, err := json.Marshal(intent)
+	if err == nil {
+		_, _ = m.stdin.Write(append(data, '\n'))
+	}
 	return nil
 }
 
@@ -121,6 +184,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.selected = 0
 		return m, nil
 
+	case httpResponseMsg:
+		m.frame = msg.frame
+		m.sessionId = msg.sessionId
+		m.selected = 0
+		return m, nil
+
 	case errMsg:
 		m.err = msg
 		return m, tea.Quit
@@ -128,8 +197,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c":
-			m.sendIntent(generated.Intent{Type: "quit"})
-			return m, tea.Quit
+			cmd := m.handleIntent(generated.Intent{Type: "quit"})
+			return m, tea.Batch(cmd, tea.Quit)
 
 		case "up":
 			m.statusMessage = ""
@@ -151,13 +220,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.statusMessage = ""
 			if len(m.frame.Choices) > 0 && m.selected >= 0 && m.selected < len(m.frame.Choices) {
 				choice := m.frame.Choices[m.selected]
-				m.sendIntent(generated.Intent{
+				cmd := m.handleIntent(generated.Intent{
 					Type:     "selectChoice",
 					ChoiceID: choice.ID,
 				})
+				return m, cmd
 			} else if len(m.frame.Choices) == 0 {
-				m.sendIntent(generated.Intent{Type: "quit"})
-				return m, tea.Quit
+				cmd := m.handleIntent(generated.Intent{Type: "quit"})
+				return m, tea.Batch(cmd, tea.Quit)
 			}
 
 		case "s", "S":
@@ -176,11 +246,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				m.statusMessage = "No save file found in Slot 1."
 			} else {
-				m.sendIntent(generated.Intent{
+				cmd := m.handleIntent(generated.Intent{
 					Type:            "load",
 					SerializedState: string(data),
 				})
 				m.statusMessage = "Game loaded from Slot 1!"
+				return m, cmd
 			}
 			return m, nil
 
@@ -190,24 +261,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				idx := val - 1
 				if idx >= 0 && idx < len(m.frame.Choices) {
 					choice := m.frame.Choices[idx]
-					m.sendIntent(generated.Intent{
+					cmd := m.handleIntent(generated.Intent{
 						Type:     "selectChoice",
 						ChoiceID: choice.ID,
 					})
+					return m, cmd
 				}
 			}
 		}
 	}
 
 	return m, nil
-}
-
-func (m model) sendIntent(intent generated.Intent) {
-	data, err := json.Marshal(intent)
-	if err != nil {
-		return
-	}
-	_, _ = m.stdin.Write(append(data, '\n'))
 }
 
 func (m model) View() string {
@@ -344,62 +408,78 @@ func (m model) View() string {
 }
 
 func main() {
-	// Spawn the Node stdio sidecar process
-	// We run 'bun' directly pointing to the main.ts file
-	cmd := exec.Command("bun", "run", "../../apps/literature-rpg/src/main.ts")
+	hostFlag := flag.String("host", "", "HTTP host of the story engine (e.g. http://localhost:8080)")
+	flag.Parse()
 
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create stdin pipe: %v\n", err)
-		os.Exit(1)
+	host := *hostFlag
+	if host != "" {
+		host = strings.TrimSuffix(host, "/")
 	}
 
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create stdout pipe: %v\n", err)
-		os.Exit(1)
-	}
+	var m model
+	m.host = host
 
-	if err := cmd.Start(); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to start sidecar process: %v\n", err)
-		os.Exit(1)
-	}
+	if host == "" {
+		// Spawn the Node stdio sidecar process
+		cmd := exec.Command("bun", "run", "../../apps/literature-rpg/src/main.ts")
 
-	defer func() {
-		_ = stdin.Close()
-		_ = cmd.Process.Kill()
-	}()
-
-	m := model{
-		stdin: stdin,
-	}
-
-	p := tea.NewProgram(m, tea.WithAltScreen())
-
-	// Goroutine to read stdout Frames from the sidecar and feed them to Bubble Tea
-	go func() {
-		reader := bufio.NewReader(stdout)
-		for {
-			line, err := reader.ReadString('\n')
-			if err != nil {
-				if err != io.EOF {
-					p.Send(errMsg(err))
-				}
-				break
-			}
-
-			var frame generated.Frame
-			if err := json.Unmarshal([]byte(line), &frame); err != nil {
-				p.Send(errMsg(err))
-				break
-			}
-
-			p.Send(frameMsg(frame))
+		stdin, err := cmd.StdinPipe()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to create stdin pipe: %v\n", err)
+			os.Exit(1)
 		}
-	}()
 
-	if _, err := p.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Bubble Tea error: %v\n", err)
-		os.Exit(1)
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to create stdout pipe: %v\n", err)
+			os.Exit(1)
+		}
+
+		if err := cmd.Start(); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to start sidecar process: %v\n", err)
+			os.Exit(1)
+		}
+
+		defer func() {
+			_ = stdin.Close()
+			_ = cmd.Process.Kill()
+		}()
+
+		m.stdin = stdin
+
+		p := tea.NewProgram(m, tea.WithAltScreen())
+
+		// Goroutine to read stdout Frames from the sidecar and feed them to Bubble Tea
+		go func() {
+			reader := bufio.NewReader(stdout)
+			for {
+				line, err := reader.ReadString('\n')
+				if err != nil {
+					if err != io.EOF {
+						p.Send(errMsg(err))
+					}
+					break
+				}
+
+				var frame generated.Frame
+				if err := json.Unmarshal([]byte(line), &frame); err != nil {
+					p.Send(errMsg(err))
+					break
+				}
+
+				p.Send(frameMsg(frame))
+			}
+		}()
+
+		if _, err := p.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "Bubble Tea error: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		p := tea.NewProgram(m, tea.WithAltScreen())
+		if _, err := p.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "Bubble Tea error: %v\n", err)
+			os.Exit(1)
+		}
 	}
 }

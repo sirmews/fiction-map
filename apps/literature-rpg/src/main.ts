@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto"
 import readline from "node:readline"
 import { applyIntent, computeFrame } from "@fiction-map/protocol"
 import {
@@ -6,6 +7,8 @@ import {
   deriveEntityState,
   registerBuiltins,
 } from "@fiction-map/runtime"
+import { Hono } from "hono"
+import { cors } from "hono/cors"
 import { story } from "./graphs/story.graph"
 import { registry } from "./project"
 import { world } from "./world"
@@ -81,6 +84,61 @@ export function startSidecar() {
   })
 }
 
+export function startHttpServer(port = Number(process.env.PORT) || 8080) {
+  const app = new Hono()
+  app.use("*", cors())
+
+  // In-memory session store
+  const sessions = new Map<string, any>()
+
+  app.get("/health", (c) => c.json({ status: "ok" }))
+
+  app.post("/intent", async (c) => {
+    try {
+      let body: any = {}
+      try {
+        body = await c.req.json()
+      } catch (_) {}
+      let sessionId = body.sessionId
+      const intent = body.intent
+
+      if (!sessionId) {
+        sessionId = randomUUID()
+      }
+
+      let state = sessions.get(sessionId)
+      if (!state) {
+        state = createInitialState(runtime.startNodeId)
+        sessions.set(sessionId, state)
+      }
+
+      if (intent) {
+        const result = applyIntent(runtime, state, intent, world)
+        if (result.error) {
+          return c.json({ error: result.error }, 400)
+        }
+        state = result.state
+        sessions.set(sessionId, state)
+        return c.json({ frame: result.frame, sessionId })
+      } else {
+        // No intent provided, just return the current frame
+        const context = { derivedState: deriveEntityState(world, state) }
+        const frame = computeFrame(runtime, state, context, world)
+        return c.json({ frame, sessionId })
+      }
+    } catch (e) {
+      return c.json({ error: (e as Error).message }, 500)
+    }
+  })
+
+  console.log(`HTTP Server starting on port ${port}...`)
+  const server = Bun.serve({
+    port,
+    fetch: app.fetch,
+  })
+  return server
+}
+
 // Only run when invoked directly
 if ((import.meta as { main?: boolean }).main) {
   if (world.errors.length > 0) {
@@ -88,5 +146,15 @@ if ((import.meta as { main?: boolean }).main) {
     process.exit(1)
   }
 
-  startSidecar()
+  const isHttp = process.argv.includes("--http") || !!process.env.PORT
+  if (isHttp) {
+    const portArgIndex = process.argv.indexOf("--port")
+    let port = Number(process.env.PORT) || 8080
+    if (portArgIndex !== -1 && portArgIndex + 1 < process.argv.length) {
+      port = Number(process.argv[portArgIndex + 1]) || port
+    }
+    startHttpServer(port)
+  } else {
+    startSidecar()
+  }
 }

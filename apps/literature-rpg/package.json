@@ -21,9 +21,11 @@
     "@fiction-map/entities": "workspace:*",
     "@fiction-map/protocol": "workspace:*",
     "@fiction-map/runtime": "workspace:*",
-    "fiction-map": "workspace:*"
+    "fiction-map": "workspace:*",
+    "hono": "^4.12.26"
   },
   "devDependencies": {
+    "@types/bun": "^1.3.14",
     "typescript": "^5.4.0",
     "vitest": "^1.0.0"
   }

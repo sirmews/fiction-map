@@ -1,0 +1,5 @@
+node_modules
+dist
+.git
+.github
+apps/literature-rpg-tui/literature-rpg-tui

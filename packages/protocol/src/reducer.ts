@@ -29,7 +29,15 @@ export function applyIntent(
     return {
       derivedState: world
         ? deriveEntityState(world as any, s)
-        : { ownedEntityIds: new Set<string>() },
+        : {
+            ownedEntityIds: new Set<string>(),
+            activeEntityIds: new Set<string>(),
+            unlockedEntityIds: new Set<string>(),
+            effectiveEntityIds: new Set<string>(),
+            activeModifiers: [],
+            prerequisites: [],
+            missingEntityIds: new Set<string>(),
+          },
     }
   }
 

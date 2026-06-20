@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "resolveJsonModule": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "bun"]
   },
   "include": ["src/**/*"]
 }
