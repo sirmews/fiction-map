@@ -33,11 +33,29 @@ jobs:
       - name: Build workspace packages
         run: bun run build
 
+      - name: Run Biome linter
+        run: bun run lint
+
+      - name: Run TypeScript typecheck
+        run: bun run typecheck
+
       - name: Run test suite
         run: bun test
 
       - name: Run Go tests
         run: go test -v ./...
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59
+          working-directory: apps/literature-rpg-tui
+
+      - name: Run golangci-lint (protocol)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59
+          working-directory: packages/protocol/go
 
       - name: Check generated protocol bindings are current
         working-directory: packages/protocol
