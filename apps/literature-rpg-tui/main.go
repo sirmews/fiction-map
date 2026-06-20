@@ -8,8 +8,10 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/sirmews/fiction-map/packages/protocol/go/generated"
 )
 
@@ -22,6 +24,89 @@ type model struct {
 	stdin    io.WriteCloser
 	err      error
 	selected int
+}
+
+var (
+	// Colors
+	magenta = lipgloss.Color("205")
+	cyan    = lipgloss.Color("86")
+	yellow  = lipgloss.Color("220")
+	red     = lipgloss.Color("196")
+	blue    = lipgloss.Color("33")
+	green   = lipgloss.Color("120")
+	gray    = lipgloss.Color("240")
+	white   = lipgloss.Color("255")
+
+	// Styles
+	titleStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("0")).
+			Background(magenta).
+			Padding(0, 2)
+
+	nodeStyle = lipgloss.NewStyle().
+			Foreground(gray).
+			Italic(true)
+
+	headerBlockStyle = lipgloss.NewStyle().
+				Bold(true).
+				Underline(true).
+				Foreground(white).
+				MarginBottom(1)
+
+	paragraphBlockStyle = lipgloss.NewStyle().
+				Foreground(white).
+				MarginBottom(1)
+
+	warningStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(white).
+			Background(red).
+			Padding(0, 1).
+			MarginBottom(1)
+
+	hudTitleStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(cyan).
+			Underline(true).
+			MarginBottom(1)
+
+	hudBoxStyle = lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(cyan).
+			Padding(1, 2).
+			Width(32)
+
+	choiceTitleStyle = lipgloss.NewStyle().
+				Bold(true).
+				Foreground(yellow).
+				MarginBottom(1)
+
+	selectedChoiceStyle = lipgloss.NewStyle().
+				Foreground(cyan).
+				Bold(true)
+
+	normalChoiceStyle = lipgloss.NewStyle().
+				Foreground(white)
+
+	footerStyle = lipgloss.NewStyle().
+			Foreground(gray).
+			MarginTop(1)
+)
+
+func renderProgressBar(current, max int, fillChar, emptyChar string, length int) string {
+	if max <= 0 {
+		return fmt.Sprintf("[%s]", strings.Repeat(emptyChar, length))
+	}
+	clampedCurrent := current
+	if clampedCurrent < 0 {
+		clampedCurrent = 0
+	} else if clampedCurrent > max {
+		clampedCurrent = max
+	}
+	filledLength := int(float64(clampedCurrent) / float64(max) * float64(length))
+	emptyLength := length - filledLength
+	return fmt.Sprintf("[%s%s]", strings.Repeat(fillChar, filledLength), strings.Repeat(emptyChar, emptyLength))
 }
 
 func (m model) Init() tea.Cmd {
@@ -106,66 +191,123 @@ func (m model) View() string {
 		return "Connecting to story engine...\n"
 	}
 
-	s := "╔════════════════════════════════════════════════════════════╗\n"
-	s += "║              FICTION MAP : LITERATURE RPG (GO)             ║\n"
-	s += "╚════════════════════════════════════════════════════════════╝\n\n"
+	// 1. Header
+	header := lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		titleStyle.Render(" FICTION MAP : LITERATURE RPG "),
+		"  ",
+		nodeStyle.Render(fmt.Sprintf("Node: %s (%s)", m.frame.CurrentNode.ID, m.frame.CurrentNode.Type)),
+	) + "\n\n"
 
-	// Render Node Info
-	s += fmt.Sprintf("Node: %s (%s)\n\n", m.frame.CurrentNode.ID, m.frame.CurrentNode.Type)
-
-	// Render Blocks
+	// 2. Left Panel: Story Text & Warnings
+	var leftBuilder strings.Builder
 	for _, block := range m.frame.CurrentNode.Blocks {
 		if block.Type == "header" {
-			s += fmt.Sprintf("\033[1;4m%s\033[0m\n\n", block.Text)
+			leftBuilder.WriteString(headerBlockStyle.Render(block.Text) + "\n")
 		} else {
-			s += fmt.Sprintf("%s\n\n", block.Text)
+			leftBuilder.WriteString(paragraphBlockStyle.Render(block.Text) + "\n")
 		}
 	}
 
-	// Render Warnings
+	// Warnings
 	for _, warning := range m.frame.Warnings {
-		s += fmt.Sprintf("\033[1;5;31m⚠ %s\033[0m\n\n", warning)
+		leftBuilder.WriteString("\n" + warningStyle.Render("⚠ "+warning) + "\n")
 	}
 
-	// Render Status HUD
-	s += "──────────────────────────────────────────────────────────────\n"
-	s += "STATUS: "
-	s += fmt.Sprintf("\033[31m♥ HP: %d%%\033[0m  ", int(m.frame.Resources["health"]))
-	s += fmt.Sprintf("\033[34m♦ MP: %d/50\033[0m  ", int(m.frame.Resources["mana"]))
-	s += fmt.Sprintf("\033[33m⛃ Gold: %dg\033[0m  ", int(m.frame.Resources["gold"]))
-	s += fmt.Sprintf("\033[37m⏳ Turn: %d\033[0m\n", int(m.frame.Resources["turns"]))
+	// 3. Right Panel: Player Status HUD
+	var rightBuilder strings.Builder
+	rightBuilder.WriteString(hudTitleStyle.Render("PLAYER STATUS") + "\n")
 
-	// Render Inventory
+	hp := int(m.frame.Resources["health"])
+	mp := int(m.frame.Resources["mana"])
+	gold := int(m.frame.Resources["gold"])
+	turns := int(m.frame.Resources["turns"])
+	cooldown := int(m.frame.Resources["heal_cooldown"])
+
+	// HP Bar
+	hpBar := renderProgressBar(hp, 100, "█", "░", 10)
+	rightBuilder.WriteString(fmt.Sprintf("\033[31m♥ HP\033[0m   %s %d%%\n", hpBar, hp))
+
+	// MP Bar
+	mpBar := renderProgressBar(mp, 50, "█", "░", 10)
+	rightBuilder.WriteString(fmt.Sprintf("\033[34m♦ MP\033[0m   %s %d/50\n", mpBar, mp))
+
+	// Gold & Turn
+	rightBuilder.WriteString(fmt.Sprintf("\033[33m⛃ Gold\033[0m : %dg\n", gold))
+	rightBuilder.WriteString(fmt.Sprintf("\033[37m⏳ Turn\033[0m : %d\n", turns))
+
+	// Cooldown
+	if cooldown > 0 {
+		rightBuilder.WriteString(fmt.Sprintf("\n\033[33m⏳ CD: %d turns left\033[0m\n", cooldown))
+	} else {
+		rightBuilder.WriteString("\n\033[32m★ Spell Cast Ready\033[0m\n")
+	}
+
+	// Inventory
+	rightBuilder.WriteString("\n" + hudTitleStyle.Render("INVENTORY") + "\n")
 	if len(m.frame.Inventory) > 0 {
-		s += "INVENTORY: "
-		for i, item := range m.frame.Inventory {
-			if i > 0 {
-				s += ", "
+		for _, item := range m.frame.Inventory {
+			symbol := "•"
+			color := "\033[32m" // green
+			if strings.Contains(item.ID, "spell") {
+				symbol = "★"
+				color = "\033[36m" // cyan
+			} else if item.ID == "lantern" {
+				symbol = "⛯"
+				color = "\033[33m" // yellow
+			} else if item.ID == "elixir" || item.ID == "spirit-elixir" {
+				symbol = "⚗"
+				color = "\033[35m" // magenta
+			} else if item.ID == "lockpick" {
+				symbol = "⚿"
+				color = "\033[90m" // gray
+			} else if item.ID == "silver-shield" {
+				symbol = "⛨"
+				color = "\033[37m" // white
+			} else if item.ID == "rune-of-water" {
+				symbol = "≈"
+				color = "\033[34m" // blue
+			} else if item.ID == "key" || item.ID == "obsidian-key" {
+				symbol = "🗝"
+				color = "\033[33m" // yellow
 			}
-			s += fmt.Sprintf("\033[32m%s\033[0m", item.Label)
-		}
-		s += "\n"
-	}
-	s += "──────────────────────────────────────────────────────────────\n\n"
-
-	// Render Choices
-	if len(m.frame.Choices) > 0 {
-		s += "\033[33mWhat do you do?\033[0m\n"
-		for i, choice := range m.frame.Choices {
-			cursor := "  "
-			color := "\033[37m"
-			if i == m.selected {
-				cursor = "❯ "
-				color = "\033[36m"
-			}
-			s += fmt.Sprintf("%s%s[%d] %s\033[0m\n", cursor, color, i+1, choice.Label)
+			rightBuilder.WriteString(fmt.Sprintf("%s%s %s\033[0m\n", color, symbol, item.Label))
 		}
 	} else {
-		s += "\033[32m★ Traversal complete! Press [Enter] or [Q] to exit. ★\033[0m\n"
+		rightBuilder.WriteString("\033[90mEmpty backpack\033[0m\n")
 	}
 
-	s += "\n\033[90m[↑/↓] Navigate • [1-9] Quick Hotkey • [Enter] Confirm • [Q] Quit\033[0m\n"
-	return s
+	// 4. Join Panels Side-by-Side
+	leftPanel := lipgloss.NewStyle().Width(45).Render(leftBuilder.String())
+	rightPanel := hudBoxStyle.Render(rightBuilder.String())
+	mainContent := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, "    ", rightPanel) + "\n\n"
+
+	// 5. Bottom Panel: Choices & Help
+	var bottomBuilder strings.Builder
+	if len(m.frame.Choices) > 0 {
+		bottomBuilder.WriteString(choiceTitleStyle.Render("What do you do?") + "\n")
+		for i, choice := range m.frame.Choices {
+			cursor := "  "
+			if i == m.selected {
+				cursor = "❯ "
+				bottomBuilder.WriteString(selectedChoiceStyle.Render(fmt.Sprintf("%s[%d] %s", cursor, i+1, choice.Label)) + "\n")
+			} else {
+				bottomBuilder.WriteString(normalChoiceStyle.Render(fmt.Sprintf("%s[%d] %s", cursor, i+1, choice.Label)) + "\n")
+			}
+		}
+	} else {
+		bottomBuilder.WriteString(lipgloss.NewStyle().Foreground(green).Bold(true).Render("★ Traversal complete! Press [Enter] or [Q] to exit. ★") + "\n")
+	}
+
+	bottomBuilder.WriteString(footerStyle.Render("[↑/↓] Navigate • [1-9] Quick Hotkey • [Enter] Confirm • [Q] Quit"))
+
+	// 6. Combine everything inside a gorgeous rounded border
+	screen := lipgloss.JoinVertical(lipgloss.Left, header, mainContent, bottomBuilder.String())
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(magenta).
+		Padding(1, 2).
+		Render(screen) + "\n"
 }
 
 func main() {
