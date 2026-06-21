@@ -13,10 +13,12 @@
     "docs:api": "typedoc",
     "format": "biome format --write .",
     "lint": "biome lint .",
-    "check": "biome check --write ."
+    "check": "biome check --write .",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.0",
+    "husky": "^9.1.7",
     "typedoc": "^0.28.19",
     "typedoc-plugin-markdown": "^4.11.0",
     "typescript": "^5.4.0"

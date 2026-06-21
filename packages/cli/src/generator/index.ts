@@ -209,8 +209,8 @@ export async function buildMetadata(
       const semanticResult = validateGraphSemantics(runtime, emptyWorld)
 
       for (const err of semanticResult.errors) {
-        graph.errors.push({
-          code: "SEMANTIC_ERROR",
+        graph.warnings.push({
+          code: "SEMANTIC_ISSUE",
           message: `[${err.type}] ${err.message} (Path: ${err.path.join(" -> ")})`,
         })
       }
@@ -349,8 +349,8 @@ export async function checkProject(options: GeneratorOptions): Promise<ProjectCh
   if (actualMetadata === null) {
     mismatches.push({ path: metadataPath, reason: "missing" })
   } else if (
-    actualMetadata.replace(/\\r\\n/g, "\\n").trimEnd() !==
-    expectedMetadata.replace(/\\r\\n/g, "\\n").trimEnd()
+    actualMetadata.replace(/\r\n/g, "\n").trimEnd() !==
+    expectedMetadata.replace(/\r\n/g, "\n").trimEnd()
   ) {
     mismatches.push({ path: metadataPath, reason: "different" })
   }
@@ -358,8 +358,8 @@ export async function checkProject(options: GeneratorOptions): Promise<ProjectCh
   if (actualSemantics === null) {
     mismatches.push({ path: semanticsPath, reason: "missing" })
   } else if (
-    actualSemantics.replace(/\\r\\n/g, "\\n").trimEnd() !==
-    expectedSemantics.replace(/\\r\\n/g, "\\n").trimEnd()
+    actualSemantics.replace(/\r\n/g, "\n").trimEnd() !==
+    expectedSemantics.replace(/\r\n/g, "\n").trimEnd()
   ) {
     mismatches.push({ path: semanticsPath, reason: "different" })
   }

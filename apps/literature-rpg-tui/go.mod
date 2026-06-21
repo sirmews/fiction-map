@@ -1,6 +1,6 @@
 module github.com/sirmews/fiction-map/apps/literature-rpg-tui
 
-go 1.26.4
+go 1.22
 
 replace github.com/sirmews/fiction-map/packages/protocol/go => ../../packages/protocol/go
 
