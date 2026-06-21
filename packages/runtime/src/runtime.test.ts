@@ -75,4 +75,74 @@ describe("GraphRuntime path enumeration", () => {
     expect(paths).toHaveLength(2)
     expect(paths.every((path) => path.steps.length <= 2)).toBe(true)
   })
+
+  it("walk() prunes cyclic loops when symbolic state repeats", () => {
+    const graph: GraphDefinition = {
+      id: "cycle-walk-traversal",
+      name: "Cycle Walk Traversal",
+      location: { file: "test.ts", line: 1, column: 1 },
+      nodes: [
+        { id: "start", type: "scene" },
+        { id: "loop", type: "scene" },
+      ],
+      edges: [
+        { id: "to-loop", type: "choice", source: "start", target: "loop" },
+        { id: "loop-back", type: "choice", source: "loop", target: "start" },
+        { id: "loop-exit", type: "choice", source: "loop", target: "start" },
+      ],
+      nodeCount: 2,
+      edgeCount: 3,
+      maxDepth: 1,
+      endings: [],
+      nodeTypesUsed: ["scene"],
+      edgeTypesUsed: ["choice"],
+      conditionsUsed: [],
+      effectsUsed: [],
+      errors: [],
+      warnings: [],
+    }
+
+    const runtime = createRuntimeFromGraph(graph)
+    const steps = runtime.walk(runtime.createState(), 100)
+
+    expect(steps).toHaveLength(2)
+    expect(steps[0].state.currentNodeId).toBe("loop")
+    expect(steps[1].state.currentNodeId).toBe("start")
+  })
+
+  it("walkWithContext() prunes cyclic loops when symbolic state repeats", () => {
+    const graph: GraphDefinition = {
+      id: "cycle-walkwithcontext-traversal",
+      name: "Cycle WalkWithContext Traversal",
+      location: { file: "test.ts", line: 1, column: 1 },
+      nodes: [
+        { id: "start", type: "scene" },
+        { id: "loop", type: "scene" },
+      ],
+      edges: [
+        { id: "to-loop", type: "choice", source: "start", target: "loop" },
+        { id: "loop-back", type: "choice", source: "loop", target: "start" },
+        { id: "loop-exit", type: "choice", source: "loop", target: "start" },
+      ],
+      nodeCount: 2,
+      edgeCount: 3,
+      maxDepth: 1,
+      endings: [],
+      nodeTypesUsed: ["scene"],
+      edgeTypesUsed: ["choice"],
+      conditionsUsed: [],
+      effectsUsed: [],
+      errors: [],
+      warnings: [],
+    }
+
+    const runtime = createRuntimeFromGraph(graph)
+    const steps = runtime.walkWithContext(runtime.createState(), (state) => ({
+      derivedState: { node: state.currentNodeId },
+    }))
+
+    expect(steps).toHaveLength(2)
+    expect(steps[0].state.currentNodeId).toBe("loop")
+    expect(steps[1].state.currentNodeId).toBe("start")
+  })
 })
