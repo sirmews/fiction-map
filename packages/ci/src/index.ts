@@ -42,6 +42,9 @@ async function runPipeline() {
         // Mount Bun and node_modules caches
         .withMountedCache("/root/.bun", bunCache)
         .withMountedCache("/app/node_modules", nodeModulesCache)
+        // Install git for diff debugging
+        .withExec(["apt-get", "update"])
+        .withExec(["apt-get", "install", "-y", "git"])
         .withExec(["bun", "install"])
         .withExec(["bun", "run", "build"])
         .withExec(["bun", "run", "check"])
