@@ -6,6 +6,7 @@ import {
   getAvailableTransitions,
   getTransitionsByAvailability,
 } from "./core/transition"
+import { SymbolicState } from "./validation/symbolicState"
 import { validateGraph } from "./core/validation"
 import { builtinEvaluators, builtinHandlers } from "./default-bindings"
 import { applyEffects } from "./effects"
@@ -309,16 +310,25 @@ export class GraphRuntime {
   ): TraversalPath[] {
     const paths: TraversalPath[] = []
     const startState = this.createState()
+    const startFingerprint = new SymbolicState(startState).getFingerprint()
 
     const stack: {
       state: GraphRuntimeState
       steps: PathStep[]
       depth: number
-    }[] = [{ state: startState, steps: [], depth: 0 }]
+      visitedStateFingerprints: Set<string>
+    }[] = [
+      {
+        state: startState,
+        steps: [],
+        depth: 0,
+        visitedStateFingerprints: new Set([startFingerprint]),
+      },
+    ]
 
     while (stack.length > 0 && paths.length < maxPaths) {
       const frame = stack.pop()!
-      const { state, steps, depth } = frame
+      const { state, steps, depth, visitedStateFingerprints } = frame
 
       if (depth >= maxDepth) {
         paths.push({
@@ -355,8 +365,21 @@ export class GraphRuntime {
       const reversed = [...available].reverse()
       for (const transition of reversed) {
         const result = this.step(state, transition, context)
+        if (!result.success || !result.state) {
+          continue
+        }
+
+        const nextState = result.state
+        const fingerprint = new SymbolicState(nextState).getFingerprint()
+        if (visitedStateFingerprints.has(fingerprint)) {
+          continue
+        }
+
+        const nextVisitedStateFingerprints = new Set(visitedStateFingerprints)
+        nextVisitedStateFingerprints.add(fingerprint)
+
         stack.push({
-          state: result.state,
+          state: nextState,
           steps: [
             ...steps,
             {
@@ -367,6 +390,7 @@ export class GraphRuntime {
             },
           ],
           depth: depth + 1,
+          visitedStateFingerprints: nextVisitedStateFingerprints,
         })
       }
     }
