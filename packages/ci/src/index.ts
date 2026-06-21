@@ -52,7 +52,7 @@ async function runPipeline() {
         .withExec(["bun", "run", "typecheck"])
         .withExec(["bun", "test"])
         .withExec(["sh", "-c", "cd packages/protocol && bun run generate --check"])
-        .withExec(["sh", "-c", "cd apps/literature-rpg && (bun run generate --check || (bun run generate && git diff && exit 1))"])
+        .withExec(["sh", "-c", "cd apps/literature-rpg && (bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1))"])
         .withExec(["sh", "-c", "cd apps/literature-rpg && bun run validate"]);
 
       // --- Container 2: Go Environment (Tests) ---
