@@ -35,21 +35,20 @@ Source: `structs/loot.struct.ts:4`
 
 ## Node Types (3)
 
-### `scene`
+### `chest`
 
 ```typescript
 defineNodeType(registry, {
-  id: "scene",
+  id: "chest",
   properties: {
-    title: { type: "string" },
-    body: { type: "string" },
+    possibleLoot: { type: "array", items: { type: "struct", structId: "loot-entry" } },
   },
   outgoingEdges: ["choice"],
   incomingEdges: ["choice"],
 })
 ```
 
-Source: `nodes/scene.node.ts:4`
+Source: `nodes/chest.node.ts:4`
 
 ---
 
@@ -66,20 +65,21 @@ Source: `nodes/compute.node.ts:4`
 
 ---
 
-### `chest`
+### `scene`
 
 ```typescript
 defineNodeType(registry, {
-  id: "chest",
+  id: "scene",
   properties: {
-    possibleLoot: { type: "array", items: { type: "struct", structId: "loot-entry" } },
+    title: { type: "string" },
+    body: { type: "string" },
   },
   outgoingEdges: ["choice"],
   incomingEdges: ["choice"],
 })
 ```
 
-Source: `nodes/chest.node.ts:4`
+Source: `nodes/scene.node.ts:4`
 
 ---
 
