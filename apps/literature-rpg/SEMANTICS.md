@@ -110,7 +110,7 @@ Source: `edges/choice.edge.ts:4`
 - Endings: `victory`, `death`
 - Conditions used: `notVisited`, `greaterThanOrEqual`, `lessThan`, `hasEntity`, `notFlag`, `hasFlag`, `resourceAtLeast`, `resourceLessThan`
 - Effects used: `addResource`, `grantEntity`, `setFlag`, `markVisited`, `revokeEntity`, `spendResource`
-- ⚠️ 18 validation errors
+- ⚠️ 18 validation warnings
 
 **Topology:**
 

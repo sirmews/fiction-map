@@ -209,8 +209,8 @@ export async function buildMetadata(
       const semanticResult = validateGraphSemantics(runtime, emptyWorld)
 
       for (const err of semanticResult.errors) {
-        graph.errors.push({
-          code: "SEMANTIC_ERROR",
+        graph.warnings.push({
+          code: "SEMANTIC_ISSUE",
           message: `[${err.type}] ${err.message} (Path: ${err.path.join(" -> ")})`,
         })
       }

@@ -1439,81 +1439,81 @@
         "revokeEntity",
         "spendResource"
       ],
-      "errors": [
+      "errors": [],
+      "warnings": [
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[infinite-drain-loop] Infinite resource-draining loop detected at node 'chamber-of-runes'. Health decreased from 100 to 70. (Path: enter-entrance -> enter-hall -> descend -> examine-glyphs -> touch-pedestal)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'succumb-to-injuries'. (Path: enter-entrance -> enter-hall -> descend -> cross-bridge -> succumb-to-injuries)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> descend -> examine-glyphs -> translate-runes -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> descend -> cross-bridge -> climb-rubble -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> explore-archives -> enter-lab -> descend-trapdoor -> swim-passage -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> climb-staircase -> go-east -> run-past-statues -> answer-riddle -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[infinite-drain-loop] Infinite resource-draining loop detected at node 'chamber-of-runes'. Health decreased from 100 to 70. (Path: enter-entrance -> enter-hall -> explore-archives -> study-heal -> return-from-archives -> descend -> examine-glyphs -> touch-pedestal)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'succumb-to-injuries'. (Path: enter-entrance -> enter-hall -> explore-archives -> study-heal -> return-from-archives -> descend -> cross-bridge -> succumb-to-injuries)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> explore-archives -> study-heal -> enter-lab -> descend-trapdoor -> swim-passage -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[infinite-drain-loop] Infinite resource-draining loop detected at node 'chamber-of-runes'. Health decreased from 100 to 70. (Path: enter-entrance -> enter-hall -> explore-archives -> study-mage-light -> return-from-archives -> descend -> examine-glyphs -> touch-pedestal)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[infinite-drain-loop] Infinite resource-draining loop detected at node 'chamber-of-runes'. Health decreased from 100 to 70. (Path: enter-entrance -> enter-hall -> explore-archives -> study-mage-light -> return-from-archives -> descend -> cast-mage-light -> touch-pedestal)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'succumb-to-injuries'. (Path: enter-entrance -> enter-hall -> explore-archives -> study-mage-light -> return-from-archives -> descend -> cross-bridge -> succumb-to-injuries)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> explore-archives -> study-mage-light -> enter-lab -> descend-trapdoor -> swim-passage -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> explore-archives -> study-mage-light -> enter-lab -> descend-trapdoor -> cast-water-walk -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[infinite-drain-loop] Infinite resource-draining loop detected at node 'chamber-of-runes'. Health decreased from 100 to 70. (Path: enter-entrance -> enter-hall -> explore-archives -> buy-lockpick -> return-from-archives -> descend -> examine-glyphs -> touch-pedestal)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'succumb-to-injuries'. (Path: enter-entrance -> enter-hall -> explore-archives -> buy-lockpick -> return-from-archives -> descend -> cross-bridge -> succumb-to-injuries)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> explore-archives -> buy-lockpick -> enter-lab -> descend-trapdoor -> swim-passage -> die-at-crypt)"
         },
         {
-          "code": "SEMANTIC_ERROR",
+          "code": "SEMANTIC_ISSUE",
           "message": "[unwinnable-path] Player died at node 'death' after taking transition 'die-at-crypt'. (Path: enter-entrance -> enter-hall -> explore-archives -> enter-lab -> brew-elixir -> descend-trapdoor -> swim-passage -> die-at-crypt)"
         }
-      ],
-      "warnings": []
+      ]
     }
   ],
   "structs": [
