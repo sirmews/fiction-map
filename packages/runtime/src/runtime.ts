@@ -227,6 +227,9 @@ export class GraphRuntime {
     maxSteps: number = 100,
   ): StepResult[] {
     const steps: StepResult[] = []
+    const visitedStateFingerprints = new Set<string>([
+      new SymbolicState(state).getFingerprint(),
+    ])
 
     for (let i = 0; i < maxSteps; i++) {
       const context = makeContext(state)
@@ -243,9 +246,12 @@ export class GraphRuntime {
       }
 
       const result = this.step(state, available[0], context)
+      const resultState = result.state
+      const fingerprint = new SymbolicState(resultState).getFingerprint()
+      const isRevisited = visitedStateFingerprints.has(fingerprint)
 
       const stepResult: StepResult = {
-        state: result.state,
+        state: resultState,
         nodeId: result.state.currentNodeId,
         available,
         applied: result,
@@ -253,8 +259,14 @@ export class GraphRuntime {
 
       steps.push(stepResult)
 
+      if (isRevisited) {
+        break
+      }
+
+      visitedStateFingerprints.add(fingerprint)
+
       // Update state for the next iteration
-      state = result.state
+      state = resultState
     }
 
     return steps
@@ -275,6 +287,9 @@ export class GraphRuntime {
     context?: EvaluationContext & EffectContext,
   ): StepResult[] {
     const steps: StepResult[] = []
+    const visitedStateFingerprints = new Set<string>([
+      new SymbolicState(state).getFingerprint(),
+    ])
 
     for (let i = 0; i < maxSteps; i++) {
       const available = this.getAvailable(state, context)
@@ -290,14 +305,23 @@ export class GraphRuntime {
       }
 
       const result = this.step(state, available[0], context)
+      const resultState = result.state
+      const fingerprint = new SymbolicState(resultState).getFingerprint()
+      const isRevisited = visitedStateFingerprints.has(fingerprint)
+
       steps.push({
-        state: cloneState(result.state),
-        nodeId: result.state.currentNodeId,
+        state: cloneState(resultState),
+        nodeId: resultState.currentNodeId,
         available,
         applied: result,
       })
 
-      state = result.state
+      if (isRevisited) {
+        break
+      }
+
+      visitedStateFingerprints.add(fingerprint)
+      state = resultState
     }
 
     return steps
