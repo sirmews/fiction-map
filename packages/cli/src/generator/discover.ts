@@ -41,6 +41,10 @@ function extractId(filename: string): string {
   return base.replace(/\.(node|edge|condition|effect|graph|struct)\.ts$/, "")
 }
 
+function sortDiscoveredFiles(a: DiscoveredFile, b: DiscoveredFile): number {
+  return a.path.localeCompare(b.path)
+}
+
 /**
  * Discover all graph primitive files in a directory
  */
@@ -65,36 +69,48 @@ export async function discoverFiles(rootDir: string): Promise<DiscoveryResult> {
     ])
 
   return {
-    nodes: nodeFiles.map((path) => ({
+    nodes: nodeFiles
+      .map((path) => ({
       path,
       type: "node" as const,
       id: extractId(path),
-    })),
-    edges: edgeFiles.map((path) => ({
+    }))
+      .sort(sortDiscoveredFiles),
+    edges: edgeFiles
+      .map((path) => ({
       path,
       type: "edge" as const,
       id: extractId(path),
-    })),
-    conditions: conditionFiles.map((path) => ({
+    }))
+      .sort(sortDiscoveredFiles),
+    conditions: conditionFiles
+      .map((path) => ({
       path,
       type: "condition" as const,
       id: extractId(path),
-    })),
-    effects: effectFiles.map((path) => ({
+    }))
+      .sort(sortDiscoveredFiles),
+    effects: effectFiles
+      .map((path) => ({
       path,
       type: "effect" as const,
       id: extractId(path),
-    })),
-    graphs: graphFiles.map((path) => ({
+    }))
+      .sort(sortDiscoveredFiles),
+    graphs: graphFiles
+      .map((path) => ({
       path,
       type: "graph" as const,
       id: extractId(path),
-    })),
-    structs: structFiles.map((path) => ({
+    }))
+      .sort(sortDiscoveredFiles),
+    structs: structFiles
+      .map((path) => ({
       path,
       type: "struct" as const,
       id: extractId(path),
-    })),
+    }))
+      .sort(sortDiscoveredFiles),
   }
 }
 
