@@ -42,19 +42,23 @@ async function runPipeline() {
         .withExec(["sh", "-c", "cd apps/literature-rpg && bun run generate --check"])
         .withExec(["sh", "-c", "cd apps/literature-rpg && bun run validate"]);
 
-      // --- Container 2: Go Environment (Tests & Linting) ---
+      // --- Container 2: Go Environment (Tests) ---
       console.log("🐹 Configuring Go container...");
       const goContainer = client
         .container()
-        .from("golang:1.26.4")
+        .from("golang:1.22")
         .withDirectory("/app", sourceDir)
         .withWorkdir("/app")
-        // Install golangci-lint compiled with Go 1.26.4
-        .withExec(["go", "install", "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8"])
-        // Run Go tests
         .withExec(["sh", "-c", "cd apps/literature-rpg-tui && go test -v ./..."])
-        .withExec(["sh", "-c", "cd packages/protocol/go && go test -v ./..."])
-        // Run golangci-lint
+        .withExec(["sh", "-c", "cd packages/protocol/go && go test -v ./..."]);
+
+      // --- Container 3: golangci-lint Environment (Linting) ---
+      console.log("🧹 Configuring golangci-lint container...");
+      const lintGoContainer = client
+        .container()
+        .from("golangci/golangci-lint:v1.64.8")
+        .withDirectory("/app", sourceDir)
+        .withWorkdir("/app")
         .withExec(["sh", "-c", "cd apps/literature-rpg-tui && golangci-lint run --timeout 5m ./..."])
         .withExec(["sh", "-c", "cd packages/protocol/go && golangci-lint run --timeout 5m ./..."]);
 
@@ -63,6 +67,7 @@ async function runPipeline() {
       await Promise.all([
         bunContainer.sync(),
         goContainer.sync(),
+        lintGoContainer.sync(),
       ]);
 
       console.log("✅ All CI checks passed successfully! Safe to push.");
