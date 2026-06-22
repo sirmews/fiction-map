@@ -4,9 +4,24 @@ import { connect } from "@dagger.io/dagger";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-async function runPipeline() {
-  console.log("🚀 Starting Fiction Map Local CI Pipeline via Dagger...");
+function getProvisioningFailureMessage(error: unknown): string {
+  const seen: unknown[] = [];
+  const messages: string[] = [];
+  let current = error;
+  while (current && typeof current === "object") {
+    if (seen.includes(current)) {
+      break;
+    }
+    seen.push(current);
+    if ("message" in current && typeof current.message === "string") {
+      messages.push(current.message);
+    }
+    current = (current as { cause?: unknown }).cause;
+  }
+  return messages.join(" ");
+}
 
+async function runPipelineAttempt() {
   await connect(
     async (client) => {
       // 1. Mount the host repository directory (excluding node_modules and build artifacts)
@@ -91,9 +106,38 @@ async function runPipeline() {
       ]);
 
       console.log("✅ All CI checks passed successfully! Safe to push.");
-    }
-    // Note: We removed `{ LogOutput: process.stdout }` to keep the terminal output clean and professional!
+    },
+    { LogOutput: process.stderr },
   );
+}
+
+async function runPipeline() {
+  console.log("🚀 Starting Fiction Map Local CI Pipeline via Dagger...");
+
+  const maxAttempts = 3;
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await runPipelineAttempt();
+      return;
+    } catch (error) {
+      lastError = error;
+      const message = getProvisioningFailureMessage(error);
+      const shouldRetry =
+        message.includes("automatic provisioning") ||
+        message.includes("connectParams.port") ||
+        message.includes("failed to execute function with automatic provisioning");
+
+      if (!shouldRetry || attempt === maxAttempts) {
+        throw error;
+      }
+      console.error(`⚠️ Dagger engine setup failed on attempt ${attempt}/${maxAttempts}; retrying...`);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 3000 * attempt);
+      });
+    }
+  }
+  throw lastError;
 }
 
 runPipeline().catch((err) => {
