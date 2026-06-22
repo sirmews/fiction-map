@@ -201,7 +201,7 @@ function checkTsFilesForBoundaryViolations(packageDir: string) {
   }
 }
 
-function getLineOffsets(content: string): number[] {
+function _getLineOffsets(content: string): number[] {
   const offsets: number[] = []
   let index = content.indexOf("\n")
   while (index !== -1) {
@@ -211,7 +211,7 @@ function getLineOffsets(content: string): number[] {
   return offsets
 }
 
-function getLineNumber(content: string, columnOffset: number): number {
+function _getLineNumber(content: string, columnOffset: number): number {
   if (columnOffset <= 0) {
     return 1
   }

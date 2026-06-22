@@ -1,12 +1,98 @@
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 import { connect } from "@dagger.io/dagger";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, "../../..");
 
-async function runPipeline() {
-  console.log("🚀 Starting Fiction Map Local CI Pipeline via Dagger...");
+function getProvisioningFailureMessage(error: unknown): string {
+  const seen: unknown[] = [];
+  const messages: string[] = [];
+  let current = error;
+  while (current && typeof current === "object") {
+    if (seen.includes(current)) {
+      break;
+    }
+    seen.push(current);
+    if ("message" in current && typeof current.message === "string") {
+      messages.push(current.message);
+    }
+    current = (current as { cause?: unknown }).cause;
+  }
+  return messages.join(" ");
+}
 
+function runShellCommand(command: string, cwd = projectRoot) {
+  execSync(command, {
+    cwd,
+    stdio: "inherit",
+    shell: true,
+  });
+}
+
+function ensureGolangciLint() {
+  try {
+    execSync("command -v golangci-lint", {
+      stdio: "ignore",
+      shell: true,
+    });
+    return;
+  } catch {
+    console.log("⚠️ golangci-lint not found, installing...");
+    const goPath = execSync("go env GOPATH", { encoding: "utf8", shell: true }).trim();
+    runShellCommand(
+      "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.64.8/install.sh | sh -s -- -b \"$(go env GOPATH)/bin\" v1.64.8",
+    );
+    process.env.PATH = `${goPath}/bin:${process.env.PATH}`;
+  }
+}
+
+async function runLocalPipeline() {
+  console.log("🔁 Falling back to local validation execution...");
+  runShellCommand("bun run build", projectRoot);
+  runShellCommand("bun run check", projectRoot);
+  runShellCommand("bun run lint:boundaries", projectRoot);
+  runShellCommand("bun run typecheck", projectRoot);
+  runShellCommand("bun test", projectRoot);
+
+  runShellCommand("bun run generate --check", path.join(projectRoot, "packages/protocol"));
+  runShellCommand(
+    "bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1)",
+    path.join(projectRoot, "apps/literature-rpg"),
+  );
+  runShellCommand("bun run validate", path.join(projectRoot, "apps/literature-rpg"));
+
+  runShellCommand("go test -v ./...", path.join(projectRoot, "apps/literature-rpg-tui"));
+  runShellCommand("go test -v ./...", path.join(projectRoot, "packages/protocol/go"));
+
+  ensureGolangciLint();
+  runShellCommand(
+    "golangci-lint run --timeout 5m ./...",
+    path.join(projectRoot, "apps/literature-rpg-tui"),
+  );
+  runShellCommand(
+    "golangci-lint run --timeout 5m ./...",
+    path.join(projectRoot, "packages/protocol/go"),
+  );
+
+  console.log("✅ Local validation checks passed successfully!");
+}
+
+function isDaggerRetryableError(error: unknown): boolean {
+  const message = getProvisioningFailureMessage(error).toLowerCase();
+  return (
+    message.includes("automatic provisioning") ||
+    message.includes("connectparams.port") ||
+    message.includes("failed to execute function with automatic provisioning") ||
+    message.includes("failed to pull image") ||
+    message.includes("context deadline exceeded") ||
+    message.includes("failed to run command [docker pull") ||
+    message.includes("start engine")
+  );
+}
+
+async function runPipelineAttempt() {
   await connect(
     async (client) => {
       // 1. Mount the host repository directory (excluding node_modules and build artifacts)
@@ -91,9 +177,39 @@ async function runPipeline() {
       ]);
 
       console.log("✅ All CI checks passed successfully! Safe to push.");
-    }
-    // Note: We removed `{ LogOutput: process.stdout }` to keep the terminal output clean and professional!
+    },
+    { LogOutput: process.stderr },
   );
+}
+
+async function runPipeline() {
+  console.log("🚀 Starting Fiction Map Local CI Pipeline via Dagger...");
+
+  const maxAttempts = 3;
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await runPipelineAttempt();
+      return;
+    } catch (error) {
+      lastError = error;
+      const shouldRetry = isDaggerRetryableError(error);
+
+      if (!shouldRetry || attempt === maxAttempts) {
+        if (shouldRetry) {
+          console.error(`⚠️ Dagger setup failed after ${attempt} attempt(s), using local fallback.`);
+          await runLocalPipeline();
+          return;
+        }
+        throw error;
+      }
+      console.error(`⚠️ Dagger engine setup failed on attempt ${attempt}/${maxAttempts}; retrying...`);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 3000 * attempt);
+      });
+    }
+  }
+  throw lastError;
 }
 
 runPipeline().catch((err) => {

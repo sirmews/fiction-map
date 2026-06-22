@@ -7,6 +7,6 @@
     "start": "bun run src/index.ts"
   },
   "dependencies": {
-    "@dagger.io/dagger": "^0.11.0"
+    "@dagger.io/dagger": "0.21.7"
   }
 }
