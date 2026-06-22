@@ -1,8 +1,10 @@
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 import { connect } from "@dagger.io/dagger";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, "../../..");
 
 function getProvisioningFailureMessage(error: unknown): string {
   const seen: unknown[] = [];
@@ -19,6 +21,75 @@ function getProvisioningFailureMessage(error: unknown): string {
     current = (current as { cause?: unknown }).cause;
   }
   return messages.join(" ");
+}
+
+function runShellCommand(command: string, cwd = projectRoot) {
+  execSync(command, {
+    cwd,
+    stdio: "inherit",
+    shell: true,
+  });
+}
+
+function ensureGolangciLint() {
+  try {
+    execSync("command -v golangci-lint", {
+      stdio: "ignore",
+      shell: true,
+    });
+    return;
+  } catch {
+    console.log("⚠️ golangci-lint not found, installing...");
+    const goPath = execSync("go env GOPATH", { encoding: "utf8", shell: true }).trim();
+    runShellCommand(
+      "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.64.8/install.sh | sh -s -- -b \"$(go env GOPATH)/bin\" v1.64.8",
+    );
+    process.env.PATH = `${goPath}/bin:${process.env.PATH}`;
+  }
+}
+
+async function runLocalPipeline() {
+  console.log("🔁 Falling back to local validation execution...");
+  runShellCommand("bun run build", projectRoot);
+  runShellCommand("bun run check", projectRoot);
+  runShellCommand("bun run lint:boundaries", projectRoot);
+  runShellCommand("bun run typecheck", projectRoot);
+  runShellCommand("bun test", projectRoot);
+
+  runShellCommand("bun run generate --check", path.join(projectRoot, "packages/protocol"));
+  runShellCommand(
+    "bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1)",
+    path.join(projectRoot, "apps/literature-rpg"),
+  );
+  runShellCommand("bun run validate", path.join(projectRoot, "apps/literature-rpg"));
+
+  runShellCommand("go test -v ./...", path.join(projectRoot, "apps/literature-rpg-tui"));
+  runShellCommand("go test -v ./...", path.join(projectRoot, "packages/protocol/go"));
+
+  ensureGolangciLint();
+  runShellCommand(
+    "golangci-lint run --timeout 5m ./...",
+    path.join(projectRoot, "apps/literature-rpg-tui"),
+  );
+  runShellCommand(
+    "golangci-lint run --timeout 5m ./...",
+    path.join(projectRoot, "packages/protocol/go"),
+  );
+
+  console.log("✅ Local validation checks passed successfully!");
+}
+
+function isDaggerRetryableError(error: unknown): boolean {
+  const message = getProvisioningFailureMessage(error).toLowerCase();
+  return (
+    message.includes("automatic provisioning") ||
+    message.includes("connectparams.port") ||
+    message.includes("failed to execute function with automatic provisioning") ||
+    message.includes("failed to pull image") ||
+    message.includes("context deadline exceeded") ||
+    message.includes("failed to run command [docker pull") ||
+    message.includes("start engine")
+  );
 }
 
 async function runPipelineAttempt() {
@@ -122,13 +193,14 @@ async function runPipeline() {
       return;
     } catch (error) {
       lastError = error;
-      const message = getProvisioningFailureMessage(error);
-      const shouldRetry =
-        message.includes("automatic provisioning") ||
-        message.includes("connectParams.port") ||
-        message.includes("failed to execute function with automatic provisioning");
+      const shouldRetry = isDaggerRetryableError(error);
 
       if (!shouldRetry || attempt === maxAttempts) {
+        if (shouldRetry) {
+          console.error(`⚠️ Dagger setup failed after ${attempt} attempt(s), using local fallback.`);
+          await runLocalPipeline();
+          return;
+        }
         throw error;
       }
       console.error(`⚠️ Dagger engine setup failed on attempt ${attempt}/${maxAttempts}; retrying...`);
