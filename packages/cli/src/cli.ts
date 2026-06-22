@@ -8,6 +8,7 @@ import { parseArgs } from "node:util"
 import { ascii } from "./commands/ascii"
 import { generate } from "./commands/generate"
 import { installHooks } from "./commands/hooks"
+import { debug } from "./commands/debug"
 import { explain, query, showGraph } from "./commands/query"
 import { validate } from "./commands/validate"
 
@@ -28,6 +29,7 @@ Commands:
   graph       Show graph-level metadata and topology
   explain     Explain a graph, node, or edge by id
   ascii       Draw a beautiful ASCII map of the story graph
+  debug       Interactively step through transitions for a graph
 
 Options:
   --help, -h        Show this help
@@ -55,6 +57,10 @@ Ascii Options:
   --root-dir        Root directory (default: current directory)
   --output-dir      Output directory containing .fiction-map/metadata.json
   --format, -f      Output format: terminal, llm, mermaid (default: terminal)
+
+Debug Options:
+  --root-dir        Root directory (default: current directory)
+  --output-dir      Output directory containing .fiction-map/metadata.json
 
 Examples:
   fiction-map generate
@@ -179,6 +185,13 @@ async function main(): Promise<void> {
         rootDir: values["root-dir"],
         outputDir: values["output-dir"],
         format: values.format,
+      })
+      break
+
+    case "debug":
+      await debug(positionals[1], {
+        rootDir: values["root-dir"],
+        outputDir: values["output-dir"],
       })
       break
 
