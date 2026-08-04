@@ -16,6 +16,8 @@ import { world } from "./world"
 registerBuiltins(registry)
 
 export const runtime = createRuntimeFromGraph(story)
+export { registry } from "./project"
+export { world } from "./world"
 
 // Global Triggers
 runtime.addTrigger({
