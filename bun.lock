@@ -80,6 +80,7 @@
         "@base-ui/react": "^1.5.0",
         "@fiction-map/core": "workspace:*",
         "@fiction-map/entities": "workspace:*",
+        "@fiction-map/protocol": "workspace:*",
         "@fiction-map/runtime": "workspace:*",
         "@fontsource-variable/geist": "^5.2.9",
         "@radix-ui/react-slot": "^1.1.2",
