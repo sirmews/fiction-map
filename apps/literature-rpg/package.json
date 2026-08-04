@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": "src/main.ts",
   "scripts": {
     "build:deps": "bun run --filter @fiction-map/core build && bun run --filter @fiction-map/entities build && bun run --filter @fiction-map/runtime build && bun run --filter @fiction-map/protocol build && bun run --filter fiction-map build",
     "prestart": "bun run build:deps",

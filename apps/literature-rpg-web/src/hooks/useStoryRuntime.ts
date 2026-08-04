@@ -1,85 +1,110 @@
-import {
-  createInitialState,
-  createRuntimeFromGraph,
-  deriveEntityState,
-  type GraphRuntimeState,
-  registerBuiltins,
-  type Transition,
-} from "@fiction-map/runtime"
-import { useCallback, useMemo, useState } from "react"
-import { story } from "../../../literature-rpg/src/graphs/story.graph"
-import { registry } from "../../../literature-rpg/src/project"
-import { world } from "../../../literature-rpg/src/world"
+import { useCallback, useEffect, useState } from "react"
+import type { Frame, FrameChoice, Intent } from "@fiction-map/protocol"
 
-registerBuiltins(registry)
-
-export const runtime = createRuntimeFromGraph(story)
-
-runtime.addTrigger({
-  id: "turn-counter-trigger",
-  conditions: [],
-  effects: [{ type: "addResource", key: "turns", amount: 1 }],
-})
-
-runtime.addTrigger({
-  id: "cavern-collapse-trigger",
-  conditions: [{ type: "resourceAtLeast", key: "turns", value: 11 }],
-  effects: [{ type: "spendResource", key: "health", amount: 25, clampToZero: true }],
-})
-
-runtime.addTrigger({
-  id: "death-trigger",
-  conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
-  effects: [{ type: "navigate", nodeId: "death" }],
-})
-
-runtime.addTrigger({
-  id: "mana-regen-trigger",
-  conditions: [{ type: "resourceLessThan", key: "mana", value: 50 }],
-  effects: [{ type: "addResource", key: "mana", amount: 5 }],
-})
-
-runtime.addTrigger({
-  id: "cooldown-tick-trigger",
-  conditions: [{ type: "resourceAtLeast", key: "heal_cooldown", value: 1 }],
-  effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
-})
+export type ClientGameState = Frame
 
 export function useStoryRuntime() {
-  const [state, setState] = useState<GraphRuntimeState>(() =>
-    createInitialState(runtime.startNodeId),
-  )
+  const [gameState, setGameState] = useState<ClientGameState | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const context = useMemo(() => {
-    return { derivedState: deriveEntityState(world, state) }
-  }, [state])
+  const fetchState = useCallback(async (intent?: Intent) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const body = { sessionId, intent }
+      const res = await fetch("http://localhost:8080/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setError(data.error)
+        console.error("Engine API error:", data.error)
+      }
+      if (data.frame) {
+        setGameState(data.frame)
+      }
+      if (data.sessionId) {
+        setSessionId(data.sessionId)
+      }
+    } catch (e) {
+      console.error("Failed to fetch state:", e)
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }, [sessionId])
 
-  const currentNode = runtime.nodes.get(state.currentNodeId)
-  const availableChoices = runtime.getAvailable(state, context)
+  // Initial fetch
+  useEffect(() => {
+    if (!gameState && !loading && sessionId === null) {
+      fetchState()
+    }
+  }, [gameState, loading, sessionId, fetchState])
+
+  // Initial mount trigger
+  useEffect(() => {
+    let mounted = true;
+    fetch("http://localhost:8080/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+    })
+      .then(res => res.json())
+      .then(data => {
+         if (!mounted) return;
+         if (data.frame) setGameState(data.frame);
+         if (data.sessionId) setSessionId(data.sessionId);
+         setLoading(false);
+      })
+      .catch(e => {
+         if (!mounted) return;
+         console.error("Failed to fetch initial state:", e);
+         setError((e as Error).message);
+         setLoading(false);
+      });
+    return () => { mounted = false; };
+  }, [])
 
   const step = useCallback(
-    (choice: Transition) => {
-      const result = runtime.step(state, choice, context)
-      if (result.success) {
-        setState(result.state)
-      } else {
-        console.error("Transition failed:", result.failureReason)
-      }
+    (choice: FrameChoice) => {
+      fetchState({ type: "selectChoice", choiceId: choice.id })
     },
-    [state, context],
+    [fetchState],
   )
 
   const reset = useCallback(() => {
-    setState(createInitialState(runtime.startNodeId))
+    setSessionId(null)
+    setGameState(null)
+    setLoading(true)
+    // The initial mount logic won't run again, so we need to call fetchState directly
+    // but without sessionId to force a new session.
+    fetch("http://localhost:8080/intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    })
+      .then(res => res.json())
+      .then(data => {
+         if (data.frame) setGameState(data.frame);
+         if (data.sessionId) setSessionId(data.sessionId);
+         setLoading(false);
+      })
+      .catch(e => {
+         console.error("Failed to fetch new state:", e);
+         setError((e as Error).message);
+         setLoading(false);
+      });
   }, [])
 
   return {
-    state,
-    context,
-    currentNode,
-    availableChoices,
+    gameState,
+    loading,
+    error,
     step,
     reset,
-    world,
   }
 }
