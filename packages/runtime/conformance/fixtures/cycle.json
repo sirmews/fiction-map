@@ -1,0 +1,40 @@
+{
+  "name": "cycle",
+  "description": "A graph with a reachable cycle (start<->loop). No visited/flag conditions, so the abstract-state fingerprint is sound and the cycle is correctly pruned. The intended contract: enumeratePaths lists distinct paths with no repeated abstract state within a path.",
+  "blueprint": {
+    "nodes": [
+      { "id": "start", "type": "scene" },
+      { "id": "loop", "type": "scene" },
+      { "id": "end", "type": "scene" }
+    ],
+    "edges": [
+      { "id": "to-loop", "source": "start", "target": "loop" },
+      { "id": "to-end", "source": "start", "target": "end" },
+      { "id": "loop-back", "source": "loop", "target": "start" },
+      { "id": "loop-exit", "source": "loop", "target": "end" }
+    ],
+    "endings": ["end"],
+    "startNode": "start"
+  },
+  "calls": [
+    {
+      "method": "enumeratePaths",
+      "args": [6, 100],
+      "expected": [
+        {
+          "steps": [{ "transitionId": "to-end", "fromNodeId": "start", "toNodeId": "end", "success": true }],
+          "finalNodeId": "end",
+          "endedAt": "ending"
+        },
+        {
+          "steps": [
+            { "transitionId": "to-loop", "fromNodeId": "start", "toNodeId": "loop", "success": true },
+            { "transitionId": "loop-exit", "fromNodeId": "loop", "toNodeId": "end", "success": true }
+          ],
+          "finalNodeId": "end",
+          "endedAt": "ending"
+        }
+      ]
+    }
+  ]
+}

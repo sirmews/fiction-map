@@ -1,0 +1,28 @@
+{
+  "name": "walk-linear",
+  "description": "walk() follows the first available transition until no transitions remain or a symbolic-state revisit is detected. This graph is a simple linear chain start->mid->end where end has no outgoing transitions. walk() must produce two steps and stop at end with no available transitions.",
+  "blueprint": {
+    "nodes": [
+      { "id": "start", "type": "scene" },
+      { "id": "mid", "type": "scene" },
+      { "id": "end", "type": "scene" }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "mid" },
+      { "id": "e2", "source": "mid", "target": "end" }
+    ],
+    "endings": ["end"],
+    "startNode": "start"
+  },
+  "calls": [
+    {
+      "method": "walk",
+      "args": [100],
+      "expected": {
+        "length": 3,
+        "finalNodeId": "end",
+        "nodeSequence": ["mid", "end", "end"]
+      }
+    }
+  ]
+}

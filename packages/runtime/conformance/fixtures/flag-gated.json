@@ -1,0 +1,60 @@
+{
+  "name": "flag-gated",
+  "description": "Control case for the flag dimension of the fingerprint. A flag (`unlocked`) set by the lever path enables a `hasFlag`-gated transition. Flags ARE included in the symbolic fingerprint, so this must be sound: THREE paths, reaching both end_win (via lever) and end_lose (via both routes).",
+  "blueprint": {
+    "nodes": [
+      { "id": "start", "type": "scene" },
+      { "id": "lever", "type": "scene" },
+      { "id": "door", "type": "scene" },
+      { "id": "end_win", "type": "scene" },
+      { "id": "end_lose", "type": "scene" }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "lever" },
+      { "id": "e2", "source": "start", "target": "door" },
+      {
+        "id": "e3",
+        "source": "lever",
+        "target": "door",
+        "effects": [{ "type": "setFlag", "key": "unlocked", "value": true }]
+      },
+      {
+        "id": "e4",
+        "source": "door",
+        "target": "end_win",
+        "conditions": [{ "type": "hasFlag", "key": "unlocked" }]
+      },
+      { "id": "e5", "source": "door", "target": "end_lose" }
+    ],
+    "endings": ["end_win", "end_lose"],
+    "startNode": "start"
+  },
+  "calls": [
+    {
+      "method": "enumeratePaths",
+      "args": [10, 100],
+      "expected": [
+        {
+          "steps": [{ "transitionId": "e2", "fromNodeId": "start", "toNodeId": "door", "success": true },
+                     { "transitionId": "e5", "fromNodeId": "door", "toNodeId": "end_lose", "success": true }],
+          "finalNodeId": "end_lose",
+          "endedAt": "ending"
+        },
+        {
+          "steps": [{ "transitionId": "e1", "fromNodeId": "start", "toNodeId": "lever", "success": true },
+                     { "transitionId": "e3", "fromNodeId": "lever", "toNodeId": "door", "success": true },
+                     { "transitionId": "e4", "fromNodeId": "door", "toNodeId": "end_win", "success": true }],
+          "finalNodeId": "end_win",
+          "endedAt": "ending"
+        },
+        {
+          "steps": [{ "transitionId": "e1", "fromNodeId": "start", "toNodeId": "lever", "success": true },
+                     { "transitionId": "e3", "fromNodeId": "lever", "toNodeId": "door", "success": true },
+                     { "transitionId": "e5", "fromNodeId": "door", "toNodeId": "end_lose", "success": true }],
+          "finalNodeId": "end_lose",
+          "endedAt": "ending"
+        }
+      ]
+    }
+  ]
+}

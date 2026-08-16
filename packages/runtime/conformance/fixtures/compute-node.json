@@ -1,0 +1,32 @@
+{
+  "name": "compute-node",
+  "description": "A compute node (autoResolve: true) automatically applies enterEffects and traverses the first available outgoing transition without player input. start->compute (autoResolve, sets flag 'done') -> end. enumeratePaths must show the auto-resolved transition as a single step reaching end, with the flag side-effect captured in the final state.",
+  "blueprint": {
+    "nodes": [
+      { "id": "start", "type": "scene" },
+      { "id": "compute", "type": "compute", "autoResolve": true, "enterEffects": [{ "type": "setFlag", "key": "done", "value": true }] },
+      { "id": "end", "type": "scene" }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "compute" },
+      { "id": "e2", "source": "compute", "target": "end" }
+    ],
+    "endings": ["end"],
+    "startNode": "start"
+  },
+  "calls": [
+    {
+      "method": "enumeratePaths",
+      "args": [10, 100],
+      "expected": [
+        {
+          "steps": [
+            { "transitionId": "e1", "fromNodeId": "start", "toNodeId": "end", "success": true }
+          ],
+          "finalNodeId": "end",
+          "endedAt": "ending"
+        }
+      ]
+    }
+  ]
+}

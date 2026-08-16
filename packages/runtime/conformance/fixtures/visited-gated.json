@@ -1,0 +1,57 @@
+{
+  "name": "visited-gated",
+  "description": "A transition (e5) gated by `visited(b)` is only available on the SECOND arrival at `a` (after start->a->b->a). The first and second arrival at `a` share the same abstract fingerprint {currentNodeId, flags, vars, entities} but differ in `state.visited` (b is visited only on the second). A fingerprint that excludes `visited` is UNSOUND: it treats the second arrival as a revisit of the first and drops the only path to `end_via_loop`. Correct result is THREE paths.",
+  "blueprint": {
+    "nodes": [
+      { "id": "start", "type": "scene" },
+      { "id": "a", "type": "scene" },
+      { "id": "b", "type": "scene" },
+      { "id": "end_direct", "type": "scene" },
+      { "id": "end_via_loop", "type": "scene" }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "a" },
+      { "id": "e2", "source": "a", "target": "end_direct" },
+      { "id": "e3", "source": "a", "target": "b" },
+      { "id": "e4", "source": "b", "target": "a" },
+      {
+        "id": "e5",
+        "source": "a",
+        "target": "end_via_loop",
+        "conditions": [{ "type": "visited", "nodeId": "b" }]
+      }
+    ],
+    "endings": ["end_direct", "end_via_loop"],
+    "startNode": "start"
+  },
+  "calls": [
+    {
+      "method": "enumeratePaths",
+      "args": [6, 100],
+      "expected": [
+        {
+          "steps": [{ "transitionId": "e1", "fromNodeId": "start", "toNodeId": "a", "success": true },
+                     { "transitionId": "e2", "fromNodeId": "a", "toNodeId": "end_direct", "success": true }],
+          "finalNodeId": "end_direct",
+          "endedAt": "ending"
+        },
+        {
+          "steps": [{ "transitionId": "e1", "fromNodeId": "start", "toNodeId": "a", "success": true },
+                     { "transitionId": "e3", "fromNodeId": "a", "toNodeId": "b", "success": true },
+                     { "transitionId": "e4", "fromNodeId": "b", "toNodeId": "a", "success": true },
+                     { "transitionId": "e2", "fromNodeId": "a", "toNodeId": "end_direct", "success": true }],
+          "finalNodeId": "end_direct",
+          "endedAt": "ending"
+        },
+        {
+          "steps": [{ "transitionId": "e1", "fromNodeId": "start", "toNodeId": "a", "success": true },
+                     { "transitionId": "e3", "fromNodeId": "a", "toNodeId": "b", "success": true },
+                     { "transitionId": "e4", "fromNodeId": "b", "toNodeId": "a", "success": true },
+                     { "transitionId": "e5", "fromNodeId": "a", "toNodeId": "end_via_loop", "success": true }],
+          "finalNodeId": "end_via_loop",
+          "endedAt": "ending"
+        }
+      ]
+    }
+  ]
+}

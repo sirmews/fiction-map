@@ -1,0 +1,35 @@
+{
+  "name": "dead-end",
+  "description": "A branch that leads to a node with no outgoing transitions but that is NOT declared as an ending. enumeratePaths must report it with endedAt 'dead-end', distinct from 'ending'.",
+  "blueprint": {
+    "nodes": [
+      { "id": "start", "type": "scene" },
+      { "id": "end", "type": "scene" },
+      { "id": "trap", "type": "scene" }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "end" },
+      { "id": "e2", "source": "start", "target": "trap" }
+    ],
+    "endings": ["end"],
+    "startNode": "start"
+  },
+  "calls": [
+    {
+      "method": "enumeratePaths",
+      "args": [10, 100],
+      "expected": [
+        {
+          "steps": [{ "transitionId": "e1", "fromNodeId": "start", "toNodeId": "end", "success": true }],
+          "finalNodeId": "end",
+          "endedAt": "ending"
+        },
+        {
+          "steps": [{ "transitionId": "e2", "fromNodeId": "start", "toNodeId": "trap", "success": true }],
+          "finalNodeId": "trap",
+          "endedAt": "dead-end"
+        }
+      ]
+    }
+  ]
+}

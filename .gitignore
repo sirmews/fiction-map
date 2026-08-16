@@ -47,3 +47,5 @@ pnpm-lock.yaml
 
 # Gemini review artifacts
 .gemini-review/
+references/
+packages/runtime-rs/target/
