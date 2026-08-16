@@ -21,6 +21,7 @@ export const equalsEvaluator: ConditionEvaluator = (
   const { key, value } = condition as EqualsCondition
   return state.variables[key] === value
 }
+equalsEvaluator.reads = ["variables"]
 
 export const notEqualsEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -29,6 +30,7 @@ export const notEqualsEvaluator: ConditionEvaluator = (
   const { key, value } = condition as EqualsCondition
   return state.variables[key] !== value
 }
+notEqualsEvaluator.reads = ["variables"]
 
 export const greaterThanEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -41,6 +43,7 @@ export const greaterThanEvaluator: ConditionEvaluator = (
   }
   return current > value
 }
+greaterThanEvaluator.reads = ["variables"]
 
 export const greaterThanOrEqualEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -53,6 +56,7 @@ export const greaterThanOrEqualEvaluator: ConditionEvaluator = (
   }
   return current >= value
 }
+greaterThanOrEqualEvaluator.reads = ["variables"]
 
 export const lessThanEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -65,6 +69,7 @@ export const lessThanEvaluator: ConditionEvaluator = (
   }
   return current < value
 }
+lessThanEvaluator.reads = ["variables"]
 
 export const lessThanOrEqualEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -77,6 +82,7 @@ export const lessThanOrEqualEvaluator: ConditionEvaluator = (
   }
   return current <= value
 }
+lessThanOrEqualEvaluator.reads = ["variables"]
 
 export const hasFlagEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -85,6 +91,7 @@ export const hasFlagEvaluator: ConditionEvaluator = (
   const { key } = condition as KeyCondition
   return key in state.flags
 }
+hasFlagEvaluator.reads = ["flags"]
 
 export const notFlagEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -93,6 +100,7 @@ export const notFlagEvaluator: ConditionEvaluator = (
   const { key } = condition as KeyCondition
   return !(key in state.flags) || !state.flags[key]
 }
+notFlagEvaluator.reads = ["flags"]
 
 export const flagEqualsEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -101,6 +109,7 @@ export const flagEqualsEvaluator: ConditionEvaluator = (
   const { key, value } = condition as FlagCondition
   return state.flags[key] === value
 }
+flagEqualsEvaluator.reads = ["flags"]
 
 export const visitedEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -109,6 +118,7 @@ export const visitedEvaluator: ConditionEvaluator = (
   const { nodeId } = condition as NodeIdCondition
   return state.visited.has(nodeId)
 }
+visitedEvaluator.reads = ["visited"]
 
 export const notVisitedEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -117,6 +127,7 @@ export const notVisitedEvaluator: ConditionEvaluator = (
   const { nodeId } = condition as NodeIdCondition
   return !state.visited.has(nodeId)
 }
+notVisitedEvaluator.reads = ["visited"]
 
 export const currentNodeEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -125,6 +136,7 @@ export const currentNodeEvaluator: ConditionEvaluator = (
   const { nodeId } = condition as NodeIdCondition
   return state.currentNodeId === nodeId
 }
+currentNodeEvaluator.reads = ["currentNode"]
 
 export const hasVariableEvaluator: ConditionEvaluator = (
   state: GraphRuntimeState,
@@ -133,6 +145,7 @@ export const hasVariableEvaluator: ConditionEvaluator = (
   const { key } = condition as KeyCondition
   return key in state.variables
 }
+hasVariableEvaluator.reads = ["variables"]
 
 export const coreBuiltinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["equals", equalsEvaluator],

@@ -2,7 +2,6 @@ import { createInitialState } from "../core/state"
 import { deriveEntityState } from "../entities/derived"
 import type { GraphRuntime } from "../runtime"
 import type { GraphRuntimeState } from "../types"
-import { SymbolicState } from "./symbolicState"
 import type { SemanticError, SemanticValidationOptions, SemanticValidationResult } from "./types"
 
 interface PathNode {
@@ -36,7 +35,7 @@ export function solveGraphSemantics(
   ]
 
   const visitedStateFingerprints = new Set<string>()
-  visitedStateFingerprints.add(new SymbolicState(startState).getFingerprint())
+  visitedStateFingerprints.add(runtime.fingerprintOf(startState))
 
   let stepsCount = 0
 
@@ -113,8 +112,7 @@ export function solveGraphSemantics(
       }
 
       // 7. Memoize and Prune
-      const symbolic = new SymbolicState(nextState)
-      const fingerprint = symbolic.getFingerprint()
+      const fingerprint = runtime.fingerprintOf(nextState)
 
       if (visitedStateFingerprints.has(fingerprint)) {
         continue

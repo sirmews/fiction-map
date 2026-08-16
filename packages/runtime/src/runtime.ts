@@ -17,6 +17,7 @@ import type {
   EvaluationContext,
   GraphRuntimeState,
   NodeDefinition,
+  StateField,
   StateTrigger,
   Transition,
   TransitionResult,
@@ -49,6 +50,20 @@ export class GraphRuntime {
   private evaluators: Map<string, ConditionEvaluator>
   private handlers: Map<string, EffectHandler>
   public triggers: StateTrigger[] = []
+  /**
+   * Fields included in the symbolic-state fingerprint. Derived from the union
+   * of `reads` declared by every registered condition evaluator. Two states
+   * that differ only in fields outside this projection are treated as
+   * equivalent for cycle pruning — which is sound because no reachable
+   * condition reads those fields.
+   */
+  private fingerprintProjection!: ReadonlySet<StateField>
+  /**
+   * Whether cycle pruning is enabled. Disabled when any evaluator reads
+   * `history` (unbounded), in which case enumeration relies on depth/path
+   * bounds alone.
+   */
+  private pruneEnabled!: boolean
 
   constructor(
     blueprint: GraphBlueprint,
@@ -58,10 +73,55 @@ export class GraphRuntime {
     this.parsed = parseGraph(blueprint)
     this.evaluators = evaluators ?? builtinEvaluators
     this.handlers = handlers ?? builtinHandlers
+    this.recomputeProjection()
+  }
+
+  private recomputeProjection(): void {
+    this.fingerprintProjection = this.computeProjection()
+    this.pruneEnabled = !this.fingerprintProjection.has("history")
+  }
+
+  private computeProjection(): ReadonlySet<StateField> {
+    const usedEvaluatorTypes = new Set<string>()
+
+    for (const transition of this.parsed.transitions) {
+      for (const cond of transition.requirements?.all ?? []) usedEvaluatorTypes.add(cond.type)
+      for (const cond of transition.requirements?.any ?? []) usedEvaluatorTypes.add(cond.type)
+      for (const cond of transition.requirements?.none ?? []) usedEvaluatorTypes.add(cond.type)
+      for (const cond of transition.visibility?.all ?? []) usedEvaluatorTypes.add(cond.type)
+      for (const cond of transition.visibility?.any ?? []) usedEvaluatorTypes.add(cond.type)
+      for (const cond of transition.visibility?.none ?? []) usedEvaluatorTypes.add(cond.type)
+    }
+
+    for (const trigger of this.triggers) {
+      for (const cond of trigger.conditions) usedEvaluatorTypes.add(cond.type)
+    }
+
+    const fields = new Set<StateField>(["currentNode"])
+    for (const type of usedEvaluatorTypes) {
+      const evaluator = this.evaluators.get(type)
+      if (evaluator?.reads) {
+        for (const field of evaluator.reads) {
+          fields.add(field)
+        }
+      }
+    }
+    return fields
+  }
+
+  /**
+   * Compute the symbolic-state fingerprint of a runtime state, using the
+   * projection derived from the registered evaluators. Public so that the
+   * semantics solver and consumers share the runtime's notion of state
+   * equivalence.
+   */
+  fingerprintOf(state: GraphRuntimeState): string {
+    return new SymbolicState(state, this.fingerprintProjection).getFingerprint()
   }
 
   addTrigger(trigger: StateTrigger): void {
     this.triggers.push(trigger)
+    this.recomputeProjection()
   }
 
   get transitions(): Transition[] {
@@ -228,7 +288,7 @@ export class GraphRuntime {
   ): StepResult[] {
     const steps: StepResult[] = []
     const visitedStateFingerprints = new Set<string>([
-      new SymbolicState(state).getFingerprint(),
+      this.fingerprintOf(state),
     ])
 
     for (let i = 0; i < maxSteps; i++) {
@@ -247,8 +307,8 @@ export class GraphRuntime {
 
       const result = this.step(state, available[0], context)
       const resultState = result.state
-      const fingerprint = new SymbolicState(resultState).getFingerprint()
-      const isRevisited = visitedStateFingerprints.has(fingerprint)
+      const fingerprint = this.fingerprintOf(resultState)
+      const isRevisited = this.pruneEnabled && visitedStateFingerprints.has(fingerprint)
 
       const stepResult: StepResult = {
         state: resultState,
@@ -288,7 +348,7 @@ export class GraphRuntime {
   ): StepResult[] {
     const steps: StepResult[] = []
     const visitedStateFingerprints = new Set<string>([
-      new SymbolicState(state).getFingerprint(),
+      this.fingerprintOf(state),
     ])
 
     for (let i = 0; i < maxSteps; i++) {
@@ -306,8 +366,8 @@ export class GraphRuntime {
 
       const result = this.step(state, available[0], context)
       const resultState = result.state
-      const fingerprint = new SymbolicState(resultState).getFingerprint()
-      const isRevisited = visitedStateFingerprints.has(fingerprint)
+      const fingerprint = this.fingerprintOf(resultState)
+      const isRevisited = this.pruneEnabled && visitedStateFingerprints.has(fingerprint)
 
       steps.push({
         state: cloneState(resultState),
@@ -334,7 +394,7 @@ export class GraphRuntime {
   ): TraversalPath[] {
     const paths: TraversalPath[] = []
     const startState = this.createState()
-    const startFingerprint = new SymbolicState(startState).getFingerprint()
+    const startFingerprint = this.fingerprintOf(startState)
 
     const stack: {
       state: GraphRuntimeState
@@ -394,8 +454,8 @@ export class GraphRuntime {
         }
 
         const nextState = result.state
-        const fingerprint = new SymbolicState(nextState).getFingerprint()
-        if (visitedStateFingerprints.has(fingerprint)) {
+        const fingerprint = this.fingerprintOf(nextState)
+        if (this.pruneEnabled && visitedStateFingerprints.has(fingerprint)) {
           continue
         }
 

@@ -49,18 +49,51 @@ export interface StateTrigger {
   effects: Effect[]
 }
 
+/**
+ * State fields that can affect the result of a condition evaluation. A
+ * `ConditionEvaluator` declares the subset it reads via `reads` so the runtime
+ * can build a sound symbolic-state fingerprint: two states that differ only in
+ * fields NO reachable condition reads are genuinely equivalent for forward
+ * exploration and may be pruned; two states that differ in a field some
+ * condition reads MUST NOT be pruned as equal.
+ *
+ * The fingerprint always includes `currentNode`; the other fields are included
+ * iff some registered evaluator declares them in `reads`.
+ */
+export type StateField =
+  | "currentNode"
+  | "flags"
+  | "variables"
+  | "visited"
+  | "history"
+  | "entityOwned"
+  | "entityActive"
+  | "entityUnlocked"
+  | "entityResources"
+  | "entityExtensions"
+  | "extensions"
+
+export type ConditionEvaluator = {
+  (
+    state: GraphRuntimeState,
+    condition: Condition,
+    context?: EvaluationContext,
+  ): boolean
+  /**
+   * State fields this evaluator reads. Used to build a sound fingerprint.
+   * Defaults to `["currentNode"]` if omitted. Include `history` only if the
+   * evaluator reads `state.history`; doing so disables cycle pruning (history
+   * is unbounded), so enumeration then relies on depth/path bounds alone.
+   */
+  reads?: StateField[]
+}
+
 export interface EvaluationContext {
   registry?: unknown
   scope?: string
   derivedState?: DerivedEntityState
   [key: string]: unknown
 }
-
-export type ConditionEvaluator = (
-  state: GraphRuntimeState,
-  condition: Condition,
-  context?: EvaluationContext,
-) => boolean
 
 // ============================================================================
 // EFFECTS

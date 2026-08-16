@@ -22,6 +22,7 @@ export const hasEntityEvaluator: ConditionEvaluator = (state, condition, context
   }
   return ownsEntity(state, entityId)
 }
+hasEntityEvaluator.reads = ["entityOwned"]
 
 export const entityActiveEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
   const { entityId } = condition as EntityCondition
@@ -32,6 +33,7 @@ export const entityActiveEvaluator: ConditionEvaluator = (state, condition, cont
   }
   return entityIsActive(state, entityId)
 }
+entityActiveEvaluator.reads = ["entityActive"]
 
 export const entityUnlockedEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
   const { entityId } = condition as EntityCondition
@@ -42,16 +44,19 @@ export const entityUnlockedEvaluator: ConditionEvaluator = (state, condition, co
   }
   return entityIsUnlocked(state, entityId)
 }
+entityUnlockedEvaluator.reads = ["entityUnlocked"]
 
 export const resourceAtLeastEvaluator: ConditionEvaluator = (state, condition): boolean => {
   const { key, value } = condition as NumericCondition
   return typeof key === "string" && typeof value === "number" && getResource(state, key) >= value
 }
+resourceAtLeastEvaluator.reads = ["entityResources"]
 
 export const resourceLessThanEvaluator: ConditionEvaluator = (state, condition): boolean => {
   const { key, value } = condition as NumericCondition
   return typeof key === "string" && typeof value === "number" && getResource(state, key) < value
 }
+resourceLessThanEvaluator.reads = ["entityResources"]
 
 export const entityBuiltinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["hasEntity", hasEntityEvaluator],
