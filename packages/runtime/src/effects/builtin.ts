@@ -6,7 +6,7 @@
  * The default `GraphRuntime` combines both maps via `../default-bindings.ts`.
  */
 
-import { cloneState, navigateToNode } from "../core/state"
+import { cloneState, navigateToNode, setFlag, setVariable } from "../core/state"
 import type { Effect, EffectHandler, GraphRuntimeState } from "../types"
 
 type KeyValueEffect = Effect & { key: string; value: unknown }
@@ -17,14 +17,20 @@ type FlagEffect = Effect & { key: string; value: boolean | string | number }
 type NodeIdEffect = Effect & { nodeId: string }
 type MergeEffect = Effect & { key: string; value: Record<string, unknown> }
 
+function isForbiddenStateKey(key: string): boolean {
+  return key === "__proto__" || key === "constructor" || key === "prototype"
+}
+
 export const setVariableHandler: EffectHandler = (
   state: GraphRuntimeState,
   effect: Effect,
 ): GraphRuntimeState => {
   const { key, value } = effect as KeyValueEffect
-  const cloned = cloneState(state)
-  cloned.variables[key] = value
-  return cloned
+  if (!isForbiddenStateKey(key)) {
+    return setVariable(state, key, value)
+  }
+
+  return state
 }
 
 export const deleteVariableHandler: EffectHandler = (
@@ -48,9 +54,7 @@ export const incrementHandler: EffectHandler = (
     return state
   }
 
-  const cloned = cloneState(state)
-  cloned.variables[key] = current + delta
-  return cloned
+  return setVariable(state, key, current + delta)
 }
 
 export const decrementHandler: EffectHandler = (
@@ -64,9 +68,7 @@ export const decrementHandler: EffectHandler = (
     return state
   }
 
-  const cloned = cloneState(state)
-  cloned.variables[key] = current - delta
-  return cloned
+  return setVariable(state, key, current - delta)
 }
 
 export const clampHandler: EffectHandler = (
@@ -80,9 +82,7 @@ export const clampHandler: EffectHandler = (
     return state
   }
 
-  const cloned = cloneState(state)
-  cloned.variables[key] = Math.max(min, Math.min(max, current))
-  return cloned
+  return setVariable(state, key, Math.max(min, Math.min(max, current)))
 }
 
 export const setFlagHandler: EffectHandler = (
@@ -90,9 +90,11 @@ export const setFlagHandler: EffectHandler = (
   effect: Effect,
 ): GraphRuntimeState => {
   const { key, value } = effect as FlagEffect
-  const cloned = cloneState(state)
-  cloned.flags[key] = value
-  return cloned
+  if (!isForbiddenStateKey(key)) {
+    return setFlag(state, key, value)
+  }
+
+  return state
 }
 
 export const clearFlagHandler: EffectHandler = (
@@ -132,6 +134,10 @@ export const setExtensionHandler: EffectHandler = (
   effect: Effect,
 ): GraphRuntimeState => {
   const { key, value } = effect as KeyValueEffect
+  if (isForbiddenStateKey(key)) {
+    return state
+  }
+
   const cloned = cloneState(state)
   cloned.extensions = { ...cloned.extensions, [key]: value }
   return cloned
@@ -142,6 +148,10 @@ export const mergeExtensionHandler: EffectHandler = (
   effect: Effect,
 ): GraphRuntimeState => {
   const { key, value } = effect as MergeEffect
+  if (isForbiddenStateKey(key)) {
+    return state
+  }
+
   const cloned = cloneState(state)
   const current = (cloned.extensions?.[key] as Record<string, unknown>) ?? {}
   cloned.extensions = {

@@ -7,6 +7,44 @@ import type {
 } from "../types"
 import { SERIALIZATION_SCHEMA_VERSION } from "../types"
 
+const FORBIDDEN_STATE_KEYS = new Set(["__proto__", "prototype", "constructor"])
+
+function isForbiddenStateKey(key: string): boolean {
+  return FORBIDDEN_STATE_KEYS.has(key)
+}
+
+function createStateMap<T>(seed?: Record<string, T>): Record<string, T> {
+  const map = Object.create(null) as Record<string, T>
+
+  if (!seed) {
+    return map
+  }
+
+  for (const [key, value] of Object.entries(seed)) {
+    if (!isForbiddenStateKey(key)) {
+      map[key] = value
+    }
+  }
+
+  return map
+}
+
+function mergeStateMap<T>(base: Record<string, T>, updates?: Record<string, T>): Record<string, T> {
+  const merged = createStateMap(base)
+
+  if (!updates) {
+    return merged
+  }
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (!isForbiddenStateKey(key)) {
+      merged[key] = value
+    }
+  }
+
+  return merged
+}
+
 /**
  * Create initial state at a starting node.
  *
@@ -23,11 +61,11 @@ export function createInitialState(
   return {
     currentNodeId: startNodeId,
     history: [],
-    variables: initialVariables ? { ...initialVariables } : {},
-    flags: {},
+    variables: createStateMap(initialVariables),
+    flags: createStateMap(),
     visited: new Set([startNodeId]),
     entityState: initialEntityState ? cloneEntityState(initialEntityState) : undefined,
-    extensions: initialExtensions ? { ...initialExtensions } : undefined,
+    extensions: initialExtensions ? createStateMap(initialExtensions) : undefined,
   }
 }
 
@@ -41,11 +79,11 @@ export function cloneState(state: GraphRuntimeState): GraphRuntimeState {
   return {
     currentNodeId: state.currentNodeId,
     history: [...state.history],
-    variables: { ...state.variables },
-    flags: { ...state.flags },
+    variables: createStateMap(state.variables),
+    flags: createStateMap(state.flags),
     visited: new Set(state.visited),
     entityState: state.entityState ? cloneEntityState(state.entityState) : undefined,
-    extensions: state.extensions ? { ...state.extensions } : undefined,
+    extensions: state.extensions ? createStateMap(state.extensions) : undefined,
   }
 }
 
@@ -70,11 +108,11 @@ export function mergeState(
   }
 
   if (updates.variables !== undefined) {
-    cloned.variables = { ...cloned.variables, ...updates.variables }
+    cloned.variables = mergeStateMap(cloned.variables, updates.variables)
   }
 
   if (updates.flags !== undefined) {
-    cloned.flags = { ...cloned.flags, ...updates.flags }
+    cloned.flags = mergeStateMap(cloned.flags, updates.flags)
   }
 
   if (updates.visited !== undefined) {
@@ -86,7 +124,7 @@ export function mergeState(
   }
 
   if (updates.extensions !== undefined) {
-    cloned.extensions = { ...cloned.extensions, ...updates.extensions }
+    cloned.extensions = mergeStateMap(cloned.extensions ?? createStateMap(), updates.extensions)
   }
 
   return cloned
@@ -147,6 +185,10 @@ export function setFlag(
   key: string,
   value: boolean | string | number,
 ): GraphRuntimeState {
+  if (isForbiddenStateKey(key)) {
+    return state
+  }
+
   const cloned = cloneState(state)
   cloned.flags[key] = value
   return cloned
@@ -186,6 +228,10 @@ export function setVariable(
   key: string,
   value: unknown,
 ): GraphRuntimeState {
+  if (isForbiddenStateKey(key)) {
+    return state
+  }
+
   const cloned = cloneState(state)
   cloned.variables[key] = value
   return cloned
@@ -208,13 +254,16 @@ export function incrementVariable(
   key: string,
   delta: number,
 ): GraphRuntimeState {
+  if (isForbiddenStateKey(key)) {
+    return state
+  }
+
   const current = state.variables[key]
   if (typeof current !== "number") {
     return state
   }
-  const cloned = cloneState(state)
-  cloned.variables[key] = current + delta
-  return cloned
+
+  return setVariable(state, key, current + delta)
 }
 
 // ============================================================================
@@ -226,7 +275,7 @@ function createEmptyEntityState(): EntityRuntimeState {
     owned: new Set(),
     active: new Set(),
     unlocked: new Set(),
-    resources: {},
+    resources: createStateMap(),
   }
 }
 
@@ -235,8 +284,8 @@ function cloneEntityState(entityState: EntityRuntimeState): EntityRuntimeState {
     owned: new Set(entityState.owned),
     active: new Set(entityState.active),
     unlocked: new Set(entityState.unlocked),
-    resources: { ...entityState.resources },
-    extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
+    resources: createStateMap(entityState.resources),
+    extensions: entityState.extensions ? createStateMap(entityState.extensions) : undefined,
   }
 }
 
@@ -303,6 +352,10 @@ export function addResource(
     return state
   }
 
+  if (isForbiddenStateKey(key)) {
+    return state
+  }
+
   const cloned = cloneStateWithEntityState(state)
   const current = cloned.entityState!.resources[key] ?? 0
   cloned.entityState!.resources[key] = current + amount
@@ -315,6 +368,10 @@ export function spendResource(
   amount: number,
   options?: { allowNegative?: boolean; clampToZero?: boolean },
 ): GraphRuntimeState {
+  if (isForbiddenStateKey(key)) {
+    return state
+  }
+
   const current = getResource(state, key)
 
   if (!Number.isFinite(amount) || amount < 0) {
@@ -353,8 +410,8 @@ function serializeEntityState(
     owned: [...entityState.owned],
     active: [...entityState.active],
     unlocked: [...entityState.unlocked],
-    resources: { ...entityState.resources },
-    extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
+    resources: createStateMap(entityState.resources),
+    extensions: entityState.extensions ? createStateMap(entityState.extensions) : undefined,
   }
 }
 
@@ -369,8 +426,8 @@ function deserializeEntityState(
     owned: new Set(entityState.owned),
     active: new Set(entityState.active),
     unlocked: new Set(entityState.unlocked),
-    resources: { ...entityState.resources },
-    extensions: entityState.extensions ? { ...entityState.extensions } : undefined,
+    resources: createStateMap(entityState.resources),
+    extensions: entityState.extensions ? createStateMap(entityState.extensions) : undefined,
   }
 }
 
@@ -385,11 +442,11 @@ export function serializeState(state: GraphRuntimeState): SerializableState {
     schemaVersion: SERIALIZATION_SCHEMA_VERSION,
     currentNodeId: state.currentNodeId,
     history: [...state.history],
-    variables: { ...state.variables },
-    flags: { ...state.flags },
+    variables: createStateMap(state.variables),
+    flags: createStateMap(state.flags),
     visited: [...state.visited],
     entityState: serializeEntityState(state.entityState),
-    extensions: state.extensions ? { ...state.extensions } : undefined,
+    extensions: state.extensions ? createStateMap(state.extensions) : undefined,
   }
 }
 
@@ -413,10 +470,10 @@ export function deserializeState(data: SerializableState): GraphRuntimeState {
   return {
     currentNodeId: data.currentNodeId,
     history: [...data.history],
-    variables: { ...data.variables },
-    flags: { ...data.flags },
+    variables: createStateMap(data.variables),
+    flags: createStateMap(data.flags),
     visited: new Set(data.visited),
     entityState: deserializeEntityState(data.entityState),
-    extensions: data.extensions ? { ...data.extensions } : undefined,
+    extensions: data.extensions ? createStateMap(data.extensions) : undefined,
   }
 }
