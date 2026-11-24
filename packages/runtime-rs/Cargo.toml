@@ -1,0 +1,15 @@
+[package]
+name = "fiction-map-runtime"
+version = "0.1.0"
+edition = "2024"
+description = "Rust port of the fiction-map runtime path enumeration engine"
+license = "MIT"
+
+[lib]
+name = "fiction_map_runtime"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip", "raw_value"] }
+ryu-js = "1"

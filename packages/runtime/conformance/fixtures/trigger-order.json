@@ -1,0 +1,161 @@
+{
+  "name": "trigger-order",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start"
+        },
+        {
+          "id": "work"
+        },
+        {
+          "id": "done"
+        }
+      ],
+      "edges": [
+        {
+          "id": "approach",
+          "source": "start",
+          "target": "work"
+        },
+        {
+          "id": "confirm",
+          "source": "work",
+          "target": "done",
+          "conditions": [
+            {
+              "type": "hasFlag",
+              "key": "opened"
+            }
+          ]
+        }
+      ]
+    },
+    "triggers": [
+      {
+        "id": "forward",
+        "conditions": [
+          {
+            "type": "hasFlag",
+            "key": "ready"
+          }
+        ],
+        "effects": [
+          {
+            "type": "setFlag",
+            "key": "opened",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "previous",
+        "conditions": [
+          {
+            "type": "visited",
+            "nodeId": "work"
+          }
+        ],
+        "effects": [
+          {
+            "type": "setFlag",
+            "key": "ready",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "unconditional-0",
+        "conditions": [],
+        "effects": [
+          {
+            "type": "setFlag",
+            "key": "applied-0",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "unconditional-1",
+        "conditions": [],
+        "effects": [
+          {
+            "type": "setFlag",
+            "key": "applied-1",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "unconditional-2",
+        "conditions": [],
+        "effects": [
+          {
+            "type": "setFlag",
+            "key": "applied-2",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "unconditional-3",
+        "conditions": [],
+        "effects": [
+          {
+            "type": "setFlag",
+            "key": "applied-3",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "unconditional-4",
+        "conditions": [],
+        "effects": [
+          {
+            "type": "setFlag",
+            "key": "applied-4",
+            "value": true
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "approach",
+            "fromNodeId": "start",
+            "toNodeId": "work",
+            "success": true
+          },
+          {
+            "transitionId": "confirm",
+            "fromNodeId": "work",
+            "toNodeId": "done",
+            "success": true
+          }
+        ],
+        "finalNodeId": "done",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "done",
+          "history": ["start", "work"],
+          "variables": {},
+          "flags": {
+            "ready": true,
+            "opened": true,
+            "applied-0": true,
+            "applied-1": true,
+            "applied-2": true
+          },
+          "visited": ["start", "work", "done"]
+        }
+      }
+    ]
+  }
+}

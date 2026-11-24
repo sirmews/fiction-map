@@ -5,6 +5,7 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+/packages/runtime-rs/target/
 
 # Environment files
 .env

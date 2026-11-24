@@ -1,0 +1,97 @@
+{
+  "name": "cycle",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start",
+          "type": "scene"
+        },
+        {
+          "id": "loop",
+          "type": "scene"
+        },
+        {
+          "id": "end",
+          "type": "scene"
+        }
+      ],
+      "edges": [
+        {
+          "id": "to-loop",
+          "source": "start",
+          "target": "loop"
+        },
+        {
+          "id": "to-end",
+          "source": "start",
+          "target": "end"
+        },
+        {
+          "id": "loop-back",
+          "source": "loop",
+          "target": "start"
+        },
+        {
+          "id": "loop-exit",
+          "source": "loop",
+          "target": "end"
+        }
+      ],
+      "endings": ["end"],
+      "startNode": "start"
+    },
+    "maxDepth": 6,
+    "maxPaths": 100
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "to-loop",
+            "fromNodeId": "start",
+            "toNodeId": "loop",
+            "success": true
+          },
+          {
+            "transitionId": "loop-exit",
+            "fromNodeId": "loop",
+            "toNodeId": "end",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end",
+          "history": ["start", "loop"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "loop", "end"]
+        }
+      },
+      {
+        "steps": [
+          {
+            "transitionId": "to-end",
+            "fromNodeId": "start",
+            "toNodeId": "end",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end",
+          "history": ["start"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "end"]
+        }
+      }
+    ]
+  }
+}

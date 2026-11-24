@@ -1,0 +1,172 @@
+{
+  "name": "visited-gated",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start",
+          "type": "scene"
+        },
+        {
+          "id": "a",
+          "type": "scene"
+        },
+        {
+          "id": "b",
+          "type": "scene"
+        },
+        {
+          "id": "end_direct",
+          "type": "scene"
+        },
+        {
+          "id": "end_via_loop",
+          "type": "scene"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "source": "start",
+          "target": "a"
+        },
+        {
+          "id": "e2",
+          "source": "a",
+          "target": "end_direct"
+        },
+        {
+          "id": "e3",
+          "source": "a",
+          "target": "b"
+        },
+        {
+          "id": "e4",
+          "source": "b",
+          "target": "a"
+        },
+        {
+          "id": "e5",
+          "source": "a",
+          "target": "end_via_loop",
+          "conditions": [
+            {
+              "type": "visited",
+              "nodeId": "b"
+            }
+          ]
+        }
+      ],
+      "endings": ["end_direct", "end_via_loop"],
+      "startNode": "start"
+    },
+    "maxDepth": 6,
+    "maxPaths": 100
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "e1",
+            "fromNodeId": "start",
+            "toNodeId": "a",
+            "success": true
+          },
+          {
+            "transitionId": "e2",
+            "fromNodeId": "a",
+            "toNodeId": "end_direct",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end_direct",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end_direct",
+          "history": ["start", "a"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "a", "end_direct"]
+        }
+      },
+      {
+        "steps": [
+          {
+            "transitionId": "e1",
+            "fromNodeId": "start",
+            "toNodeId": "a",
+            "success": true
+          },
+          {
+            "transitionId": "e3",
+            "fromNodeId": "a",
+            "toNodeId": "b",
+            "success": true
+          },
+          {
+            "transitionId": "e4",
+            "fromNodeId": "b",
+            "toNodeId": "a",
+            "success": true
+          },
+          {
+            "transitionId": "e2",
+            "fromNodeId": "a",
+            "toNodeId": "end_direct",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end_direct",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end_direct",
+          "history": ["start", "a", "b", "a"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "a", "b", "end_direct"]
+        }
+      },
+      {
+        "steps": [
+          {
+            "transitionId": "e1",
+            "fromNodeId": "start",
+            "toNodeId": "a",
+            "success": true
+          },
+          {
+            "transitionId": "e3",
+            "fromNodeId": "a",
+            "toNodeId": "b",
+            "success": true
+          },
+          {
+            "transitionId": "e4",
+            "fromNodeId": "b",
+            "toNodeId": "a",
+            "success": true
+          },
+          {
+            "transitionId": "e5",
+            "fromNodeId": "a",
+            "toNodeId": "end_via_loop",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end_via_loop",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end_via_loop",
+          "history": ["start", "a", "b", "a"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "a", "b", "end_via_loop"]
+        }
+      }
+    ]
+  }
+}

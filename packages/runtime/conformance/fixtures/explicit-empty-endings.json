@@ -1,0 +1,52 @@
+{
+  "name": "explicit-empty-endings",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start"
+        },
+        {
+          "id": "leaf"
+        }
+      ],
+      "edges": [
+        {
+          "id": "empty",
+          "source": "start",
+          "target": ""
+        },
+        {
+          "id": "leaf",
+          "source": "start",
+          "target": "leaf"
+        }
+      ],
+      "endings": []
+    }
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "leaf",
+            "fromNodeId": "start",
+            "toNodeId": "leaf",
+            "success": true
+          }
+        ],
+        "finalNodeId": "leaf",
+        "endedAt": "dead-end",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "leaf",
+          "history": ["start"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "leaf"]
+        }
+      }
+    ]
+  }
+}

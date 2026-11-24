@@ -1,0 +1,336 @@
+{
+  "name": "all-builtins",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start"
+        },
+        {
+          "id": "work"
+        },
+        {
+          "id": "done"
+        }
+      ],
+      "edges": [
+        {
+          "id": "prep",
+          "source": "start",
+          "target": "work",
+          "effects": [
+            {
+              "type": "increment",
+              "key": "absent",
+              "delta": 3
+            },
+            {
+              "type": "setVariable",
+              "key": "score",
+              "value": 4
+            },
+            {
+              "type": "increment",
+              "key": "score",
+              "delta": 8
+            },
+            {
+              "type": "decrement",
+              "key": "score",
+              "delta": 2
+            },
+            {
+              "type": "clamp",
+              "key": "score",
+              "min": 0,
+              "max": 7
+            },
+            {
+              "type": "setVariable",
+              "key": "gone",
+              "value": "gone"
+            },
+            {
+              "type": "deleteVariable",
+              "key": "gone"
+            },
+            {
+              "type": "setVariable",
+              "key": "object",
+              "value": {
+                "a": [1, "x"]
+              }
+            },
+            {
+              "type": "setFlag",
+              "key": "falseFlag",
+              "value": false
+            },
+            {
+              "type": "setFlag",
+              "key": "removeFlag",
+              "value": true
+            },
+            {
+              "type": "clearFlag",
+              "key": "removeFlag"
+            },
+            {
+              "type": "markVisited",
+              "nodeId": "off-route"
+            },
+            {
+              "type": "grantEntity",
+              "entityId": "z"
+            },
+            {
+              "type": "grantEntity",
+              "entityId": "a"
+            },
+            {
+              "type": "grantEntity",
+              "entityId": "removeMe"
+            },
+            {
+              "type": "revokeEntity",
+              "entityId": "removeMe"
+            },
+            {
+              "type": "activateEntity",
+              "entityId": "z"
+            },
+            {
+              "type": "activateEntity",
+              "entityId": "a"
+            },
+            {
+              "type": "deactivateEntity",
+              "entityId": "z"
+            },
+            {
+              "type": "unlockEntity",
+              "entityId": "portal"
+            },
+            {
+              "type": "unlockEntity",
+              "entityId": "locked-again"
+            },
+            {
+              "type": "lockEntity",
+              "entityId": "locked-again"
+            },
+            {
+              "type": "addResource",
+              "key": "score",
+              "amount": 2
+            },
+            {
+              "type": "addResource",
+              "key": "health",
+              "formula": "(score + -1) * 5 / 0 + 3"
+            },
+            {
+              "type": "spendResource",
+              "key": "health",
+              "amount": 8
+            },
+            {
+              "type": "spendResource",
+              "key": "health",
+              "amount": 8,
+              "clampToZero": true
+            },
+            {
+              "type": "spendResource",
+              "key": "credit",
+              "amount": 8,
+              "allowNegative": true
+            },
+            {
+              "type": "setExtension",
+              "key": "note",
+              "value": {
+                "initial": 1,
+                "old": 2
+              }
+            },
+            {
+              "type": "mergeExtension",
+              "key": "note",
+              "value": {
+                "old": 3,
+                "latest": 4
+              }
+            },
+            {
+              "type": "setVariable",
+              "key": "__proto__",
+              "value": 99
+            },
+            {
+              "type": "setFlag",
+              "key": "constructor",
+              "value": true
+            },
+            {
+              "type": "addResource",
+              "key": "prototype",
+              "amount": 1
+            },
+            {
+              "type": "navigate",
+              "nodeId": "side-trip"
+            },
+            {
+              "type": "noOp"
+            }
+          ]
+        },
+        {
+          "id": "confirm",
+          "source": "work",
+          "target": "done",
+          "conditions": [
+            {
+              "type": "equals",
+              "key": "score",
+              "value": 7
+            },
+            {
+              "type": "notEquals",
+              "key": "object",
+              "value": {
+                "a": [1, "x"]
+              }
+            },
+            {
+              "type": "hasVariable",
+              "key": "score"
+            },
+            {
+              "type": "greaterThan",
+              "key": "score",
+              "value": 3
+            },
+            {
+              "type": "greaterThanOrEqual",
+              "key": "score",
+              "value": 7
+            },
+            {
+              "type": "lessThan",
+              "key": "score",
+              "value": 8
+            },
+            {
+              "type": "lessThanOrEqual",
+              "key": "score",
+              "value": 7
+            },
+            {
+              "type": "hasFlag",
+              "key": "falseFlag"
+            },
+            {
+              "type": "notFlag",
+              "key": "falseFlag"
+            },
+            {
+              "type": "flagEquals",
+              "key": "falseFlag",
+              "value": false
+            },
+            {
+              "type": "visited",
+              "nodeId": "off-route"
+            },
+            {
+              "type": "notVisited",
+              "nodeId": "done"
+            },
+            {
+              "type": "currentNode",
+              "nodeId": "work"
+            },
+            {
+              "type": "hasEntity",
+              "entityId": "z"
+            },
+            {
+              "type": "entityActive",
+              "entityId": "a"
+            },
+            {
+              "type": "entityUnlocked",
+              "entityId": "portal"
+            },
+            {
+              "type": "resourceAtLeast",
+              "key": "health",
+              "value": 0
+            },
+            {
+              "type": "resourceLessThan",
+              "key": "credit",
+              "value": -7
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "prep",
+            "fromNodeId": "start",
+            "toNodeId": "work",
+            "success": true
+          },
+          {
+            "transitionId": "confirm",
+            "fromNodeId": "work",
+            "toNodeId": "done",
+            "success": true
+          }
+        ],
+        "finalNodeId": "done",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "done",
+          "history": ["start", "side-trip", "work"],
+          "variables": {
+            "score": 7,
+            "object": {
+              "a": [1, "x"]
+            }
+          },
+          "flags": {
+            "falseFlag": false
+          },
+          "visited": ["start", "off-route", "side-trip", "work", "done"],
+          "entityState": {
+            "owned": ["z", "a"],
+            "active": ["a"],
+            "unlocked": ["portal"],
+            "resources": {
+              "score": 2,
+              "health": 0,
+              "credit": -8
+            }
+          },
+          "extensions": {
+            "note": {
+              "initial": 1,
+              "old": 3,
+              "latest": 4
+            }
+          }
+        }
+      }
+    ]
+  }
+}

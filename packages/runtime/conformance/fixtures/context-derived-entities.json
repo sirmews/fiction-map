@@ -1,0 +1,70 @@
+{
+  "name": "context-derived-entities",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start"
+        },
+        {
+          "id": "work"
+        },
+        {
+          "id": "done"
+        }
+      ],
+      "edges": [
+        {
+          "id": "confirm",
+          "source": "start",
+          "target": "done",
+          "conditions": [
+            {
+              "type": "hasEntity",
+              "entityId": "placed"
+            },
+            {
+              "type": "entityActive",
+              "entityId": "equipped"
+            },
+            {
+              "type": "entityUnlocked",
+              "entityId": "via-unlock"
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "derivedState": {
+        "ownedEntityIds": ["placed"],
+        "activeEntityIds": ["equipped"],
+        "effectiveEntityIds": ["via-unlock"]
+      }
+    }
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "confirm",
+            "fromNodeId": "start",
+            "toNodeId": "done",
+            "success": true
+          }
+        ],
+        "finalNodeId": "done",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "done",
+          "history": ["start"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "done"]
+        }
+      }
+    ]
+  }
+}
