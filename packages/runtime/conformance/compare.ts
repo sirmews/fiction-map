@@ -113,21 +113,17 @@ if (import.meta.main) {
   const input = cases.map(({ name, request }) =>
     JSON.stringify(assertValid(validateRequest, request, name)),
   )
-  const executable = process.env.FICTION_MAP_RUST_BINARY
-  const arguments_ = executable
-    ? []
-    : [
-        "run",
-        "--quiet",
-        "--locked",
-        "--manifest-path",
-        fileURLToPath(new URL("../../runtime-rs/Cargo.toml", import.meta.url)),
-      ]
-  const results = spawnSync(executable ?? "cargo", arguments_, {
-    input: `${input.join("\n")}\n`,
-    encoding: "utf8",
-    maxBuffer: 16 * 1024 * 1024,
-  })
+  const results = spawnSync(
+    "cargo",
+    [
+      "run",
+      "--quiet",
+      "--locked",
+      "--manifest-path",
+      fileURLToPath(new URL("../../runtime-rs/Cargo.toml", import.meta.url)),
+    ],
+    { input: `${input.join("\n")}\n`, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
+  )
   if (results.error) throw results.error
   equal(results.status, 0, results.stderr)
   const output = results.stdout.trim().split("\n")

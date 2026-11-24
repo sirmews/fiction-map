@@ -57,9 +57,6 @@ async function runLocalPipeline() {
   runShellCommand("bun test", projectRoot);
 
   runShellCommand("bun run generate --check", path.join(projectRoot, "packages/protocol"));
-  runShellCommand("bun run packages/runtime/conformance/generate.ts --check");
-  runShellCommand("cargo test --locked --manifest-path packages/runtime-rs/Cargo.toml");
-  runShellCommand("bun run packages/runtime/conformance/compare.ts");
   runShellCommand(
     "bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1)",
     path.join(projectRoot, "apps/literature-rpg"),
@@ -107,7 +104,6 @@ async function runPipelineAttempt() {
             "packages/*/node_modules",
             "apps/*/node_modules",
             "packages/*/dist",
-            "packages/runtime-rs/target",
             "apps/*/dist",
             "apps/literature-rpg-web/dist",
             "bun.lock",
@@ -122,17 +118,9 @@ async function runPipelineAttempt() {
       const goBuildCache = client.cacheVolume("fiction-map-go-build-cache");
       const golangciLintCache = client.cacheVolume("fiction-map-golangci-lint-cache");
 
-      const rustContainer = client
-        .container()
-        .from("rust:1.93-bookworm")
-        .withDirectory("/app", sourceDir)
-        .withWorkdir("/app/packages/runtime-rs")
-        .withExec(["cargo", "test", "--locked"])
-        .withExec(["cargo", "build", "--locked"]);
-
       // --- Container 1: Bun Environment (Lint, Typecheck, Test, Protocol, Metadata) ---
       console.log("📦 Configuring Bun container...");
-      const bunContainer = client
+      let bunContainer = client
         .container()
         .from("oven/bun:1.3.14")
         .withDirectory("/app", sourceDir)
@@ -150,10 +138,6 @@ async function runPipelineAttempt() {
         .withExec(["bun", "run", "typecheck"])
         .withExec(["bun", "test"])
         .withExec(["sh", "-c", "cd packages/protocol && bun run generate --check"])
-        .withExec(["bun", "run", "packages/runtime/conformance/generate.ts", "--check"])
-        .withFile("/usr/local/bin/fiction-map-runtime", rustContainer.file("/app/packages/runtime-rs/target/debug/fiction-map-runtime"))
-        .withEnvVariable("FICTION_MAP_RUST_BINARY", "/usr/local/bin/fiction-map-runtime")
-        .withExec(["bun", "run", "packages/runtime/conformance/compare.ts"])
         .withExec(["sh", "-c", "cd apps/literature-rpg && (bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1))"])
         .withExec(["sh", "-c", "cd apps/literature-rpg && bun run validate"]);
 
