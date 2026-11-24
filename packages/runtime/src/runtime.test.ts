@@ -1,6 +1,7 @@
 import type { GraphDefinition } from "@fiction-map/core"
 import { describe, expect, it } from "vitest"
 import { createRuntimeFromGraph } from "./graph-definition"
+import { GraphRuntime } from "./runtime"
 
 describe("GraphRuntime path enumeration", () => {
   it("prunes cycles by symbolic-state fingerprint to avoid unbounded branching", () => {
@@ -74,6 +75,91 @@ describe("GraphRuntime path enumeration", () => {
 
     expect(paths).toHaveLength(2)
     expect(paths.every((path) => path.steps.length <= 2)).toBe(true)
+  })
+
+  it("keeps a visit-sensitive exit reachable after a cycle", () => {
+    const graph: GraphDefinition = {
+      id: "visited-gated-cycle",
+      name: "Visited Gated Cycle",
+      location: { file: "test.ts", line: 1, column: 1 },
+      nodes: [
+        { id: "start", type: "scene" },
+        { id: "detour", type: "scene" },
+        { id: "end", type: "scene" },
+      ],
+      edges: [
+        { id: "detour", type: "choice", source: "start", target: "detour" },
+        { id: "return", type: "choice", source: "detour", target: "start" },
+        {
+          id: "exit-after-detour",
+          type: "choice",
+          source: "start",
+          target: "end",
+          conditions: [{ type: "visited", nodeId: "detour" }],
+        },
+      ],
+      nodeCount: 3,
+      edgeCount: 3,
+      maxDepth: 3,
+      endings: ["end"],
+      nodeTypesUsed: ["scene"],
+      edgeTypesUsed: ["choice"],
+      conditionsUsed: ["visited"],
+      effectsUsed: [],
+      errors: [],
+      warnings: [],
+    }
+
+    const paths = createRuntimeFromGraph(graph).enumeratePaths(10, 100)
+    expect(paths.map((path) => path.steps.map((step) => step.transitionId))).toEqual([
+      ["detour", "return", "exit-after-detour"],
+    ])
+  })
+
+  it("keeps an exit gated by an existing custom evaluator", () => {
+    const runtime = new GraphRuntime(
+      {
+        nodes: [{ id: "start" }, { id: "end" }],
+        edges: [
+          {
+            id: "get-key",
+            source: "start",
+            target: "start",
+            effects: [{ type: "setFlag", key: "key", value: true }],
+          },
+          { id: "exit", source: "start", target: "end", conditions: [{ type: "customKey" }] },
+        ],
+      },
+      new Map([["customKey", (state) => state.flags.key === true]]),
+    )
+
+    expect(runtime.enumeratePaths().map((path) => path.finalNodeId)).toEqual(["end"])
+  })
+
+  it("continues walking when a cycle changes which choices are visible", () => {
+    const runtime = new GraphRuntime({
+      nodes: [{ id: "start" }, { id: "detour" }, { id: "end" }],
+      edges: [
+        {
+          id: "take-detour",
+          source: "start",
+          target: "detour",
+          visibility: [{ type: "notVisited", nodeId: "detour" }],
+        },
+        { id: "return", source: "detour", target: "start" },
+        { id: "exit", source: "start", target: "end" },
+      ],
+    })
+
+    const walk = runtime.walk(runtime.createState())
+    const walkWithContext = runtime.walkWithContext(runtime.createState(), () => ({}))
+    for (const steps of [walk, walkWithContext]) {
+      expect(steps.filter((step) => step.applied).map((step) => step.nodeId)).toEqual([
+        "detour",
+        "start",
+        "end",
+      ])
+    }
   })
 
   it("walk() prunes cyclic loops when symbolic state repeats", () => {
