@@ -92,4 +92,12 @@ export interface JournalDocument {
   choices: JournalChoice[]
   checkpoints?: JournalCheckpoint[]
   forkPoint?: JournalForkPoint
+  /**
+   * Content-addressed blob store for large `request.args`/`response`
+   * payloads. Keys are `"sha256:<hex>"` hashes of the canonical JSON of the
+   * stored value; entries reference them via `{ "$blob": "sha256:…" }`
+   * placeholders. See `blobs.ts` (`extractBlobs`/`inlineBlobs`). The engine
+   * treats blob contents as opaque.
+   */
+  blobs?: Record<string, unknown>
 }

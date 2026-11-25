@@ -54,6 +54,7 @@ jobs:
           bun run packages/runtime/conformance/generate.ts --check
           cargo +1.93.0 test --locked --manifest-path packages/runtime-rs/Cargo.toml
           bun run packages/runtime/conformance/compare.ts
+          bun run packages/runtime/conformance/journal-check.ts
           bun run packages/runtime/conformance/cutover/contract.ts
 
           (cd apps/literature-rpg && (bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1)))

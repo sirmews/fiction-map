@@ -1,0 +1,211 @@
+{
+  "name": "basic-recorded-session",
+  "blueprint": {
+    "nodes": [
+      {
+        "id": "start"
+      },
+      {
+        "id": "mid"
+      },
+      {
+        "id": "alt"
+      },
+      {
+        "id": "end"
+      }
+    ],
+    "edges": [
+      {
+        "id": "to-mid",
+        "source": "start",
+        "target": "mid",
+        "conditions": [
+          {
+            "type": "llmGate"
+          }
+        ],
+        "effects": [
+          {
+            "type": "llmMark"
+          }
+        ]
+      },
+      {
+        "id": "start-alt",
+        "source": "start",
+        "target": "alt"
+      },
+      {
+        "id": "mid-end",
+        "source": "mid",
+        "target": "end",
+        "conditions": [
+          {
+            "type": "hasVariable",
+            "key": "mark"
+          }
+        ]
+      },
+      {
+        "id": "mid-alt",
+        "source": "mid",
+        "target": "alt"
+      },
+      {
+        "id": "alt-end",
+        "source": "alt",
+        "target": "end",
+        "effects": [
+          {
+            "type": "setVariable",
+            "key": "viaAlt",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "startNode": "start",
+    "endings": ["end"]
+  },
+  "replayPath": ["to-mid", "mid-end"],
+  "save": {
+    "schemaVersion": 1,
+    "state": {
+      "schemaVersion": 1,
+      "currentNodeId": "end",
+      "history": ["start", "mid"],
+      "variables": {
+        "mark": "fixture"
+      },
+      "flags": {},
+      "visited": ["start", "mid", "end"]
+    },
+    "journal": {
+      "format": "fiction-map/journal",
+      "formatVersion": 1,
+      "session": {
+        "graphId": "fixture/journal",
+        "graphVersion": "fixture-v1",
+        "createdAt": "2026-11-25T17:16:24.813Z",
+        "initialState": {
+          "schemaVersion": 1,
+          "currentNodeId": "start",
+          "history": [],
+          "variables": {},
+          "flags": {},
+          "visited": ["start"]
+        }
+      },
+      "capabilities": {
+        "llm.test": {
+          "pluginTypes": ["llmGate", "llmMark"],
+          "version": "1.0.0",
+          "reexecutable": false,
+          "sideEffectFree": false,
+          "source": {
+            "provider": "fixture",
+            "model": "stub-1",
+            "seed": 7
+          }
+        }
+      },
+      "entries": [
+        {
+          "seq": 0,
+          "stepIndex": 1,
+          "stateFingerprint": "{\"node\":\"start\",\"flags\":[],\"owned\":[],\"active\":[],\"unlocked\":[],\"resources\":[],\"variables\":[],\"visited\":[]}",
+          "capability": "llm.test",
+          "requestHash": "sha256:594b1b382fdd0567e08e36223c71dcd955b48734a60244eb363e918923e87d62",
+          "request": {
+            "pluginType": "llmGate",
+            "kind": "condition",
+            "args": {
+              "type": "llmGate"
+            }
+          },
+          "response": true,
+          "durationMs": 0.008249999999989654
+        },
+        {
+          "seq": 1,
+          "stepIndex": 2,
+          "stateFingerprint": "{\"node\":\"start\",\"flags\":[],\"owned\":[],\"active\":[],\"unlocked\":[],\"resources\":[],\"variables\":[],\"visited\":[]}",
+          "capability": "llm.test",
+          "requestHash": "sha256:594b1b382fdd0567e08e36223c71dcd955b48734a60244eb363e918923e87d62",
+          "request": {
+            "pluginType": "llmGate",
+            "kind": "condition",
+            "args": {
+              "type": "llmGate"
+            }
+          },
+          "response": true,
+          "durationMs": 0.0014999999999929514
+        },
+        {
+          "seq": 2,
+          "stepIndex": 2,
+          "stateFingerprint": "{\"node\":\"start\",\"flags\":[],\"owned\":[],\"active\":[],\"unlocked\":[],\"resources\":[],\"variables\":[],\"visited\":[]}",
+          "capability": "llm.test",
+          "requestHash": "sha256:9f338279f05440ad35edbf32e51d8db243ff5eeac11299d728f5793224a2342d",
+          "request": {
+            "pluginType": "llmMark",
+            "kind": "effect",
+            "args": {
+              "type": "llmMark"
+            }
+          },
+          "response": {
+            "schemaVersion": 1,
+            "currentNodeId": "start",
+            "history": [],
+            "variables": {
+              "mark": "fixture"
+            },
+            "flags": {},
+            "visited": ["start"]
+          },
+          "durationMs": 0.14504200000000367
+        }
+      ],
+      "choices": [
+        {
+          "seq": 0,
+          "stepIndex": 2,
+          "transitionId": "to-mid",
+          "stateFingerprint": "{\"node\":\"start\",\"flags\":[],\"owned\":[],\"active\":[],\"unlocked\":[],\"resources\":[],\"variables\":[],\"visited\":[]}"
+        },
+        {
+          "seq": 1,
+          "stepIndex": 4,
+          "transitionId": "mid-end",
+          "stateFingerprint": "{\"node\":\"mid\",\"flags\":[],\"owned\":[],\"active\":[],\"unlocked\":[],\"resources\":[],\"variables\":[[\"mark\",\"fixture\"]],\"visited\":[]}"
+        }
+      ]
+    },
+    "capabilities": {
+      "llm.test": {
+        "pluginTypes": ["llmGate", "llmMark"],
+        "version": "1.0.0",
+        "reexecutable": false,
+        "sideEffectFree": false,
+        "source": {
+          "provider": "fixture",
+          "model": "stub-1",
+          "seed": 7
+        }
+      }
+    }
+  },
+  "expectedState": {
+    "schemaVersion": 1,
+    "currentNodeId": "end",
+    "history": ["start", "mid"],
+    "variables": {
+      "mark": "fixture"
+    },
+    "flags": {},
+    "visited": ["start", "mid", "end"]
+  }
+}
