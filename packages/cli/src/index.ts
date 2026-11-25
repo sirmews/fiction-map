@@ -2,6 +2,7 @@
  * Fiction Map CLI
  */
 
+export { enumeratePaths } from "./commands/enumerate-paths"
 export { generate } from "./commands/generate"
 export { explain, query, showGraph } from "./commands/query"
 export { generateMetadata, generateSemantics } from "./generator"

@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "build": "bun run --filter '*' build",
+    "build:rust": "cargo build --release --manifest-path packages/runtime-rs/Cargo.toml",
     "test": "bun run --filter '*' test",
     "typecheck": "bun run --filter '*' typecheck",
     "lint:boundaries": "bun run ./scripts/check-boundary.ts",

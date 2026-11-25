@@ -19,4 +19,24 @@ The workspace build generates the matching wasm-bindgen glue and embeds the Wasm
 
 The enumeration comparison exercises the native and WebAssembly hosts against the pinned outputs. The [runtime cutover contract](../runtime/conformance/cutover/README.md) also covers browser gameplay, older saves, and observable callback behavior against the original TypeScript runtime's results. GitHub Actions runs both checks.
 
+## Native JSON CLI
+
+The `fiction-map enumerate-paths` command ([packages/cli](../cli)) sends each selected graph from `.fiction-map/metadata.json` to this binary as one JSON `EnumerationRequest` per line and prints the JSON responses. It uses the same Rust traversal, condition dispatch, effect operations, and formula parser as the WebAssembly runtime.
+
+The command looks for the binary in this order:
+
+1. `FICTION_MAP_RUNTIME_RS` (path to a prebuilt binary)
+2. `packages/runtime-rs/target/release/fiction-map-runtime`
+3. `packages/runtime-rs/target/debug/fiction-map-runtime`
+
+Build it with `bun run build:rust` from the repository root (or
+`cargo build --release --manifest-path packages/runtime-rs/Cargo.toml`). The command never
+invokes cargo itself; if no binary is found it prints the build command above and exits
+non-zero.
+
+```sh
+bun run build:rust
+fiction-map enumerate-paths --graph library-mystery --max-depth 10 --json
+```
+
 After changing the native wire schema, run `bun run packages/runtime/conformance/generate.ts` to refresh the wire bindings.
