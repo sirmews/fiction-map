@@ -20,6 +20,12 @@ export const method1 = (target, name, a) => target[name](a);
 export const method2 = (target, name, a, b) => target[name](a, b);
 export const method3 = (target, name, a, b, c) => target[name](a, b, c);
 export const stringifyValue = value => String(value);
+// Rust strings require valid UTF-8. Escape lone UTF-16 surrogates and the
+// escape character so JavaScript identifiers survive comparison and formatting.
+export const portableText = value => String(value).replace(/[\uD800-\uDFFF\uE000]/gu, unit =>
+    "\uE000" + (unit === "\uE000" ? unit : String.fromCharCode(unit.charCodeAt(0) + 0x1000)));
+export const hostText = value => value.replace(/\uE000([\uE000\uE800-\uEFFF])/gu, (_, unit) =>
+    unit === "\uE000" ? unit : String.fromCharCode(unit.charCodeAt(0) - 0x1000));
 "#)]
 extern "C" {
     #[wasm_bindgen(catch)]
@@ -59,6 +65,10 @@ extern "C" {
     ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(catch, js_name = stringifyValue)]
     pub(crate) fn js_string(value: &JsValue) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(catch, js_name = portableText)]
+    fn portable_text(value: &JsValue) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(js_name = hostText)]
+    pub(crate) fn host_text(value: &str) -> JsValue;
 }
 
 pub(crate) fn call(value: &JsValue, receiver: &JsValue, args: &[JsValue]) -> JsResult {
@@ -90,5 +100,5 @@ pub(crate) fn nullish(value: &JsValue) -> bool {
 }
 
 pub(crate) fn text(value: &JsValue) -> Result<String, JsValue> {
-    Ok(js_string(value)?.as_string().unwrap_or_default())
+    Ok(portable_text(value)?.as_string().unwrap_or_default())
 }

@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::js_fingerprint::{fingerprint, visited_condition_nodes};
 use crate::js_state::clone_state;
-use crate::js_util::{array, call, items, method, nullish, text};
+use crate::js_util::{array, call, host_text, items, method, nullish, text};
 use crate::traversal::{
     AUTOMATIC_LOOP_CODE, PathEnding, PathHost, automatic_loop_message, enumerate, finish_transition,
 };
@@ -85,7 +85,7 @@ pub fn step(
             if at_limit {
                 return Err(make_error.call2(
                     &JsValue::UNDEFINED,
-                    &JsValue::from_str(&automatic_loop_message(&text(&node_id)?)),
+                    &host_text(&automatic_loop_message(&text(&node_id)?)),
                     &JsValue::from_str(AUTOMATIC_LOOP_CODE),
                 )?);
             }

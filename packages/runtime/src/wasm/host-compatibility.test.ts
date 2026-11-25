@@ -3,6 +3,7 @@ import {
   applyEffect,
   createInitialState,
   evaluateCondition,
+  GraphRuntime,
   getAvailableTransitions,
   getTransitionsByAvailability,
   setVariableHandler,
@@ -11,6 +12,25 @@ import {
 import type { ConditionEvaluator, EffectHandler, Transition } from "../types"
 
 describe("live JavaScript host", () => {
+  it("preserves JavaScript graph identifiers and diagnostic field order", () => {
+    const identifiers = ["\uD800", "\uFFFD", "\uE000", "\uE800", "\u{1F408}"]
+    const runtime = new GraphRuntime({
+      nodes: ["start", ...identifiers].map((id) => ({ id })),
+      edges: [],
+    })
+
+    expect([...runtime.endingNodeIds]).toEqual(identifiers)
+    const { errors } = runtime.validate()
+    expect(errors.slice(0, identifiers.length)).toEqual(
+      identifiers.map((nodeId) => ({
+        type: "unreachable-node",
+        nodeId,
+        message: `Node '${nodeId}' is not reachable from start node 'start'`,
+      })),
+    )
+    expect(Object.keys(errors[0])).toEqual(["type", "nodeId", "message"])
+  })
+
   it("dispatches by callback identity when a consumer aliases or replaces a built-in", () => {
     const state = createInitialState("start")
     const condition = { type: "alias", nodeId: "start" }

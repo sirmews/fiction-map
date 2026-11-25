@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 use crate::js_entities::derive_entity_state;
 use crate::js_runtime::{fingerprint_text, runtime_visit_nodes};
 use crate::js_state::create_initial_state;
-use crate::js_util::{array, items, method, nullish, text};
+use crate::js_util::{array, host_text, items, method, nullish, text};
 use crate::validation::{
     TransitionEndpoints, has_dangling_transitions, terminal_nodes, validate_graph,
 };
@@ -74,7 +74,7 @@ pub fn endings(nodes: &JsValue, transitions: &JsValue, skip_first: bool) -> JsRe
         sources.iter().map(String::as_str),
         excluded,
     );
-    Ok(array(endings.into_iter().map(JsValue::from_str)).into())
+    Ok(array(endings.into_iter().map(host_text)).into())
 }
 
 #[wasm_bindgen(js_name = validateGraph)]
@@ -87,30 +87,20 @@ pub fn graph(nodes: &JsValue, transitions: &JsValue, start: &JsValue) -> JsResul
     let validation = validate_graph(&ids, &endpoints, start.as_deref());
     let errors = Array::new();
     for error in &validation.errors {
-        let entry = record(&[
-            ("type", &JsValue::from_str(error.kind)),
-            ("message", &JsValue::from_str(&error.message)),
-        ])?;
+        let entry = record(&[("type", &JsValue::from_str(error.kind))])?;
+        if let Some(transition) = error.transition_id {
+            set(&entry, "transitionId", &host_text(transition))?;
+        }
         if error.kind == "missing-start-node" {
-            let value = error
-                .node_id
-                .map(JsValue::from_str)
-                .unwrap_or(JsValue::UNDEFINED);
+            let value = error.node_id.map(host_text).unwrap_or(JsValue::UNDEFINED);
             set(&entry, "nodeId", &value)?;
         } else if let Some(node) = error.node_id {
-            set(&entry, "nodeId", &JsValue::from_str(node))?;
+            set(&entry, "nodeId", &host_text(node))?;
         }
-        if let Some(transition) = error.transition_id {
-            set(&entry, "transitionId", &JsValue::from_str(transition))?;
-        }
+        set(&entry, "message", &host_text(&error.message))?;
         errors.push(&entry);
     }
-    let reachable = array(
-        validation
-            .reachable_nodes
-            .into_iter()
-            .map(JsValue::from_str),
-    );
+    let reachable = array(validation.reachable_nodes.into_iter().map(host_text));
     record(&[
         ("valid", &JsValue::from_bool(errors.length() == 0)),
         ("errors", errors.as_ref()),
@@ -266,7 +256,7 @@ fn semantic_error(category: &str, node: &JsValue, message: &str, path: &[JsValue
     record(&[
         ("type", &JsValue::from_str(category)),
         ("nodeId", node),
-        ("message", &JsValue::from_str(message)),
+        ("message", &host_text(message)),
         ("path", array(path.iter().cloned()).as_ref()),
     ])
 }
