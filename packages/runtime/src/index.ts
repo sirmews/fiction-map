@@ -135,6 +135,7 @@ export type {
   NodeDefinition,
   SerializableEntityState,
   SerializableState,
+  StateTrigger,
   Transition,
   TransitionAvailability,
   TransitionResult,

@@ -694,7 +694,7 @@ export class JournalSession {
       ...(this.blobs ? { blobs: { ...this.blobs } } : {}),
       forkPoint: { parentHash, atSeq },
     }
-    return JournalSession.create({
+    const forked = JournalSession.create({
       blueprint: this.blueprint,
       evaluators: this.rawEvaluators,
       handlers: this.rawHandlers,
@@ -705,6 +705,13 @@ export class JournalSession {
       graphVersion: this.sessionMeta.graphVersion,
       createdAt: this.sessionMeta.createdAt,
     })
+    // Triggers are runtime registrations, not journal data: a fork is the
+    // same session lineage, so it inherits them. `deserializeSession` cannot
+    // do this — consumers must re-register triggers there.
+    for (const trigger of this.runtime.triggers) {
+      forked.addTrigger(trigger)
+    }
+    return forked
   }
 }
 
