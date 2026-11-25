@@ -141,4 +141,46 @@ describe("Semantic Graph Validator", () => {
     expect(result.errors[0].type).toBe("infinite-drain-loop")
     expect(result.errors[0].nodeId).toBe("start")
   })
+
+  it("keeps distinct resource states at a join during semantic validation", () => {
+    const graph = defineGraph(registry, {
+      id: "resource-join",
+      nodes: [
+        { id: "start", type: "scene", title: "Start" },
+        { id: "high", type: "scene", title: "High" },
+        { id: "low", type: "scene", title: "Low" },
+        { id: "join", type: "scene", title: "Join" },
+        { id: "end", type: "scene", title: "End" },
+      ],
+      edges: [
+        {
+          id: "choose-high",
+          type: "choice",
+          source: "start",
+          target: "high",
+          effects: [{ type: "addResource", key: "health", amount: 100 }],
+        },
+        {
+          id: "choose-low",
+          type: "choice",
+          source: "start",
+          target: "low",
+          effects: [{ type: "addResource", key: "health", amount: 10 }],
+        },
+        { id: "high-join", type: "choice", source: "high", target: "join" },
+        { id: "low-join", type: "choice", source: "low", target: "join" },
+        {
+          id: "spend",
+          type: "choice",
+          source: "join",
+          target: "end",
+          effects: [{ type: "spendResource", key: "health", amount: 20, clampToZero: true }],
+        },
+      ],
+    })
+
+    const result = validateGraphSemantics(createRuntimeFromGraph(graph), world)
+    expect(result.valid).toBe(false)
+    expect(result.errors.some((error) => error.type === "unwinnable-path")).toBe(true)
+  })
 })

@@ -6,7 +6,6 @@ import {
   getAvailableTransitions,
   getTransitionsByAvailability,
 } from "./core/transition"
-import { SymbolicState } from "./validation/symbolicState"
 import { validateGraph } from "./core/validation"
 import { builtinEvaluators, builtinHandlers } from "./default-bindings"
 import { applyEffects } from "./effects"
@@ -22,6 +21,7 @@ import type {
   TransitionResult,
   ValidationResult,
 } from "./types"
+import { getVisitedConditionNodeIds, SymbolicState } from "./validation/symbolicState"
 
 export interface StepResult {
   state: GraphRuntimeState
@@ -227,8 +227,9 @@ export class GraphRuntime {
     maxSteps: number = 100,
   ): StepResult[] {
     const steps: StepResult[] = []
+    const visitSensitiveNodeIds = getVisitedConditionNodeIds(this.transitions, this.triggers)
     const visitedStateFingerprints = new Set<string>([
-      new SymbolicState(state).getFingerprint(),
+      new SymbolicState(state, visitSensitiveNodeIds).getFingerprint(),
     ])
 
     for (let i = 0; i < maxSteps; i++) {
@@ -247,7 +248,7 @@ export class GraphRuntime {
 
       const result = this.step(state, available[0], context)
       const resultState = result.state
-      const fingerprint = new SymbolicState(resultState).getFingerprint()
+      const fingerprint = new SymbolicState(resultState, visitSensitiveNodeIds).getFingerprint()
       const isRevisited = visitedStateFingerprints.has(fingerprint)
 
       const stepResult: StepResult = {
@@ -287,8 +288,9 @@ export class GraphRuntime {
     context?: EvaluationContext & EffectContext,
   ): StepResult[] {
     const steps: StepResult[] = []
+    const visitSensitiveNodeIds = getVisitedConditionNodeIds(this.transitions, this.triggers)
     const visitedStateFingerprints = new Set<string>([
-      new SymbolicState(state).getFingerprint(),
+      new SymbolicState(state, visitSensitiveNodeIds).getFingerprint(),
     ])
 
     for (let i = 0; i < maxSteps; i++) {
@@ -306,7 +308,7 @@ export class GraphRuntime {
 
       const result = this.step(state, available[0], context)
       const resultState = result.state
-      const fingerprint = new SymbolicState(resultState).getFingerprint()
+      const fingerprint = new SymbolicState(resultState, visitSensitiveNodeIds).getFingerprint()
       const isRevisited = visitedStateFingerprints.has(fingerprint)
 
       steps.push({
@@ -333,8 +335,9 @@ export class GraphRuntime {
     context?: EvaluationContext & EffectContext,
   ): TraversalPath[] {
     const paths: TraversalPath[] = []
+    const visitSensitiveNodeIds = getVisitedConditionNodeIds(this.transitions, this.triggers)
     const startState = this.createState()
-    const startFingerprint = new SymbolicState(startState).getFingerprint()
+    const startFingerprint = new SymbolicState(startState, visitSensitiveNodeIds).getFingerprint()
 
     const stack: {
       state: GraphRuntimeState
@@ -394,7 +397,7 @@ export class GraphRuntime {
         }
 
         const nextState = result.state
-        const fingerprint = new SymbolicState(nextState).getFingerprint()
+        const fingerprint = new SymbolicState(nextState, visitSensitiveNodeIds).getFingerprint()
         if (visitedStateFingerprints.has(fingerprint)) {
           continue
         }
