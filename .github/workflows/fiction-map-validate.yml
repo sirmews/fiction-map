@@ -74,12 +74,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build and play a turn in the self-hosted container
+        shell: bash
         run: |
           docker build -t fiction-map-engine .
           docker run --detach --name fiction-map-engine --publish 127.0.0.1::8080 fiction-map-engine
-          trap 'docker logs fiction-map-engine && docker rm --force fiction-map-engine' EXIT
-          endpoint="http://$(docker port fiction-map-engine 8080/tcp)/intent"
-          curl --fail --silent --show-error --retry 5 --retry-connrefused --max-time 10 \
+          trap 'docker logs fiction-map-engine; docker rm --force fiction-map-engine' EXIT
+          endpoint="http://$(docker port fiction-map-engine 8080/tcp)"
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --max-time 5 "$endpoint/health" \
+            | jq -e '.status == "ok"'
+          curl --fail --silent --show-error --max-time 5 \
             --header 'Content-Type: application/json' \
-            --data '{"intent":{"type":"selectChoice","choiceId":"enter-entrance"}}' "$endpoint" \
+            --data '{"intent":{"type":"selectChoice","choiceId":"enter-entrance"}}' "$endpoint/intent" \
             | jq -e '.frame.currentNode.id == "entrance"'
