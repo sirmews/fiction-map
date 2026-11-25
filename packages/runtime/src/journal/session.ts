@@ -631,10 +631,6 @@ export class JournalSession {
   }
 
   serialize(): JournalDocument {
-    const capabilities: Record<string, CapabilityDeclaration> = {}
-    for (const [id, declaration] of this.capabilities) {
-      capabilities[id] = { ...declaration, pluginTypes: [...declaration.pluginTypes] }
-    }
     return {
       format: JOURNAL_FORMAT,
       formatVersion: JOURNAL_FORMAT_VERSION,
@@ -644,7 +640,7 @@ export class JournalSession {
         createdAt: this.sessionMeta.createdAt,
         initialState: this.sessionMeta.initialState,
       },
-      capabilities,
+      capabilities: this.capabilitiesManifest(),
       entries: this.entries.map((entry) => ({
         ...entry,
         request: { ...entry.request },
@@ -653,6 +649,14 @@ export class JournalSession {
       ...(this.forkPoint ? { forkPoint: { ...this.forkPoint } } : {}),
       ...(this.blobs ? { blobs: { ...this.blobs } } : {}),
     }
+  }
+
+  private capabilitiesManifest(): Record<string, CapabilityDeclaration> {
+    const capabilities: Record<string, CapabilityDeclaration> = {}
+    for (const [id, declaration] of this.capabilities) {
+      capabilities[id] = { ...declaration, pluginTypes: [...declaration.pluginTypes] }
+    }
+    return capabilities
   }
 
   /**
@@ -681,14 +685,16 @@ export class JournalSession {
     }
     const prefixEntries = this.entries.slice(0, atSeq + 1)
     const prefixChoices = this.choices.filter((choice) => choice.stepIndex <= last.stepIndex)
-    const parentHash = sha256Prefixed(
-      canonicalStringify({ entries: prefixEntries, choices: prefixChoices }),
-    )
+    // forkPoint.parentHash identifies the parent journal this fork was cut
+    // from (plan §5): hash the parent's full serialized content, not the
+    // retained prefix — the prefix hash would collide across different
+    // parents and could not identify the parent's tail.
+    const parentHash = sha256Prefixed(canonicalStringify(this.serialize()))
     const prefixJournal: JournalDocument = {
       format: JOURNAL_FORMAT,
       formatVersion: JOURNAL_FORMAT_VERSION,
       session: { ...this.sessionMeta, initialState: this.sessionMeta.initialState },
-      capabilities: this.serialize().capabilities,
+      capabilities: this.capabilitiesManifest(),
       entries: prefixEntries.map((entry) => ({ ...entry, request: { ...entry.request } })),
       choices: prefixChoices.map((choice) => ({ ...choice })),
       ...(this.blobs ? { blobs: { ...this.blobs } } : {}),

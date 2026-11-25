@@ -20,8 +20,9 @@ import type { CapabilityDeclaration, JournalDocument, JournalMode } from "./type
  * Session save composition (plan §6): a `SerializableState` snapshot plus the
  * full `JournalDocument` and capability manifest, as one JSON document.
  *
- * The state snapshot is authoritative for resuming play; the journal is the
- * replay/branch record. `capabilities` mirrors `journal.capabilities` so a
+ * The state snapshot is authoritative for resuming play in `"record"`
+ * mode; the journal is the replay/branch record. `capabilities` mirrors
+ * `journal.capabilities` so a
  * save is self-describing — `deserializeSession` can feed it straight back
  * into `JournalSessionOptions.capabilities`.
  */
@@ -71,7 +72,13 @@ export interface DeserializeSessionOptions {
 
 export interface DeserializedSession {
   session: JournalSession
-  /** The saved live state, ready to keep playing from. */
+  /**
+   * The saved live state. Continue playing from it in `"record"` mode
+   * (the journal keeps appending). In `"replay"` mode the cursors start at
+   * the journal's beginning, so stepping this state diverges immediately —
+   * replay consumers must instead start from `session.createState()` and
+   * let the journal reproduce the recorded path.
+   */
   state: GraphRuntimeState
 }
 

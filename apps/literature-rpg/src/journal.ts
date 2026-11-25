@@ -21,6 +21,7 @@ import {
   builtinHandlers,
   type CapabilityDeclaration,
   type ConditionEvaluator,
+  canonicalStringify,
   cloneState,
   createJournalSession,
   type DeserializedSession,
@@ -38,7 +39,9 @@ import {
   type SerializableState,
   type SessionSave,
   type StateTrigger,
+  sha256Prefixed,
 } from "@fiction-map/runtime"
+import { globalTriggers } from "./global-triggers"
 import { story } from "./graphs/story.graph"
 import { registry } from "./project"
 import { world } from "./world"
@@ -49,6 +52,12 @@ registerBuiltins(registry)
  * The same blueprint `createRuntimeFromGraph(story)` builds internally.
  */
 export const storyBlueprint = graphDefinitionToBlueprint(story)
+
+/**
+ * Content hash of the blueprint, recorded as `session.graphVersion` so a
+ * journal is pinned to the exact graph it was recorded against.
+ */
+export const storyGraphVersion = sha256Prefixed(canonicalStringify(storyBlueprint))
 
 // ---------------------------------------------------------------------------
 // Custom plugin: fortuneRoll (the demo capability)
@@ -118,50 +127,22 @@ export const gameHandlers: Map<string, EffectHandler> = new Map(builtinHandlers)
 gameHandlers.set("fortuneRoll", fortuneRollHandler)
 
 // ---------------------------------------------------------------------------
-// Triggers: the same five globals as main.ts, plus the fortune trigger
+// Triggers: the shared global set plus the fortune trigger
 // ---------------------------------------------------------------------------
 
-type GameTrigger = StateTrigger
-
-const fortuneTrigger: GameTrigger = {
+const fortuneTrigger: StateTrigger = {
   id: "fortune-trigger",
   conditions: [],
   effects: [{ type: "fortuneRoll" }],
 }
 
 /**
- * Trigger list applied to every journal session. Mirrors `main.ts` exactly,
- * with `fortune-trigger` appended so it fires once per `step()` (conditions
- * are empty) and produces one journaled capability exchange per step.
+ * Trigger list applied to every journal session: the shared `globalTriggers`
+ * from `global-triggers.ts` (same five globals as `main.ts`) plus
+ * `fortune-trigger`, which fires once per `step()` (conditions are empty)
+ * and produces one journaled capability exchange per step.
  */
-export const gameTriggers: readonly GameTrigger[] = [
-  {
-    id: "turn-counter-trigger",
-    conditions: [],
-    effects: [{ type: "addResource", key: "turns", amount: 1 }],
-  },
-  {
-    id: "cavern-collapse-trigger",
-    conditions: [{ type: "resourceAtLeast", key: "turns", value: 11 }],
-    effects: [{ type: "spendResource", key: "health", amount: 25, clampToZero: true }],
-  },
-  {
-    id: "death-trigger",
-    conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
-    effects: [{ type: "navigate", nodeId: "death" }],
-  },
-  {
-    id: "mana-regen-trigger",
-    conditions: [{ type: "resourceLessThan", key: "mana", value: 50 }],
-    effects: [{ type: "addResource", key: "mana", amount: 5 }],
-  },
-  {
-    id: "cooldown-tick-trigger",
-    conditions: [{ type: "resourceAtLeast", key: "heal_cooldown", value: 1 }],
-    effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
-  },
-  fortuneTrigger,
-]
+export const gameTriggers: readonly StateTrigger[] = [...globalTriggers, fortuneTrigger]
 
 // ---------------------------------------------------------------------------
 // Session factories
@@ -189,6 +170,7 @@ export function createGameJournalSession(options: GameJournalSessionOptions = {}
     mode: options.mode ?? "record",
     journal: options.journal ?? null,
     graphId: story.id,
+    graphVersion: storyGraphVersion,
     initialState: options.initialState,
     createdAt: options.createdAt,
   })
@@ -212,7 +194,9 @@ export function deserializeGameSession(
     blueprint: storyBlueprint,
     evaluators: gameEvaluators,
     handlers: gameHandlers,
-    capabilities: parsed.capabilities,
+    // Pass the app's own declarations (not the save's copy) so replay
+    // validates the live manifest against the recorded one.
+    capabilities: gameCapabilities,
     mode: options.mode ?? "replay",
     graphId: story.id,
   })
