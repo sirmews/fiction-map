@@ -9,6 +9,7 @@ import {
 } from "@fiction-map/runtime"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
+import { globalTriggers } from "./global-triggers"
 import { story } from "./graphs/story.graph"
 import { registry } from "./project"
 import { world } from "./world"
@@ -17,36 +18,10 @@ registerBuiltins(registry)
 
 export const runtime = createRuntimeFromGraph(story)
 
-// Global Triggers
-runtime.addTrigger({
-  id: "turn-counter-trigger",
-  conditions: [],
-  effects: [{ type: "addResource", key: "turns", amount: 1 }],
-})
-
-runtime.addTrigger({
-  id: "cavern-collapse-trigger",
-  conditions: [{ type: "resourceAtLeast", key: "turns", value: 11 }],
-  effects: [{ type: "spendResource", key: "health", amount: 25, clampToZero: true }],
-})
-
-runtime.addTrigger({
-  id: "death-trigger",
-  conditions: [{ type: "resourceLessThan", key: "health", value: 1 }],
-  effects: [{ type: "navigate", nodeId: "death" }],
-})
-
-runtime.addTrigger({
-  id: "mana-regen-trigger",
-  conditions: [{ type: "resourceLessThan", key: "mana", value: 50 }],
-  effects: [{ type: "addResource", key: "mana", amount: 5 }],
-})
-
-runtime.addTrigger({
-  id: "cooldown-tick-trigger",
-  conditions: [{ type: "resourceAtLeast", key: "heal_cooldown", value: 1 }],
-  effects: [{ type: "spendResource", key: "heal_cooldown", amount: 1, clampToZero: true }],
-})
+// Global Triggers (shared with journal.ts via global-triggers.ts)
+for (const trigger of globalTriggers) {
+  runtime.addTrigger(trigger)
+}
 
 export function startSidecar() {
   let state = createInitialState(runtime.startNodeId)

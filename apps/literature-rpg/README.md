@@ -38,7 +38,29 @@ bun run test       # asserts the walk reaches dark-chapter
 bun run typecheck  # tsc --noEmit
 bun run generate   # writes src/.fiction-map/metadata.json and src/SEMANTICS.md
 bun run validate   # checks the generated metadata
+bun run journal:demo  # record/replay/fork demo for the session journal
 ```
+
+## Session journal demo
+
+[src/journal.ts](src/journal.ts) wires the `@fiction-map/runtime` session
+journal (`JournalSession` + `SessionSave`) around the same story graph. It
+adds one custom plugin — the non-deterministic `fortuneRoll` effect, declared
+as a journaled capability — plus the same five global triggers as
+[src/main.ts](src/main.ts). Because `JournalSession` builds its own runtime,
+it cannot wrap `main.ts`'s `runtime`; the blueprint is derived with
+`graphDefinitionToBlueprint(story)` instead.
+
+```bash
+bun run journal:demo   # records ~17 steps to victory, saves
+                       # .fiction-map/session-demo.json, replays it
+                       # identically (zero plugin calls), and forks a
+                       # divergent branch
+bun run test           # journal.test.ts covers record → save → replay → fork
+```
+
+The HTTP server and sidecar in `main.ts` are unchanged — this is a standalone
+integration demo, not live-session rewiring.
 
 ## Why this app exists
 

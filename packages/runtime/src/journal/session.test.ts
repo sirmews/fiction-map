@@ -291,6 +291,34 @@ describe("JournalSession", () => {
     expect(replayedFork.variables.viaAlt).toBe(true)
   })
 
+  it("fork inherits the parent's triggers", () => {
+    const record = sessionOptions("record")
+    const session = createJournalSession(record.options)
+    session.addTrigger({
+      id: "test-trigger",
+      conditions: [],
+      effects: [{ type: "setVariable", key: "triggered", value: true }],
+    })
+
+    let state = session.createState()
+    state = session.step(
+      state,
+      session.getAvailable(state).find((t) => t.id === "to-mid")!,
+      {},
+    ).state
+    expect(state.variables.triggered).toBe(true)
+
+    const forked = session.fork(session.serialize().entries.length - 1)
+    expect(forked.triggers.map((t) => t.id)).toContain("test-trigger")
+
+    const forkState = forked.step(
+      state,
+      forked.getAvailable(state).find((t) => t.id === "mid-end")!,
+      {},
+    ).state
+    expect(forkState.variables.triggered).toBe(true)
+  })
+
   it("replays a recorded walk with zero plugin invocations", () => {
     const record = sessionOptions("record")
     const session = createJournalSession(record.options)
