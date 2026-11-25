@@ -13,6 +13,7 @@
     "validate": "bun node_modules/fiction-map/dist/cli.js validate --root-dir src",
     "pretest": "bun run build:deps",
     "test": "vitest run",
+    "journal:demo": "bun run src/journal-demo.ts",
     "pretypecheck": "bun run build:deps",
     "typecheck": "tsc --noEmit"
   },

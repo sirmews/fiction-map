@@ -49,3 +49,6 @@ pnpm-lock.yaml
 
 # Gemini review artifacts
 .gemini-review/
+
+# Journal demo output
+apps/literature-rpg/.fiction-map/session-demo.json
