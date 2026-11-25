@@ -21,6 +21,30 @@ impl NumericTest {
     }
 }
 
+/// The entity collections an entity condition can consult. Both the native
+/// host and the live JavaScript host interpret these variants, so the mapping
+/// from condition kind to derived-state key and entity-state collection lives
+/// in exactly one place.
+#[derive(Clone, Copy)]
+pub(crate) enum EntitySet {
+    Owned,
+    Active,
+    Unlocked,
+}
+
+impl EntitySet {
+    /// Key of this collection in the derived-state record produced by
+    /// `deriveEntityState`. Only the JavaScript host reads it by name.
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) fn derived_key(self) -> &'static str {
+        match self {
+            Self::Owned => "ownedEntityIds",
+            Self::Active => "activeEntityIds",
+            Self::Unlocked => "effectiveEntityIds",
+        }
+    }
+}
+
 /// The native host reads JSON and the browser host reads live JavaScript values.
 /// Both evaluate the same predicates, precedence and short-circuit rules.
 pub(crate) trait ConditionHost {
@@ -31,7 +55,7 @@ pub(crate) trait ConditionHost {
     fn flag_unset(&self) -> Result<bool, Self::Error>;
     fn visited(&self) -> Result<Option<bool>, Self::Error>;
     fn at_current_node(&self) -> Result<bool, Self::Error>;
-    fn entity(&self, derived: &str, collection: &str) -> Result<bool, Self::Error>;
+    fn entity(&self, set: EntitySet) -> Result<bool, Self::Error>;
     fn resource(&self, test: NumericTest) -> Result<bool, Self::Error>;
 }
 
@@ -50,9 +74,9 @@ pub(crate) fn evaluate_with<H: ConditionHost>(kind: &str, host: &H) -> Result<bo
         "visited" => host.visited()? == Some(true),
         "notVisited" => host.visited()? == Some(false),
         "currentNode" => host.at_current_node()?,
-        "hasEntity" => host.entity("ownedEntityIds", "owned")?,
-        "entityActive" => host.entity("activeEntityIds", "active")?,
-        "entityUnlocked" => host.entity("effectiveEntityIds", "unlocked")?,
+        "hasEntity" => host.entity(EntitySet::Owned)?,
+        "entityActive" => host.entity(EntitySet::Active)?,
+        "entityUnlocked" => host.entity(EntitySet::Unlocked)?,
         "resourceAtLeast" => host.resource(NumericTest::AtLeast)?,
         "resourceLessThan" => host.resource(NumericTest::Less)?,
         _ => false,
@@ -128,24 +152,24 @@ impl ConditionHost for NativeCondition<'_> {
     fn at_current_node(&self) -> Result<bool, Infallible> {
         Ok(self.string("nodeId") == Some(&self.state.current_node))
     }
-    fn entity(&self, derived: &str, collection: &str) -> Result<bool, Infallible> {
+    fn entity(&self, set: EntitySet) -> Result<bool, Infallible> {
         let Some(id) = self.string("entityId") else {
             return Ok(false);
         };
         let derived_ids = self
             .context
             .and_then(|c| c.derived_state.as_ref())
-            .and_then(|d| match derived {
-                "ownedEntityIds" => d.owned_entity_ids.as_ref(),
-                "activeEntityIds" => d.active_entity_ids.as_ref(),
-                _ => d.effective_entity_ids.as_ref(),
+            .and_then(|d| match set {
+                EntitySet::Owned => d.owned_entity_ids.as_ref(),
+                EntitySet::Active => d.active_entity_ids.as_ref(),
+                EntitySet::Unlocked => d.effective_entity_ids.as_ref(),
             });
         Ok(derived_ids.is_some_and(|ids| ids.iter().any(|v| v == id))
             || self.state.entity_state.as_ref().is_some_and(|entities| {
-                let ids = match collection {
-                    "owned" => &entities.owned,
-                    "active" => &entities.active,
-                    _ => &entities.unlocked,
+                let ids = match set {
+                    EntitySet::Owned => &entities.owned,
+                    EntitySet::Active => &entities.active,
+                    EntitySet::Unlocked => &entities.unlocked,
                 };
                 ids.contains(&id.to_owned())
             }))

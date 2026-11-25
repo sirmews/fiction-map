@@ -1,4 +1,4 @@
-use crate::conditions::{self, ConditionHost, NumericTest};
+use crate::conditions::{self, ConditionHost, EntitySet, NumericTest};
 use crate::formula;
 use crate::js_state as state;
 use crate::js_util::{method, nullish};
@@ -85,19 +85,22 @@ impl ConditionHost for LiveCondition<'_> {
         let node = get(self.item, "nodeId")?;
         Ok(get(self.state, "currentNodeId")? == node)
     }
-    fn entity(&self, derived: &str, collection: &str) -> Result<bool, JsValue> {
+    fn entity(&self, set: EntitySet) -> Result<bool, JsValue> {
         let id = get(self.item, "entityId")?;
         if !id.is_string() {
             return Ok(false);
         }
-        let ids = optional(&optional(self.context, "derivedState")?, derived)?;
+        let ids = optional(
+            &optional(self.context, "derivedState")?,
+            set.derived_key(),
+        )?;
         if !nullish(&ids) && method(&ids, "has", std::slice::from_ref(&id))?.is_truthy() {
             return Ok(true);
         }
-        match collection {
-            "owned" => state::owns_entity(self.state, &id),
-            "active" => state::entity_is_active(self.state, &id),
-            _ => state::entity_is_unlocked(self.state, &id),
+        match set {
+            EntitySet::Owned => state::owns_entity(self.state, &id),
+            EntitySet::Active => state::entity_is_active(self.state, &id),
+            EntitySet::Unlocked => state::entity_is_unlocked(self.state, &id),
         }
     }
     fn resource(&self, test: NumericTest) -> Result<bool, JsValue> {

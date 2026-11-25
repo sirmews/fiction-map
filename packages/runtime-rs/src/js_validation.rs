@@ -58,6 +58,17 @@ fn read_ids(values: &JsValue) -> Result<Vec<String>, JsValue> {
     items(values)?.map(|value| text(&value?)).collect()
 }
 
+/// Read an optional string option, treating null and undefined as absent so
+/// the caller's default applies, matching JavaScript `??` semantics.
+fn option_text(options: &JsValue, key: &str, default: &str) -> Result<String, JsValue> {
+    let value = get(options, key)?;
+    if nullish(&value) {
+        Ok(default.to_string())
+    } else {
+        text(&value)
+    }
+}
+
 #[wasm_bindgen(js_name = inferEndingNodes)]
 pub fn endings(nodes: &JsValue, transitions: &JsValue, skip_first: bool) -> JsResult {
     let nodes = read_ids(nodes)?;
@@ -126,6 +137,15 @@ struct PendingPath {
 #[wasm_bindgen(js_name = solveGraphSemantics)]
 pub fn solve(runtime: &JsValue, world: &JsValue, options: &JsValue) -> JsResult {
     let max_steps = get(options, "maxSteps")?.as_f64().unwrap_or(100.0);
+    // Consumer vocabulary: which node id counts as a loss, which
+    // entityState.resources attribute tracks survival, and the value assumed
+    // for that attribute when absent. Defaults preserve the original
+    // Literature-RPG semantics ("death" / "health" / 100).
+    let death_node = option_text(options, "deathNodeId", "death")?;
+    let resource_key = option_text(options, "resourceKey", "health")?;
+    let resource_default = get(options, "defaultResourceValue")?
+        .as_f64()
+        .unwrap_or(100.0);
     let start = get(runtime, "startNodeId")?;
     let state = create_initial_state(
         &start,
@@ -156,7 +176,7 @@ pub fn solve(runtime: &JsValue, world: &JsValue, options: &JsValue) -> JsResult 
         iterations += 1.0;
         let current = get(&state, "currentNodeId")?;
         if method(runtime, "isEnding", std::slice::from_ref(&current))?.is_truthy() {
-            if current != "death" {
+            if text(&current)? != death_node {
                 wins += 1.0;
             }
             continue;
@@ -188,12 +208,14 @@ pub fn solve(runtime: &JsValue, world: &JsValue, options: &JsValue) -> JsResult 
             }
 
             let next = get(&next_state, "currentNodeId")?;
-            let next_health = health(&next_state)?;
+            let next_health = health(&next_state, &resource_key)?;
             let id = get(&transition, "id")?;
             let mut next_edges = edges.clone();
             next_edges.push(id.clone());
 
-            if next_health.as_f64().is_some_and(|value| value <= 0.0) || next == "death" {
+            if next_health.as_f64().is_some_and(|value| value <= 0.0)
+                || text(&next)? == death_node
+            {
                 let label = text(&next)?;
                 let id = text(&id)?;
                 errors.push(&semantic_error(
@@ -206,8 +228,10 @@ pub fn solve(runtime: &JsValue, world: &JsValue, options: &JsValue) -> JsResult 
             }
 
             if nodes.contains(&next) {
-                let before = health(&state)?.as_f64().unwrap_or(100.0);
-                let after = next_health.as_f64().unwrap_or(100.0);
+                let before = health(&state, &resource_key)?
+                    .as_f64()
+                    .unwrap_or(resource_default);
+                let after = next_health.as_f64().unwrap_or(resource_default);
                 if after < before {
                     let label = text(&next)?;
                     let before = ryu_js::Buffer::new().format(before).to_owned();
@@ -240,7 +264,7 @@ pub fn solve(runtime: &JsValue, world: &JsValue, options: &JsValue) -> JsResult 
     ])
 }
 
-fn health(state: &JsValue) -> JsResult {
+fn health(state: &JsValue, key: &str) -> JsResult {
     let entity = get(state, "entityState")?;
     if nullish(&entity) {
         return Ok(JsValue::UNDEFINED);
@@ -249,7 +273,7 @@ fn health(state: &JsValue) -> JsResult {
     if nullish(&resources) {
         return Ok(JsValue::UNDEFINED);
     }
-    get(&resources, "health")
+    get(&resources, key)
 }
 
 fn semantic_error(category: &str, node: &JsValue, message: &str, path: &[JsValue]) -> JsResult {
