@@ -4,6 +4,11 @@ use crate::wasm::{JsResult, get, record, set};
 use js_sys::{Array, Function, Object, Reflect, Set};
 use wasm_bindgen::prelude::*;
 
+// cloneState runs once per transition, per effect, per navigation, and per
+// walk snapshot. Reading and copying every container through Reflect would
+// cost dozens of boundary crossings per clone, so the whole snapshot stays on
+// the JS side in a single call. Field reads, copies, and key order mirror
+// state_snapshot with Collection::Set exactly.
 #[wasm_bindgen(inline_js = "
 export function copyIterable(value) { return [...value]; }
 export function copyOwnEntries(target, source, excluded) {
@@ -15,6 +20,35 @@ export function copyOwnEntries(target, source, excluded) {
     }
     return result;
 }
+function cloneSet(value) { return value == null ? new Set() : new Set(value); }
+function cloneMap(source, excluded) {
+    const result = Object.create(null);
+    if (source) {
+        for (const [key, val] of Object.entries(source)) {
+            if (!excluded.has(key)) result[key] = val;
+        }
+    }
+    return result;
+}
+function optionalMap(source, excluded) { return source ? cloneMap(source, excluded) : undefined; }
+export function cloneSnapshot(source, excluded) {
+    const snapshot = {};
+    snapshot.currentNodeId = source.currentNodeId;
+    snapshot.history = [...source.history];
+    snapshot.variables = cloneMap(source.variables, excluded);
+    snapshot.flags = cloneMap(source.flags, excluded);
+    snapshot.visited = cloneSet(source.visited);
+    const entities = source.entityState;
+    snapshot.entityState = entities ? {
+        owned: cloneSet(entities.owned),
+        active: cloneSet(entities.active),
+        unlocked: cloneSet(entities.unlocked),
+        resources: cloneMap(entities.resources, excluded),
+        extensions: optionalMap(entities.extensions, excluded),
+    } : undefined;
+    snapshot.extensions = optionalMap(source.extensions, excluded);
+    return snapshot;
+}
 ")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = copyOwnEntries)]
@@ -25,6 +59,8 @@ extern "C" {
     ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(catch, js_name = copyIterable)]
     fn copy_iterable(value: &JsValue) -> Result<Array, JsValue>;
+    #[wasm_bindgen(catch, js_name = cloneSnapshot)]
+    fn clone_snapshot(source: &JsValue, excluded: &JsValue) -> Result<JsValue, JsValue>;
 }
 
 // The native and live hosts exclude the same state keys. This immutable
@@ -176,7 +212,7 @@ pub fn create_initial_state(
 
 #[wasm_bindgen(js_name = cloneState)]
 pub fn clone_state(state: &JsValue) -> JsResult {
-    state_snapshot(state, Collection::Set, None)
+    EXCLUDED_KEYS.with(|excluded| clone_snapshot(state, excluded))
 }
 
 fn update_field(

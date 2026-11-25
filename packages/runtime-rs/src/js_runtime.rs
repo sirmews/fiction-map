@@ -14,6 +14,14 @@ use crate::wasm::transition::{
 };
 use crate::wasm::{JsResult, get, record, set, spread};
 
+// One boundary crossing replaces spread + derivedState read + write. Each
+// call still returns a fresh object, preserving per-iteration identity.
+#[wasm_bindgen(inline_js = "export function traceContext(context) { const c = {...context}; c.derivedState = context.derivedState; return c; }")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = traceContext)]
+    fn trace_context(context: &JsValue) -> Result<JsValue, JsValue>;
+}
+
 #[wasm_bindgen(js_name = runtimeStep)]
 pub fn step(
     runtime: &JsValue,
@@ -31,21 +39,21 @@ pub fn step(
     }
 
     let fired = Set::new(&JsValue::UNDEFINED);
+    // Loop-invariant host reads are taken once per step instead of once per
+    // trigger pass or automatic transition. The triggers array and nodes map
+    // keep their live JS identity, so iteration and Map.get still observe
+    // mutations to their contents.
+    let triggers = get(runtime, "triggers")?;
+    let mut nodes = None;
     let state = finish_transition(
         state,
         |state| {
             let trace_context = if context.is_truthy() {
-                let spread_context = spread(context)?;
-                set(
-                    &spread_context,
-                    "derivedState",
-                    &get(context, "derivedState")?,
-                )?;
-                spread_context
+                trace_context(context)?
             } else {
                 JsValue::UNDEFINED
             };
-            for trigger in items(&get(runtime, "triggers")?)? {
+            for trigger in items(&triggers)? {
                 let trigger = trigger?;
                 let id = get(&trigger, "id")?;
                 if fired.has(&id) {
@@ -74,8 +82,11 @@ pub fn step(
         },
         |state, at_limit| {
             let node_id = get(state, "currentNodeId")?;
+            if nodes.is_none() {
+                nodes = Some(get(runtime, "nodes")?);
+            }
             let node = method(
-                &get(runtime, "nodes")?,
+                nodes.as_ref().unwrap(),
                 "get",
                 std::slice::from_ref(&node_id),
             )?;
