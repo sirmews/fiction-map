@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fiction Map session journal wire contract",
+  "description": "JSON document format for JournalDocument, SessionSave, and recorded-session fixtures. Mirrors packages/runtime/src/journal/types.ts and save.ts field-for-field; generated bindings live in conformance/generated/journal.ts and runtime-rs/src/generated/journal.rs.",
+  "$ref": "#/$defs/JournalDocument",
+  "$defs": {
+    "SerializableEntityState": {
+      "type": "object",
+      "required": ["owned", "active", "unlocked", "resources"],
+      "properties": {
+        "owned": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "active": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "unlocked": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "SerializableState": {
+      "type": "object",
+      "required": ["schemaVersion", "currentNodeId", "history", "variables", "flags", "visited"],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "enum": [1]
+        },
+        "currentNodeId": {
+          "type": "string"
+        },
+        "history": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "flags": {
+          "type": "object",
+          "additionalProperties": { "type": ["boolean", "string", "number"] }
+        },
+        "visited": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "entityState": {
+          "$ref": "#/$defs/SerializableEntityState"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalSessionInfo": {
+      "type": "object",
+      "required": ["createdAt", "initialState"],
+      "properties": {
+        "graphId": {
+          "type": "string"
+        },
+        "graphVersion": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "initialState": {
+          "$ref": "#/$defs/SerializableState"
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalRequest": {
+      "type": "object",
+      "required": ["pluginType", "kind", "args"],
+      "properties": {
+        "pluginType": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["condition", "effect"]
+        },
+        "args": {}
+      },
+      "additionalProperties": false
+    },
+    "CapabilityDeclaration": {
+      "type": "object",
+      "required": ["pluginTypes", "version", "reexecutable", "sideEffectFree"],
+      "properties": {
+        "pluginTypes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "version": {
+          "type": "string"
+        },
+        "reexecutable": {
+          "type": "boolean"
+        },
+        "sideEffectFree": {
+          "type": "boolean"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalEntry": {
+      "type": "object",
+      "required": [
+        "seq",
+        "stepIndex",
+        "stateFingerprint",
+        "capability",
+        "requestHash",
+        "request",
+        "response",
+        "durationMs"
+      ],
+      "properties": {
+        "seq": {
+          "type": "integer"
+        },
+        "stepIndex": {
+          "type": "integer"
+        },
+        "stateFingerprint": {
+          "type": "string"
+        },
+        "capability": {
+          "type": "string"
+        },
+        "requestHash": {
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/JournalRequest"
+        },
+        "response": {},
+        "durationMs": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalChoice": {
+      "type": "object",
+      "required": ["seq", "stepIndex", "transitionId", "stateFingerprint"],
+      "properties": {
+        "seq": {
+          "type": "integer"
+        },
+        "stepIndex": {
+          "type": "integer"
+        },
+        "transitionId": {
+          "type": "string"
+        },
+        "stateFingerprint": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalCheckpoint": {
+      "type": "object",
+      "required": ["stepIndex", "state", "entrySeq"],
+      "properties": {
+        "stepIndex": {
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/SerializableState"
+        },
+        "entrySeq": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalForkPoint": {
+      "type": "object",
+      "required": ["parentHash", "atSeq"],
+      "properties": {
+        "parentHash": {
+          "type": "string"
+        },
+        "atSeq": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalDocument": {
+      "type": "object",
+      "required": ["format", "formatVersion", "session", "capabilities", "entries", "choices"],
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["fiction-map/journal"]
+        },
+        "formatVersion": {
+          "type": "integer",
+          "enum": [1]
+        },
+        "session": {
+          "$ref": "#/$defs/JournalSessionInfo"
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/CapabilityDeclaration" }
+        },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JournalEntry" }
+        },
+        "choices": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JournalChoice" }
+        },
+        "checkpoints": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JournalCheckpoint" }
+        },
+        "forkPoint": {
+          "$ref": "#/$defs/JournalForkPoint"
+        },
+        "blobs": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "SessionSave": {
+      "type": "object",
+      "required": ["schemaVersion", "state", "journal", "capabilities"],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "enum": [1]
+        },
+        "state": {
+          "$ref": "#/$defs/SerializableState"
+        },
+        "journal": {
+          "$ref": "#/$defs/JournalDocument"
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/CapabilityDeclaration" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "JournalFixture": {
+      "type": "object",
+      "required": ["name", "blueprint", "replayPath", "save", "expectedState"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "blueprint": {},
+        "replayPath": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "save": {
+          "$ref": "#/$defs/SessionSave"
+        },
+        "expectedState": {
+          "$ref": "#/$defs/SerializableState"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

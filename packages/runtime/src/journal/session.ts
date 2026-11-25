@@ -182,6 +182,7 @@ export class JournalSession {
   private readonly choices: JournalChoice[] = []
   private readonly sessionMeta: JournalDocument["session"]
   private readonly forkPoint?: JournalDocument["forkPoint"]
+  private readonly blobs?: JournalDocument["blobs"]
   private opIndex = 0
   private activeStepIndex: number | null = null
   private entryCursor = 0
@@ -206,6 +207,7 @@ export class JournalSession {
         initialState: journal.session.initialState,
       }
       this.forkPoint = journal.forkPoint
+      this.blobs = journal.blobs ? { ...journal.blobs } : undefined
       // Replay must verify the caller's declarations against the recorded
       // manifest; record continuation may adopt the journal's own manifest.
       if (this.mode === "replay") this.validateManifest(journal, provided)
@@ -649,6 +651,7 @@ export class JournalSession {
       })),
       choices: this.choices.map((choice) => ({ ...choice })),
       ...(this.forkPoint ? { forkPoint: { ...this.forkPoint } } : {}),
+      ...(this.blobs ? { blobs: { ...this.blobs } } : {}),
     }
   }
 
@@ -688,6 +691,7 @@ export class JournalSession {
       capabilities: this.serialize().capabilities,
       entries: prefixEntries.map((entry) => ({ ...entry, request: { ...entry.request } })),
       choices: prefixChoices.map((choice) => ({ ...choice })),
+      ...(this.blobs ? { blobs: { ...this.blobs } } : {}),
       forkPoint: { parentHash, atSeq },
     }
     return JournalSession.create({

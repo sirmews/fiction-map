@@ -172,11 +172,32 @@ export {
   createRuntimeFromGraph,
   graphDefinitionToBlueprint,
 } from "./graph-definition"
+// Content-addressed blob convention for large journal payloads
+export {
+  ERR_JOURNAL_BLOB_MISMATCH,
+  ERR_JOURNAL_BLOB_MISSING,
+  type ExtractBlobsOptions,
+  type ExtractBlobsResult,
+  extractBlobs,
+  inlineBlobs,
+  isJournalBlobRef,
+  type JournalBlobRef,
+  journalBlobKey,
+} from "./journal/blobs"
 export {
   canonicalStringify,
   sha256Hex,
   sha256Prefixed,
 } from "./journal/hash"
+// Session save composition (state snapshot + journal)
+export {
+  type DeserializedSession,
+  type DeserializeSessionOptions,
+  deserializeSession,
+  SESSION_SAVE_SCHEMA_VERSION,
+  type SessionSave,
+  serializeSession,
+} from "./journal/save"
 // Session journal (record / replay / fork)
 export {
   createJournalSession,

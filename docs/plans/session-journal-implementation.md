@@ -1,6 +1,12 @@
 # Session Journal — Implementation Plan
 
-**Status:** Draft
+**Status:** Phase 1 merged (record/replay/fork in `packages/runtime/src/journal/`).
+Phase 2 implemented: journal JSON Schema + generated TS/Rust bindings
+(`conformance/journal.schema.json` → `conformance/generated/journal.ts` +
+`runtime-rs/src/generated/journal.rs`), `SessionSave` composition
+(`serializeSession`/`deserializeSession` in `journal/save.ts`), and the
+content-addressed blob convention (`journal/blobs.ts`, `JournalDocument.blobs`).
+Phase 3 (Rust journal cursor) remains.
 **ADR:** [2026-11-25-session-journal-replay](../decisions/2026-11-25-session-journal-replay.md)
 **Vocabulary:** [CONTEXT.md](../../CONTEXT.md) — Session, Journal, Record, Replay, Branch, Capability, Plugin
 
@@ -214,9 +220,14 @@ interface SessionSave {
   schemaVersion: 1
   state: SerializableState          // existing serializeState() output
   journal: JournalDocument          // full journal, or tail + parent ref for large sessions
-  capabilities: Map<string, CapabilityDeclaration>
+  capabilities: Record<string, CapabilityDeclaration>  // mirrors journal.capabilities
 }
 ```
+
+Implemented as `serializeSession`/`deserializeSession` in
+`packages/runtime/src/journal/save.ts`. `capabilities` is a JSON `Record`
+(the plan's `Map` sketch is not wire-representable); it duplicates
+`journal.capabilities` so a save is self-describing.
 
 `serializeState`/`deserializeState` are unchanged — the journal is a sibling artifact,
 not embedded in state. This keeps `GraphRuntimeState` pure and the journal external,
@@ -245,12 +256,18 @@ The plan is written against the TS runtime on `main`. When #103 lands:
 
 ### 8. Storage / large payloads
 
-v1 stores request/response inline. For LLM calls (multi-KB prompts/completions):
+v1 stores request/response inline. For LLM calls (multi-KB prompts/completions),
+Phase 2 implemented the content-addressed convention:
 
-- Content-address `request`/`response` blobs: `"request": {"$blob": "sha256:…"}` with a
-  sidecar `blobs/` map in the journal document (or a directory alongside it for file
-  storage). Identical prompts dedup naturally.
-- The engine treats blobs as opaque; only the journal serializer knows the convention.
+- `"request.args"`/`"response"` values whose canonical JSON exceeds a threshold
+  (default 1024 bytes, `extractBlobs({minBytes})`) are replaced by
+  `{"$blob": "sha256:<hex>"}` placeholders; the real values live in the
+  document's `blobs` map keyed by the same hash (an external store can be
+  merged in via `inlineBlobs(doc, externalBlobs)`). Identical payloads dedup
+  naturally.
+- The engine treats blobs as opaque; `extractBlobs`/`inlineBlobs` are
+  storage-layer transforms. Always inline before `createJournalSession` —
+  `inlineBlobs` re-verifies each blobbed entry's `requestHash`.
 - Compression is a storage-layer concern (gzip the file); not in the format.
 
 ### 9. Error model

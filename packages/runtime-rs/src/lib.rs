@@ -23,7 +23,6 @@ mod js_validation;
 #[cfg(target_arch = "wasm32")]
 mod wasm;
 
-#[path = "generated/path_enumeration.rs"]
 mod generated;
 
 pub use parsed_graph::enumerate_paths;
