@@ -11,8 +11,8 @@ A named, traversable structure of nodes and transitions defined by a consumer ap
 _Avoid_: story, flowchart, diagram (those are consumer or visual concerns)
 
 **Node**:
-A position in a graph with properties and outgoing transitions. Defined by a node type.
-_Avoid_: scene, state (a node is a place; state is where a session is)
+An occurrence of a node type inside a graph: a position with properties and outgoing transitions.
+_Avoid_: scene, state (reserved for session state; a node is a place, not a state value)
 
 **Node type**:
 The schema-side definition of a kind of node: its properties and allowed outgoing transitions.
@@ -40,6 +40,12 @@ _Avoid_: save, snapshot (those are persistence forms of state)
 **Step**:
 A single transition application: state + chosen transition → new state + trace.
 
+**Trace**:
+The ordered record of condition evaluations and effects applied during a step.
+
+**TransitionResult**:
+The output of applying a transition: the new state, its trace, and whether the step succeeded.
+
 **Walk**:
 An automatic sequence of steps taken without player input (e.g., through auto-resolving nodes).
 
@@ -58,8 +64,10 @@ A predicate evaluated against state (and optional derived context) that gates tr
 **Effect**:
 A state transformation applied during a step or by a trigger.
 
+### Context
+
 **Derived state**:
-Context computed from the world and current state at evaluation time — never stored as truth itself.
+Context computed from the world and current state at evaluation time; used by conditions and effects but never stored as authoritative state.
 
 ### World and entities
 
@@ -76,11 +84,11 @@ The schema-side definition of a kind of entity.
 
 **Plugin**:
 Consumer-registered code that extends engine behavior — a custom condition evaluator or effect handler, which may call external systems such as LLMs.
-_Avoid_: handler, callback (those are the code-level names; plugin is the domain concept)
+_Avoid_: handler, callback, evaluator (those are the code-level names; plugin is the domain concept)
 
 **Capability**:
 A plugin invocation boundary: the engine asks a named capability for a result and receives one back. Capabilities are the only sanctioned source of non-determinism.
-_Avoid_: service, tool
+_Avoid_: service, tool, plugin (a plugin is the registered code; a capability is the abstract exchange it participates in)
 
 ### Sessions and replay
 

@@ -4,7 +4,7 @@ Canonical documentation for Fiction Map. Start here to find the right layer.
 
 ## North star
 
-- [NORTH_STAR.md](NORTH_STAR.md) — what we're building and why (engine/framework, not consumer apps)
+- [NORTH_STAR.md](../NORTH_STAR.md) — what we're building and why (engine/framework, not consumer apps)
 - [CONTEXT.md](../CONTEXT.md) — the domain glossary: canonical vocabulary for graphs, runtime, plugins, sessions
 
 ## Decisions (ADRs)
@@ -38,4 +38,5 @@ Active and completed consumer-app plans in [plans/](plans/), notably
 
 - [research/](research/) — source-backed investigations
 - [tasks/](tasks/) — task briefs
+- [`2026-05-20-progress-vs-canonical-docs.md`](2026-05-20-progress-vs-canonical-docs.md) — rationale for separating stable docs from working notes
 - `architecture-review-*.md`, `public-api-audit.md` — point-in-time audits

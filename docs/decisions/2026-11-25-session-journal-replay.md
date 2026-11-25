@@ -26,12 +26,14 @@ Introduce the **session journal** as a first-class runtime concept:
 - In **record** mode the engine runs live and appends every capability exchange to the
   session's journal. In **replay** mode the engine never invokes plugins; it resolves each
   exchange from the journal.
-- Journal entries are keyed by state fingerprint (the existing `fingerprint`/symbolic-state
-  machinery) plus request hash, so divergence fails loudly rather than silently drifting.
+- Journal entries are appended sequentially. Each entry records the current state fingerprint
+  (using the existing `fingerprint`/symbolic-state machinery) and the request hash for
+  divergence detection, but replay advances a cursor through the journal rather than doing
+  hash lookups. If the same state+request occurs again, a new entry is appended.
 - Journal metadata pins non-determinism sources: plugin versions, model identifiers,
   sampling parameters, and seeds.
-- Plugins may declare purity: pure capabilities (e.g., formula effects) may be re-executed
-  during replay; impure ones must be journaled.
+- Plugins may declare whether they are re-executable and side-effect-free. Only such plugins
+  may be re-invoked during replay; all others must be journaled and replayed from the record.
 - Stochastic-but-deterministic randomness uses seeded RNG rather than journaling.
 
 Vocabulary is defined in [CONTEXT.md](../../CONTEXT.md) (Session, Journal, Record, Replay,
@@ -40,9 +42,10 @@ Branch, Capability, Plugin).
 ## Considered options
 
 - **Record full state snapshots per step.** Rejected as the *only* mechanism: snapshots make
-  replay cheap but cannot reconstruct *why* a plugin answered as it did, cannot fork cleanly
-  (the journal prefix is the fork point), and grow quadratically with session length.
-  Snapshots remain useful as journal checkpoints.
+  replay cheap but cannot reconstruct *why* a plugin answered as it did and cannot fork cleanly
+  (the journal prefix is the fork point). Full-state snapshots are `O(n)` in session length for
+  bounded state, but still much larger than a journal of capability exchanges. Snapshots remain
+  useful as journal checkpoints.
 - **Require plugins to be deterministic (seeded LLMs, temp 0).** Rejected: even "deterministic"
   LLM calls are not reproducible across provider versions and hardware; determinism must be
   a property of the *recording*, not the provider.
@@ -58,7 +61,9 @@ Branch, Capability, Plugin).
   recorded-session CI tests.
 - Journal entries for LLM calls are large (full prompts/completions); storage needs
   dedup/compression or content-addressed blobs. This is a storage concern, not a semantic one.
-- The JSON wire protocol (`path-enumeration.schema.json` and successors) is the natural
-  serialization for journals, so the Rust engine, Wasm binding, and engine-as-a-service all
-  share one replay format.
+- The JSON-first approach used by the wire protocol (`path-enumeration.schema.json` and
+  successors) is the natural foundation for a journal schema, so the Rust engine, Wasm
+  binding, and engine-as-a-service can share one serialization format.
+- Journals are versioned alongside the plugin/capability contract. A journal produced by an
+  older plugin contract may require a migration layer or be treated as read-only history.
 - Save format becomes: state snapshot + journal tail.
