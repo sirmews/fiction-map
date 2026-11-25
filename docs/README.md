@@ -26,6 +26,9 @@ Dated decision records in [decisions/](decisions/). Read newest-first when enter
 Active and completed consumer-app plans in [plans/](plans/), notably
 [plans/literature-rpg/](plans/literature-rpg/) and the
 [gap analysis](plans/2026-05-16-literature-rpg-gap-analysis.md).
+Engine plans include
+[session-journal-implementation.md](plans/session-journal-implementation.md)
+(deterministic record/replay for plugin-influenced sessions).
 
 ## Reference
 
