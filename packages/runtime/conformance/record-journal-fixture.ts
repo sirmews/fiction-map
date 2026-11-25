@@ -1,5 +1,5 @@
 /**
- * Regenerates conformance/fixtures/journal-*.json: records a session with
+ * Regenerates conformance/journal-fixtures/journal-*.json: records a session with
  * stubbed LLM plugins, serializes it as a SessionSave, and stores the wire
  * fixture that journal-check.ts validates and replays.
  *
@@ -85,7 +85,7 @@ const fixture = {
 }
 
 writeFileSync(
-  new URL("./fixtures/journal-session-save.json", import.meta.url),
+  new URL("./journal-fixtures/journal-session-save.json", import.meta.url),
   `${JSON.stringify(fixture, null, 2)}\n`,
 )
 console.log("wrote fixture")

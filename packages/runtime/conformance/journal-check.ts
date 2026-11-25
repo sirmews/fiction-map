@@ -73,7 +73,7 @@ interface JournalFixture {
   expectedState: ReturnType<typeof serializeState>
 }
 
-const fixturesDir = fileURLToPath(new URL("./fixtures", import.meta.url))
+const fixturesDir = fileURLToPath(new URL("./journal-fixtures", import.meta.url))
 const fixtureFiles = readdirSync(fixturesDir)
   .filter((file) => file.startsWith("journal-") && file.endsWith(".json"))
   .sort()
