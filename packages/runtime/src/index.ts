@@ -172,6 +172,34 @@ export {
   createRuntimeFromGraph,
   graphDefinitionToBlueprint,
 } from "./graph-definition"
+export {
+  canonicalStringify,
+  sha256Hex,
+  sha256Prefixed,
+} from "./journal/hash"
+// Session journal (record / replay / fork)
+export {
+  createJournalSession,
+  ERR_CAPABILITY_MISMATCH,
+  ERR_CAPABILITY_UNDECLARED,
+  ERR_JOURNAL_DIVERGENCE,
+  ERR_JOURNAL_EXHAUSTED,
+  ERR_JOURNAL_FORK_BOUNDARY,
+  ERR_JOURNAL_SCHEMA_MISMATCH,
+  JournalSession,
+  type JournalSessionOptions,
+} from "./journal/session"
+export {
+  type CapabilityDeclaration,
+  JOURNAL_FORMAT,
+  JOURNAL_FORMAT_VERSION,
+  type JournalCheckpoint,
+  type JournalChoice,
+  type JournalDocument,
+  type JournalEntry,
+  type JournalForkPoint,
+  type JournalMode,
+} from "./journal/types"
 // High-level runtime wrapper
 export {
   GraphRuntime,
