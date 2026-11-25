@@ -1,14 +1,9 @@
 import { RuntimeError } from "@fiction-map/core"
 import { type GraphBlueprint, type ParsedGraph, parseGraph } from "./adapter"
-import { cloneState, createInitialState } from "./core/state"
-import {
-  applyTransition,
-  getAvailableTransitions,
-  getTransitionsByAvailability,
-} from "./core/transition"
+import { createInitialState } from "./core/state"
+import { getAvailableTransitions, getTransitionsByAvailability } from "./core/transition"
 import { validateGraph } from "./core/validation"
 import { builtinEvaluators, builtinHandlers } from "./default-bindings"
-import { applyEffects } from "./effects"
 import type {
   ConditionEvaluator,
   EffectContext,
@@ -21,7 +16,7 @@ import type {
   TransitionResult,
   ValidationResult,
 } from "./types"
-import { getVisitedConditionNodeIds, SymbolicState } from "./validation/symbolicState"
+import { wasm } from "./wasm"
 
 export interface StepResult {
   state: GraphRuntimeState
@@ -107,109 +102,15 @@ export class GraphRuntime {
     transition: Transition,
     context?: EvaluationContext & EffectContext,
   ): TransitionResult {
-    const result = applyTransition(state, transition, this.evaluators, this.handlers, context)
-
-    if (!result.success || !result.state) {
-      return result
-    }
-
-    let updatedState = result.state
-    const maxIterations = 5
-    let iterations = 0
-    let triggerFired = false
-    const firedTriggerIds = new Set<string>()
-
-    do {
-      triggerFired = false
-      const currentContext = context
-        ? { ...context, derivedState: context.derivedState }
-        : undefined
-
-      for (const trigger of this.triggers) {
-        if (firedTriggerIds.has(trigger.id)) {
-          continue
-        }
-
-        let passed = true
-        for (const cond of trigger.conditions) {
-          const condEvaluator = this.evaluators.get(cond.type)
-          if (!condEvaluator?.(updatedState, cond, currentContext)) {
-            passed = false
-            break
-          }
-        }
-
-        if (passed) {
-          firedTriggerIds.add(trigger.id)
-          for (const effect of trigger.effects) {
-            const effectHandler = this.handlers.get(effect.type)
-            if (effectHandler) {
-              updatedState = effectHandler(updatedState, effect, currentContext)
-            }
-          }
-          triggerFired = true
-          break
-        }
-      }
-
-      iterations++
-    } while (triggerFired && iterations < maxIterations)
-
-    // Auto-resolve loop for Compute Nodes
-    const maxAutoSteps = 100
-    let autoSteps = 0
-
-    while (true) {
-      const currentNode = this.nodes.get(updatedState.currentNodeId)
-      if (!currentNode?.autoResolve) {
-        break
-      }
-
-      if (autoSteps >= maxAutoSteps) {
-        throw new RuntimeError(
-          `Infinite loop detected: exceeded ${maxAutoSteps} automatic transitions at node "${updatedState.currentNodeId}"`,
-          "ERR_RUNTIME_INFINITE_LOOP",
-        )
-      }
-      autoSteps++
-
-      // a) Apply any enterEffects
-      if (currentNode.enterEffects && currentNode.enterEffects.length > 0) {
-        const currentContext = context ? { ...context } : undefined
-        updatedState = applyEffects(
-          updatedState,
-          currentNode.enterEffects,
-          this.handlers,
-          currentContext,
-        )
-      }
-
-      // b) Evaluate requirements on outgoing edges & c) Automatically traverse the first valid edge
-      const available = this.getAvailable(updatedState, context)
-      if (available.length === 0) {
-        break
-      }
-
-      const autoTransition = available[0]
-      const autoResult = applyTransition(
-        updatedState,
-        autoTransition,
-        this.evaluators,
-        this.handlers,
-        context,
-      )
-      if (!autoResult.success || !autoResult.state) {
-        break
-      }
-
-      updatedState = autoResult.state
-    }
-
-    return {
-      ...result,
-      state: updatedState,
-      nextNodeId: updatedState.currentNodeId,
-    }
+    return wasm.runtimeStep(
+      this,
+      state,
+      transition,
+      this.evaluators,
+      this.handlers,
+      context,
+      runtimeError,
+    ) as TransitionResult
   }
 
   /**
@@ -226,51 +127,7 @@ export class GraphRuntime {
     makeContext: (state: GraphRuntimeState) => EvaluationContext & EffectContext,
     maxSteps: number = 100,
   ): StepResult[] {
-    const steps: StepResult[] = []
-    const visitSensitiveNodeIds = getVisitedConditionNodeIds(this.transitions, this.triggers)
-    const visitedStateFingerprints = new Set<string>([
-      new SymbolicState(state, visitSensitiveNodeIds).getFingerprint(),
-    ])
-
-    for (let i = 0; i < maxSteps; i++) {
-      const context = makeContext(state)
-      const available = this.getAvailable(state, context)
-
-      if (available.length === 0) {
-        steps.push({
-          state: cloneState(state),
-          nodeId: state.currentNodeId,
-          available: [],
-          applied: null,
-        })
-        break
-      }
-
-      const result = this.step(state, available[0], context)
-      const resultState = result.state
-      const fingerprint = new SymbolicState(resultState, visitSensitiveNodeIds).getFingerprint()
-      const isRevisited = visitedStateFingerprints.has(fingerprint)
-
-      const stepResult: StepResult = {
-        state: resultState,
-        nodeId: result.state.currentNodeId,
-        available,
-        applied: result,
-      }
-
-      steps.push(stepResult)
-
-      if (isRevisited) {
-        break
-      }
-
-      visitedStateFingerprints.add(fingerprint)
-
-      // Update state for the next iteration
-      state = resultState
-    }
-
-    return steps
+    return wasm.runtimeWalk(this, state, maxSteps, undefined, makeContext) as StepResult[]
   }
 
   /**
@@ -287,46 +144,7 @@ export class GraphRuntime {
     maxSteps: number = 100,
     context?: EvaluationContext & EffectContext,
   ): StepResult[] {
-    const steps: StepResult[] = []
-    const visitSensitiveNodeIds = getVisitedConditionNodeIds(this.transitions, this.triggers)
-    const visitedStateFingerprints = new Set<string>([
-      new SymbolicState(state, visitSensitiveNodeIds).getFingerprint(),
-    ])
-
-    for (let i = 0; i < maxSteps; i++) {
-      const available = this.getAvailable(state, context)
-
-      if (available.length === 0) {
-        steps.push({
-          state: cloneState(state),
-          nodeId: state.currentNodeId,
-          available: [],
-          applied: null,
-        })
-        break
-      }
-
-      const result = this.step(state, available[0], context)
-      const resultState = result.state
-      const fingerprint = new SymbolicState(resultState, visitSensitiveNodeIds).getFingerprint()
-      const isRevisited = visitedStateFingerprints.has(fingerprint)
-
-      steps.push({
-        state: cloneState(resultState),
-        nodeId: resultState.currentNodeId,
-        available,
-        applied: result,
-      })
-
-      if (isRevisited) {
-        break
-      }
-
-      visitedStateFingerprints.add(fingerprint)
-      state = resultState
-    }
-
-    return steps
+    return wasm.runtimeWalk(this, state, maxSteps, context, undefined) as StepResult[]
   }
 
   enumeratePaths(
@@ -334,98 +152,14 @@ export class GraphRuntime {
     maxPaths: number = 100,
     context?: EvaluationContext & EffectContext,
   ): TraversalPath[] {
-    const paths: TraversalPath[] = []
-    const visitSensitiveNodeIds = getVisitedConditionNodeIds(this.transitions, this.triggers)
-    const startState = this.createState()
-    const startFingerprint = new SymbolicState(startState, visitSensitiveNodeIds).getFingerprint()
-
-    const stack: {
-      state: GraphRuntimeState
-      steps: PathStep[]
-      depth: number
-      visitedStateFingerprints: Set<string>
-    }[] = [
-      {
-        state: startState,
-        steps: [],
-        depth: 0,
-        visitedStateFingerprints: new Set([startFingerprint]),
-      },
-    ]
-
-    while (stack.length > 0 && paths.length < maxPaths) {
-      const frame = stack.pop()!
-      const { state, steps, depth, visitedStateFingerprints } = frame
-
-      if (depth >= maxDepth) {
-        paths.push({
-          steps,
-          finalNodeId: state.currentNodeId,
-          endedAt: "max-depth",
-          state: cloneState(state),
-        })
-        continue
-      }
-
-      if (this.isEnding(state.currentNodeId)) {
-        paths.push({
-          steps,
-          finalNodeId: state.currentNodeId,
-          endedAt: "ending",
-          state: cloneState(state),
-        })
-        continue
-      }
-
-      const available = this.getAvailable(state, context)
-
-      if (available.length === 0) {
-        paths.push({
-          steps,
-          finalNodeId: state.currentNodeId,
-          endedAt: "dead-end",
-          state: cloneState(state),
-        })
-        continue
-      }
-
-      const reversed = [...available].reverse()
-      for (const transition of reversed) {
-        const result = this.step(state, transition, context)
-        if (!result.success || !result.state) {
-          continue
-        }
-
-        const nextState = result.state
-        const fingerprint = new SymbolicState(nextState, visitSensitiveNodeIds).getFingerprint()
-        if (visitedStateFingerprints.has(fingerprint)) {
-          continue
-        }
-
-        const nextVisitedStateFingerprints = new Set(visitedStateFingerprints)
-        nextVisitedStateFingerprints.add(fingerprint)
-
-        stack.push({
-          state: nextState,
-          steps: [
-            ...steps,
-            {
-              transitionId: transition.id,
-              fromNodeId: state.currentNodeId,
-              toNodeId: result.nextNodeId ?? state.currentNodeId,
-              success: result.success,
-            },
-          ],
-          depth: depth + 1,
-          visitedStateFingerprints: nextVisitedStateFingerprints,
-        })
-      }
-    }
-
-    return paths
+    return wasm.runtimeEnumeratePaths(this, maxDepth, maxPaths, context) as TraversalPath[]
   }
 
   validate(): ValidationResult {
     return validateGraph(this.parsed.nodes, this.parsed.transitions, this.parsed.startNodeId)
   }
+}
+
+function runtimeError(message: string, code: string): RuntimeError {
+  return new RuntimeError(message, code)
 }

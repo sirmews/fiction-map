@@ -6,6 +6,7 @@ dist/
 build/
 *.tsbuildinfo
 /packages/runtime-rs/target/
+/packages/runtime/src/wasm/generated/
 
 # Environment files
 .env

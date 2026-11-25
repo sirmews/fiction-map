@@ -1,10 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "..",
+    "rootDir": "../../..",
     "noEmit": true,
     "resolveJsonModule": true,
     "types": ["bun"]
   },
-  "include": ["*.ts", "generated/*.ts"]
+  "include": ["*.ts", "generated/*.ts", "cutover/*.ts"]
 }

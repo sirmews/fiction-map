@@ -7,51 +7,14 @@
  * that want a non-entity runtime can use `coreBuiltinEvaluators` alone.
  */
 
-import { entityIsActive, entityIsUnlocked, getResource, ownsEntity } from "../core/state"
-import type { Condition, ConditionEvaluator } from "../types"
+import type { ConditionEvaluator } from "../types"
+import { builtinCondition } from "../wasm/builtins"
 
-type EntityCondition = Condition & { entityId: string }
-type NumericCondition = Condition & { key: string; value: number }
-
-export const hasEntityEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
-  const { entityId } = condition as EntityCondition
-  if (typeof entityId !== "string") return false
-
-  if (context?.derivedState?.ownedEntityIds?.has(entityId)) {
-    return true
-  }
-  return ownsEntity(state, entityId)
-}
-
-export const entityActiveEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
-  const { entityId } = condition as EntityCondition
-  if (typeof entityId !== "string") return false
-
-  if (context?.derivedState?.activeEntityIds?.has(entityId)) {
-    return true
-  }
-  return entityIsActive(state, entityId)
-}
-
-export const entityUnlockedEvaluator: ConditionEvaluator = (state, condition, context): boolean => {
-  const { entityId } = condition as EntityCondition
-  if (typeof entityId !== "string") return false
-
-  if (context?.derivedState?.effectiveEntityIds?.has(entityId)) {
-    return true
-  }
-  return entityIsUnlocked(state, entityId)
-}
-
-export const resourceAtLeastEvaluator: ConditionEvaluator = (state, condition): boolean => {
-  const { key, value } = condition as NumericCondition
-  return typeof key === "string" && typeof value === "number" && getResource(state, key) >= value
-}
-
-export const resourceLessThanEvaluator: ConditionEvaluator = (state, condition): boolean => {
-  const { key, value } = condition as NumericCondition
-  return typeof key === "string" && typeof value === "number" && getResource(state, key) < value
-}
+export const hasEntityEvaluator = builtinCondition("hasEntity")
+export const entityActiveEvaluator = builtinCondition("entityActive")
+export const entityUnlockedEvaluator = builtinCondition("entityUnlocked")
+export const resourceAtLeastEvaluator = builtinCondition("resourceAtLeast")
+export const resourceLessThanEvaluator = builtinCondition("resourceLessThan")
 
 export const entityBuiltinEvaluators: Map<string, ConditionEvaluator> = new Map([
   ["hasEntity", hasEntityEvaluator],

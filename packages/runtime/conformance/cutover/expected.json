@@ -1,0 +1,512 @@
+{
+  "gameplay": {
+    "first": {
+      "consequence": {
+        "type": "multi",
+        "count": 4
+      },
+      "shouldNavigate": true,
+      "nextNodeId": "entrance",
+      "success": true,
+      "trace": {
+        "conditionsEvaluated": [],
+        "effectsApplied": [
+          {
+            "effect": {
+              "type": "addResource",
+              "key": "health",
+              "amount": 100
+            },
+            "handler": "addResource"
+          },
+          {
+            "effect": {
+              "type": "addResource",
+              "key": "mana",
+              "amount": 50
+            },
+            "handler": "addResource"
+          },
+          {
+            "effect": {
+              "type": "addResource",
+              "key": "gold",
+              "amount": 30
+            },
+            "handler": "addResource"
+          },
+          {
+            "effect": {
+              "type": "addResource",
+              "key": "turns",
+              "amount": 0
+            },
+            "handler": "addResource"
+          }
+        ]
+      },
+      "state": {
+        "schemaVersion": 1,
+        "currentNodeId": "entrance",
+        "history": ["courtyard"],
+        "variables": {},
+        "flags": {},
+        "visited": ["courtyard", "entrance"],
+        "entityState": {
+          "owned": [],
+          "active": [],
+          "unlocked": [],
+          "resources": {
+            "health": 100,
+            "mana": 50,
+            "gold": 30,
+            "turns": 1
+          }
+        }
+      }
+    },
+    "second": {
+      "consequence": {
+        "type": "grantEntity",
+        "entityId": "lantern"
+      },
+      "shouldNavigate": true,
+      "nextNodeId": "main-hall",
+      "success": true,
+      "trace": {
+        "conditionsEvaluated": [],
+        "effectsApplied": [
+          {
+            "effect": {
+              "type": "grantEntity",
+              "entityId": "lantern"
+            },
+            "handler": "grantEntity"
+          }
+        ]
+      },
+      "state": {
+        "schemaVersion": 1,
+        "currentNodeId": "main-hall",
+        "history": ["courtyard", "entrance"],
+        "variables": {},
+        "flags": {},
+        "visited": ["courtyard", "entrance", "main-hall"],
+        "entityState": {
+          "owned": ["lantern"],
+          "active": [],
+          "unlocked": [],
+          "resources": {
+            "health": 100,
+            "mana": 50,
+            "gold": 30,
+            "turns": 2
+          }
+        }
+      }
+    },
+    "available": ["explore-archives", "climb-staircase", "descend"],
+    "blocked": [],
+    "hidden": []
+  },
+  "transitionOutcomes": {
+    "hidden": {
+      "shouldNavigate": false,
+      "success": false,
+      "failureReason": "Transition is not visible",
+      "failedConditions": [
+        {
+          "scope": "visibility",
+          "group": "all",
+          "condition": {
+            "type": "hasFlag",
+            "key": "show"
+          }
+        }
+      ],
+      "trace": {
+        "conditionsEvaluated": [],
+        "effectsApplied": []
+      },
+      "state": {
+        "schemaVersion": 1,
+        "currentNodeId": "start",
+        "history": [],
+        "variables": {},
+        "flags": {},
+        "visited": ["start"]
+      }
+    },
+    "blocked": {
+      "consequence": {
+        "type": "multi",
+        "count": 2
+      },
+      "shouldNavigate": true,
+      "nextNodeId": "fallback",
+      "success": false,
+      "failureReason": "Requirements not met",
+      "failedConditions": [
+        {
+          "scope": "requirements",
+          "group": "all",
+          "condition": {
+            "type": "hasFlag",
+            "key": "key"
+          }
+        }
+      ],
+      "trace": {
+        "conditionsEvaluated": [],
+        "effectsApplied": [
+          {
+            "effect": {
+              "type": "setVariable",
+              "key": "score",
+              "value": 2
+            },
+            "handler": "setVariable"
+          },
+          {
+            "effect": {
+              "type": "increment",
+              "key": "score",
+              "delta": 3
+            },
+            "handler": "increment"
+          }
+        ]
+      },
+      "state": {
+        "schemaVersion": 1,
+        "currentNodeId": "fallback",
+        "history": ["start"],
+        "variables": {
+          "score": 5
+        },
+        "flags": {},
+        "visited": ["start", "fallback"]
+      }
+    },
+    "stay": {
+      "consequence": {
+        "type": "setFlag",
+        "key": "stayed",
+        "value": true
+      },
+      "shouldNavigate": false,
+      "nextNodeId": "start",
+      "success": true,
+      "trace": {
+        "conditionsEvaluated": [],
+        "effectsApplied": [
+          {
+            "effect": {
+              "type": "setFlag",
+              "key": "stayed",
+              "value": true
+            },
+            "handler": "setFlag"
+          }
+        ]
+      },
+      "state": {
+        "schemaVersion": 1,
+        "currentNodeId": "start",
+        "history": [],
+        "variables": {},
+        "flags": {
+          "stayed": true,
+          "trigger": true
+        },
+        "visited": ["start"]
+      }
+    },
+    "availability": {
+      "allowed": false,
+      "visible": true,
+      "reason": "Requirements not met",
+      "failedConditions": [
+        {
+          "scope": "requirements",
+          "group": "all",
+          "condition": {
+            "type": "hasFlag",
+            "key": "key"
+          }
+        }
+      ]
+    },
+    "original": {
+      "schemaVersion": 1,
+      "currentNodeId": "start",
+      "history": [],
+      "variables": {},
+      "flags": {},
+      "visited": ["start"]
+    }
+  },
+  "walking": {
+    "withContext": [
+      {
+        "nodeId": "next",
+        "available": ["go", "else"],
+        "applied": "next",
+        "sharesAppliedState": true,
+        "history": ["start"]
+      },
+      {
+        "nodeId": "end",
+        "available": ["finish"],
+        "applied": "end",
+        "sharesAppliedState": true,
+        "history": ["start", "next"]
+      },
+      {
+        "nodeId": "end",
+        "available": [],
+        "applied": null,
+        "sharesAppliedState": false,
+        "history": ["start", "next"]
+      }
+    ],
+    "contextNodes": ["start", "next", "end"],
+    "static": [
+      {
+        "nodeId": "next",
+        "available": ["go", "else"],
+        "applied": "next",
+        "sharesAppliedState": false,
+        "history": ["start"]
+      },
+      {
+        "nodeId": "next",
+        "available": [],
+        "applied": null,
+        "sharesAppliedState": false,
+        "history": ["start"]
+      }
+    ],
+    "depthLimited": [
+      {
+        "nodeId": "next",
+        "available": ["go", "else"],
+        "applied": "next",
+        "sharesAppliedState": false,
+        "history": ["start"]
+      }
+    ],
+    "emptyLimit": [],
+    "cycle": [
+      {
+        "nodeId": "start",
+        "available": ["repeat"],
+        "applied": "start",
+        "sharesAppliedState": false,
+        "history": ["start"]
+      }
+    ]
+  },
+  "validation": {
+    "static": {
+      "valid": false,
+      "errors": [
+        {
+          "type": "dangling-transition",
+          "transitionId": "broken",
+          "nodeId": "missing",
+          "message": "Transition 'broken' points to non-existent node 'missing'"
+        },
+        {
+          "type": "dangling-transition",
+          "transitionId": "broken",
+          "nodeId": "other",
+          "message": "Transition 'broken' has failure target pointing to non-existent node 'other'"
+        },
+        {
+          "type": "unreachable-node",
+          "nodeId": "orphan",
+          "message": "Node 'orphan' is not reachable from start node 'start'"
+        },
+        {
+          "type": "orphan-node",
+          "nodeId": "orphan",
+          "message": "Node 'orphan' has no incoming or outgoing transitions"
+        }
+      ],
+      "reachableNodes": ["start", "missing", "other"]
+    },
+    "semantic": {
+      "valid": false,
+      "errors": [
+        {
+          "type": "unwinnable-path",
+          "nodeId": "death",
+          "message": "Player died at node 'death' after taking transition 'die'.",
+          "path": ["die"]
+        },
+        {
+          "type": "dead-end-node",
+          "nodeId": "stuck",
+          "message": "Player is trapped at node 'stuck'. Outgoing choices exist but none are available under the current state.",
+          "path": ["trap"]
+        }
+      ],
+      "winnablePathsCount": 1
+    },
+    "limited": {
+      "valid": false,
+      "errors": [
+        {
+          "type": "unwinnable-path",
+          "nodeId": "death",
+          "message": "Player died at node 'death' after taking transition 'die'.",
+          "path": ["die"]
+        }
+      ],
+      "winnablePathsCount": 0
+    }
+  },
+  "persistence": {
+    "serialized": {
+      "schemaVersion": 1,
+      "currentNodeId": "entrance",
+      "history": ["courtyard"],
+      "variables": {
+        "note": {
+          "text": "saved"
+        }
+      },
+      "flags": {
+        "greeted": true
+      },
+      "visited": ["courtyard", "entrance"],
+      "entityState": {
+        "owned": ["rusty-key"],
+        "active": ["lantern"],
+        "unlocked": ["journal"],
+        "resources": {
+          "health": 50,
+          "mana": 35,
+          "turns": 1
+        },
+        "extensions": {
+          "journal": ["entry"]
+        }
+      },
+      "extensions": {
+        "chapter": "prologue"
+      }
+    },
+    "resumed": {
+      "consequence": {
+        "type": "grantEntity",
+        "entityId": "lantern"
+      },
+      "shouldNavigate": true,
+      "nextNodeId": "main-hall",
+      "success": true,
+      "trace": {
+        "conditionsEvaluated": [],
+        "effectsApplied": [
+          {
+            "effect": {
+              "type": "grantEntity",
+              "entityId": "lantern"
+            },
+            "handler": "grantEntity"
+          }
+        ]
+      },
+      "state": {
+        "schemaVersion": 1,
+        "currentNodeId": "main-hall",
+        "history": ["courtyard", "entrance"],
+        "variables": {
+          "note": {
+            "text": "saved"
+          }
+        },
+        "flags": {
+          "greeted": true
+        },
+        "visited": ["courtyard", "entrance", "main-hall"],
+        "entityState": {
+          "owned": ["rusty-key", "lantern"],
+          "active": ["lantern"],
+          "unlocked": ["journal"],
+          "resources": {
+            "health": 50,
+            "mana": 40,
+            "turns": 2
+          },
+          "extensions": {
+            "journal": ["entry"]
+          }
+        },
+        "extensions": {
+          "chapter": "prologue"
+        }
+      }
+    }
+  },
+  "callbacksAndMutation": {
+    "events": [
+      ["visibility", "start", 1, true, true],
+      ["requirement", "start", 1, true, true],
+      ["first", "start", 1, false, true],
+      ["second", "start", 5, false, true],
+      ["trigger", "compute", 10, false, false],
+      ["trigger", "compute", 10, false, false],
+      ["enter", "compute", 20, false, false],
+      ["auto", "compute", 40, false, true]
+    ],
+    "result": {
+      "consequence": {
+        "type": "multi",
+        "count": 3
+      },
+      "shouldNavigate": true,
+      "nextNodeId": "end",
+      "success": true,
+      "trace": {
+        "conditionsEvaluated": [],
+        "effectsApplied": [
+          {
+            "effect": {
+              "type": "log",
+              "name": "first"
+            },
+            "handler": "log"
+          },
+          {
+            "effect": {
+              "type": "increment",
+              "key": "count",
+              "delta": 3
+            },
+            "handler": "increment"
+          },
+          {
+            "effect": {
+              "type": "log",
+              "name": "second"
+            },
+            "handler": "log"
+          }
+        ]
+      },
+      "state": {
+        "schemaVersion": 1,
+        "currentNodeId": "end",
+        "history": ["start", "compute"],
+        "variables": {
+          "count": 80
+        },
+        "flags": {},
+        "visited": ["start", "compute", "end"],
+        "extensions": {}
+      }
+    }
+  }
+}

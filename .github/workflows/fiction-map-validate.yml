@@ -28,7 +28,7 @@ jobs:
           go-version: 1.22
 
       - name: Set up Rust
-        run: rustup toolchain install 1.93.0 --profile minimal
+        run: rustup toolchain install 1.93.0 --profile minimal --target wasm32-unknown-unknown
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -40,6 +40,8 @@ jobs:
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Run validation checks
+        env:
+          RUSTUP_TOOLCHAIN: 1.93.0
         run: |
           bun run build
           bun run check
@@ -50,7 +52,8 @@ jobs:
           (cd packages/protocol && bun run generate --check)
           bun run packages/runtime/conformance/generate.ts --check
           cargo +1.93.0 test --locked --manifest-path packages/runtime-rs/Cargo.toml
-          RUSTUP_TOOLCHAIN=1.93.0 bun run packages/runtime/conformance/compare.ts
+          bun run packages/runtime/conformance/compare.ts
+          bun run packages/runtime/conformance/cutover/contract.ts
 
           (cd apps/literature-rpg && (bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1)))
           (cd apps/literature-rpg && bun run validate)
@@ -58,3 +61,9 @@ jobs:
           (cd packages/protocol/go && go test -v ./...)
           (cd apps/literature-rpg-tui && golangci-lint run --timeout 5m ./...)
           (cd packages/protocol/go && golangci-lint run --timeout 5m ./...)
+
+      - name: Verify the Rust runtime in Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/fiction-map-playwright" --no-audit --no-fund playwright@1.59.1
+          "$RUNNER_TEMP/fiction-map-playwright/node_modules/.bin/playwright" install --with-deps chromium
+          PLAYWRIGHT_MODULE="$RUNNER_TEMP/fiction-map-playwright/node_modules/playwright/index.mjs" bun run packages/runtime/conformance/cutover/browser.ts

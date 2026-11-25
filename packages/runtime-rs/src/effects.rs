@@ -7,8 +7,114 @@ use crate::blueprint::{Effect, ExtensionObject};
 use crate::formula;
 use crate::state::{EntityRuntimeState, RuntimeState, RuntimeValue, is_forbidden_state_key};
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum EffectKind {
+    SetVariable,
+    DeleteVariable,
+    Increment,
+    Decrement,
+    Clamp,
+    SetFlag,
+    ClearFlag,
+    MarkVisited,
+    Navigate,
+    NoOp,
+    SetExtension,
+    MergeExtension,
+    GrantEntity,
+    RevokeEntity,
+    ActivateEntity,
+    DeactivateEntity,
+    UnlockEntity,
+    LockEntity,
+    AddResource,
+    SpendResource,
+}
+
+impl EffectKind {
+    pub(crate) fn parse(name: &str) -> Option<Self> {
+        Some(match name {
+            "setVariable" => Self::SetVariable,
+            "deleteVariable" => Self::DeleteVariable,
+            "increment" => Self::Increment,
+            "decrement" => Self::Decrement,
+            "clamp" => Self::Clamp,
+            "setFlag" => Self::SetFlag,
+            "clearFlag" => Self::ClearFlag,
+            "markVisited" => Self::MarkVisited,
+            "navigate" => Self::Navigate,
+            "noOp" => Self::NoOp,
+            "setExtension" => Self::SetExtension,
+            "mergeExtension" => Self::MergeExtension,
+            "grantEntity" => Self::GrantEntity,
+            "revokeEntity" => Self::RevokeEntity,
+            "activateEntity" => Self::ActivateEntity,
+            "deactivateEntity" => Self::DeactivateEntity,
+            "unlockEntity" => Self::UnlockEntity,
+            "lockEntity" => Self::LockEntity,
+            "addResource" => Self::AddResource,
+            "spendResource" => Self::SpendResource,
+            _ => return None,
+        })
+    }
+}
+
+pub(crate) fn variable_delta(current: f64, delta: f64, subtract: bool) -> f64 {
+    if subtract {
+        current - delta
+    } else {
+        current + delta
+    }
+}
+
+pub(crate) fn clamp_number(value: f64, min: f64, max: f64) -> f64 {
+    js_max(min, js_min(max, value))
+}
+
+pub(crate) struct ResourceAmount(f64);
+
+impl ResourceAmount {
+    pub(crate) fn credit(amount: f64) -> Option<Self> {
+        amount.is_finite().then_some(Self(amount))
+    }
+    pub(crate) fn debit(amount: f64) -> Option<Self> {
+        Self::credit(amount).filter(|v| v.0 >= 0.0)
+    }
+    pub(crate) fn add_to(self, current: f64) -> f64 {
+        current + self.0
+    }
+    pub(crate) fn spend_from(self, current: f64, options: SpendOptions) -> Option<f64> {
+        options
+            .permits(current < self.0)
+            .then(|| options.balance(current - self.0))
+    }
+}
+
+#[derive(Clone, Copy)]
+pub(crate) struct SpendOptions {
+    pub(crate) allow_negative: bool,
+    pub(crate) clamp_to_zero: bool,
+}
+
+impl SpendOptions {
+    pub(crate) fn permits(self, insufficient: bool) -> bool {
+        !insufficient || self.allow_negative || self.clamp_to_zero
+    }
+    pub(crate) fn balance(self, difference: f64) -> f64 {
+        if self.clamp_to_zero {
+            js_max(0.0, difference)
+        } else {
+            difference
+        }
+    }
+}
+
 /// Apply one supported effect in place. Unknown effects are ignored.
 pub fn apply(state: &mut RuntimeState, effect: &Effect) {
+    use EffectKind::*;
+    let Some(kind) = EffectKind::parse(&effect.r#type) else {
+        return;
+    };
     let key = || effect.params.get("key").and_then(|value| value.as_str());
     let value = || effect.params.get("value").cloned();
     let entity_id = || {
@@ -18,8 +124,8 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
             .and_then(|value| value.as_str())
     };
 
-    match effect.r#type.as_str() {
-        "setVariable" => {
+    match kind {
+        SetVariable => {
             if let Some(key) = key().filter(|key| !is_forbidden_state_key(key)) {
                 state.variables.insert(
                     key.to_string(),
@@ -27,31 +133,25 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
                 );
             }
         }
-        "deleteVariable" => {
+        DeleteVariable => {
             if let Some(key) = key() {
                 state.variables.remove(key);
             }
         }
-        "increment" | "decrement" => {
+        Increment | Decrement => {
             if let Some(key) = key().filter(|key| !is_forbidden_state_key(key)) {
                 let Some(current) = state.variables.get(key).and_then(RuntimeValue::as_number)
                 else {
                     return;
                 };
                 let delta = effect.params.get("delta").and_then(|value| value.as_f64());
-                let result = match (effect.r#type.as_str(), delta) {
-                    ("increment", Some(delta)) => current + delta,
-                    ("decrement", Some(delta)) => current - delta,
-                    ("increment", None) => f64::NAN,
-                    ("decrement", None) => f64::NAN,
-                    _ => unreachable!(),
-                };
+                let result = variable_delta(current, delta.unwrap_or(f64::NAN), kind == Decrement);
                 state
                     .variables
                     .insert(key.to_string(), RuntimeValue::Number(result));
             }
         }
-        "clamp" => {
+        Clamp => {
             if let Some(key) = key().filter(|key| !is_forbidden_state_key(key)) {
                 let Some(current) = state.variables.get(key).and_then(RuntimeValue::as_number)
                 else {
@@ -67,17 +167,13 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
                     .get("max")
                     .and_then(|value| value.as_f64())
                     .unwrap_or(f64::NAN);
-                let clamped = if current.is_nan() || minimum.is_nan() || maximum.is_nan() {
-                    f64::NAN
-                } else {
-                    js_max(minimum, js_min(maximum, current))
-                };
+                let clamped = clamp_number(current, minimum, maximum);
                 state
                     .variables
                     .insert(key.to_string(), RuntimeValue::Number(clamped));
             }
         }
-        "setFlag" => {
+        SetFlag => {
             if let Some(key) = key().filter(|key| !is_forbidden_state_key(key)) {
                 state.flags.insert(
                     key.to_string(),
@@ -85,23 +181,23 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
                 );
             }
         }
-        "clearFlag" => {
+        ClearFlag => {
             if let Some(key) = key() {
                 state.flags.remove(key);
             }
         }
-        "markVisited" => {
+        MarkVisited => {
             if let Some(node) = effect.params.get("nodeId").and_then(|value| value.as_str()) {
                 state.visited.insert(node.to_string());
             }
         }
-        "navigate" => {
+        Navigate => {
             if let Some(node) = effect.params.get("nodeId").and_then(|value| value.as_str()) {
                 navigate_to(state, node);
             }
         }
-        "noOp" | "" => {}
-        "setExtension" => {
+        NoOp => {}
+        SetExtension => {
             let Some(key) = key().filter(|key| !is_forbidden_state_key(key)) else {
                 return;
             };
@@ -112,7 +208,7 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
                 extensions.remove(key);
             }
         }
-        "mergeExtension" => {
+        MergeExtension => {
             let Some(key) = key().filter(|key| !is_forbidden_state_key(key)) else {
                 return;
             };
@@ -126,14 +222,14 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
             }
             extensions.insert(key.to_string(), to_raw_value(&merged).expect("JSON object"));
         }
-        "grantEntity" | "activateEntity" | "unlockEntity" => {
+        GrantEntity | ActivateEntity | UnlockEntity => {
             let Some(id) = entity_id() else { return };
             let entities = ensure_entity(state);
-            match effect.r#type.as_str() {
-                "grantEntity" => {
+            match kind {
+                GrantEntity => {
                     entities.owned.insert(id.to_string());
                 }
-                "activateEntity" => {
+                ActivateEntity => {
                     entities.active.insert(id.to_string());
                 }
                 _ => {
@@ -141,14 +237,14 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
                 }
             }
         }
-        "revokeEntity" | "deactivateEntity" | "lockEntity" => {
+        RevokeEntity | DeactivateEntity | LockEntity => {
             let Some(id) = entity_id() else { return };
             let entities = ensure_entity(state);
-            match effect.r#type.as_str() {
-                "revokeEntity" => {
+            match kind {
+                RevokeEntity => {
                     entities.owned.remove(&id.to_string());
                 }
-                "deactivateEntity" => {
+                DeactivateEntity => {
                     entities.active.remove(&id.to_string());
                 }
                 _ => {
@@ -156,7 +252,7 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
                 }
             }
         }
-        "addResource" | "spendResource" => {
+        AddResource | SpendResource => {
             let Some(key) = key().filter(|key| !is_forbidden_state_key(key)) else {
                 return;
             };
@@ -172,49 +268,33 @@ pub fn apply(state: &mut RuntimeState, effect: &Effect) {
                     .and_then(|value| value.as_f64())
                     .unwrap_or(f64::NAN),
             };
-            if effect.r#type == "addResource" {
-                if !amount.is_finite() {
-                    return;
-                }
-                let entities = ensure_entity(state);
-                let current = entities.resources.get(key).copied().unwrap_or(0.0);
-                entities.resources.insert(key.to_string(), current + amount);
+            let current = state
+                .entity_state
+                .as_ref()
+                .and_then(|entities| entities.resources.get(key))
+                .copied()
+                .unwrap_or(0.0);
+            let next = if kind == AddResource {
+                ResourceAmount::credit(amount).map(|amount| amount.add_to(current))
             } else {
-                if !amount.is_finite() || amount < 0.0 {
-                    return;
-                }
-                let allow_negative = effect
-                    .params
-                    .get("allowNegative")
-                    .and_then(|value| value.as_bool())
-                    .unwrap_or(false);
-                let clamp_to_zero = effect
-                    .params
-                    .get("clampToZero")
-                    .and_then(|value| value.as_bool())
-                    .unwrap_or(false);
-                let current = state
-                    .entity_state
-                    .as_ref()
-                    .and_then(|entities| entities.resources.get(key))
-                    .copied()
-                    .unwrap_or(0.0);
-                if current < amount && !allow_negative && !clamp_to_zero {
-                    return;
-                }
-                let entities = ensure_entity(state);
-                let next = current - amount;
-                entities.resources.insert(
-                    key.to_string(),
-                    if clamp_to_zero {
-                        js_max(0.0, next)
-                    } else {
-                        next
-                    },
-                );
+                let options = SpendOptions {
+                    allow_negative: effect
+                        .params
+                        .get("allowNegative")
+                        .and_then(Value::as_bool)
+                        .unwrap_or(false),
+                    clamp_to_zero: effect
+                        .params
+                        .get("clampToZero")
+                        .and_then(Value::as_bool)
+                        .unwrap_or(false),
+                };
+                ResourceAmount::debit(amount).and_then(|amount| amount.spend_from(current, options))
+            };
+            if let Some(next) = next {
+                ensure_entity(state).resources.insert(key.to_string(), next);
             }
         }
-        _ => {}
     }
 }
 

@@ -42,7 +42,7 @@ function decodeContext(state: DerivedState): DerivedEntityState {
   }
 }
 
-export function typescriptPaths(request: EnumerationRequest): EnumerationResponse {
+function wasmPaths(request: EnumerationRequest): EnumerationResponse {
   const runtime = new GraphRuntime(request.blueprint)
   for (const trigger of request.triggers ?? []) runtime.addTrigger(trigger)
   const derivedState = request.context?.derivedState
@@ -129,12 +129,12 @@ if (import.meta.main) {
   const output = results.stdout.trim().split("\n")
   equal(output.length, cases.length)
   for (const [index, { name }] of cases.entries()) {
-    // Decode independent copies so both engines see the same wire input.
-    const tsResult = assertValid(validateResponse, typescriptPaths(JSON.parse(input[index])), name)
+    // Decode independent copies so both hosts see the same wire input.
+    const wasmResult = assertValid(validateResponse, wasmPaths(JSON.parse(input[index])), name)
     const rsResult = assertValid(validateResponse, JSON.parse(output[index]), name)
-    deepStrictEqual(rsResult, tsResult, `Rust differs from TypeScript for ${name}`)
+    deepStrictEqual(rsResult, wasmResult, `Native Rust differs from Rust/Wasm for ${name}`)
     if (index < fixtures.length) {
-      deepStrictEqual(tsResult, fixtures[index].expected, `Golden result changed for ${name}`)
+      deepStrictEqual(wasmResult, fixtures[index].expected, `Golden result changed for ${name}`)
     }
   }
   console.log(

@@ -1,6 +1,6 @@
 # @fiction-map/runtime
 
-Graph execution engine for node-based systems.
+TypeScript bindings for Fiction Map's Rust graph execution engine. The package initializes synchronously in browser and Bun hosts. It accepts existing graph definitions, JavaScript callbacks, and versioned saves.
 
 ## Installation
 
