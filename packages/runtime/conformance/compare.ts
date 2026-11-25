@@ -2,12 +2,11 @@ import { deepStrictEqual, equal, ok } from "node:assert/strict"
 import { spawnSync } from "node:child_process"
 import { readdirSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
-import type { GraphDefinition } from "@fiction-map/core"
 import Ajv2020 from "ajv/dist/2020"
+import type { GraphBlueprint } from "../src/adapter"
 import { serializeState } from "../src/core/state"
 import { builtinEvaluators, builtinHandlers } from "../src/default-bindings"
 import type { DerivedEntityState } from "../src/entities/derived"
-import { graphDefinitionToBlueprint } from "../src/graph-definition"
 import { GraphRuntime } from "../src/runtime"
 import type {
   DerivedState,
@@ -99,12 +98,11 @@ if (import.meta.main) {
   )
   deepStrictEqual(testedEffects, new Set(builtinHandlers.keys()), "Built-in effect coverage")
 
-  const appGraph = new URL(
-    "../../../apps/literature-rpg/src/graphs/story.graph.ts",
-    import.meta.url,
-  )
-  const { story } = (await import(fileURLToPath(appGraph))) as { story: GraphDefinition }
-  const blueprint = graphDefinitionToBlueprint(story)
+  // Snapshot of the Literature RPG story graph's runtime blueprint, kept in
+  // fixtures/ so this suite does not depend on consumer app source.
+  const blueprint = JSON.parse(
+    readFileSync(new URL("fixtures/literature-rpg/story.blueprint.json", import.meta.url), "utf8"),
+  ) as GraphBlueprint
   const appCases = [4, 8, 12].map((maxDepth) => ({
     name: `Literature RPG at depth ${maxDepth}`,
     request: { blueprint, maxDepth, maxPaths: 30 },

@@ -4,9 +4,14 @@ const playwrightModule = process.env.PLAYWRIGHT_MODULE
 assert(playwrightModule, "Set PLAYWRIGHT_MODULE to the pinned Playwright installation's index.mjs")
 const { chromium } = await import(playwrightModule)
 const dist = new URL("../../../../apps/literature-rpg-web/dist/", import.meta.url)
+// This test intentionally exercises the real consumer build: the point is to
+// verify the production Literature RPG web app runs on the engine. It is the
+// one place the conformance suite depends on a consumer artifact, so fail
+// loudly with build instructions when dist/ is missing.
 assert(
   await Bun.file(new URL("index.html", dist)).exists(),
-  "Build the Literature RPG web app first",
+  `Literature RPG web build not found at ${dist.pathname}. ` +
+    "Run `bun run --cwd apps/literature-rpg-web build` first.",
 )
 
 const fixture = await Bun.build({

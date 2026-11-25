@@ -19,8 +19,7 @@ import {
   type TransitionResult,
   validateGraphSemantics,
 } from "@fiction-map/runtime"
-import { runtime as game } from "../../../../apps/literature-rpg/src/main"
-import { world } from "../../../../apps/literature-rpg/src/world"
+import { runtime as game, world } from "../fixtures/literature-rpg/runtime"
 import { checkEntitiesContract } from "./entities-contract"
 import { checkStateContract } from "./state-contract"
 

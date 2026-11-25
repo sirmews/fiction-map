@@ -1,0 +1,1428 @@
+{
+  "nodes": [
+    {
+      "id": "courtyard",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "courtyard-desc",
+          "type": "paragraph",
+          "text": "A ruined stone courtyard overgrown with ivy. Rain drizzles down from the dark sky, splashing against the ancient cobblestones."
+        }
+      ]
+    },
+    {
+      "id": "entrance",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "entrance-desc",
+          "type": "paragraph",
+          "text": "The grand obsidian doors of the Whispering Library loom before you, covered in glowing green moss."
+        }
+      ]
+    },
+    {
+      "id": "main-hall",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "hall-desc",
+          "type": "paragraph",
+          "text": "Dust motes float in shafts of grey light. A brass lantern sits on a central table."
+        },
+        {
+          "id": "hall-passage",
+          "type": "paragraph",
+          "text": "In the center of the hall, a yawning dark chasm drops into the earth."
+        },
+        {
+          "id": "hall-archives",
+          "type": "paragraph",
+          "text": "To your left, the heavy iron-reinforced doors of the archives loom."
+        },
+        {
+          "id": "hall-stairs",
+          "type": "paragraph",
+          "text": "To your right, a sweeping marble staircase leads up to the higher wings."
+        }
+      ]
+    },
+    {
+      "id": "grand-staircase",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "stairs-desc",
+          "type": "paragraph",
+          "text": "The grand staircase splits into two directions. The West Wing leads toward the Observatory, while the East Wing leads toward the Gallery of Kings."
+        }
+      ]
+    },
+    {
+      "id": "observatory",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "observatory-desc",
+          "type": "paragraph",
+          "text": "A high tower dome open to the night sky. A massive brass telescope points at a glowing constellation."
+        },
+        {
+          "id": "observatory-switch-desc",
+          "type": "paragraph",
+          "text": "Aligning the telescope reveals a hidden constellation, and you hear a heavy stone click echoing from the Alchemist's Lab below."
+        }
+      ]
+    },
+    {
+      "id": "gallery-of-kings",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "gallery-desc",
+          "type": "paragraph",
+          "text": "A long, silent hall lined with towering stone statues of ancient kings. Their hollow eyes seem to watch your every move."
+        },
+        {
+          "id": "gallery-statues-active",
+          "type": "paragraph",
+          "text": "The statues hold heavy stone swords, ready to strike down any unauthorized intruders."
+        },
+        {
+          "id": "gallery-statues-deactivated",
+          "type": "paragraph",
+          "text": "With the Silver Shield placed on the pedestal, the statues lower their weapons, granting safe passage."
+        }
+      ]
+    },
+    {
+      "id": "armory",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "armory-desc",
+          "type": "paragraph",
+          "text": "A dusty, long-abandoned armory. Racks of rusted weapons line the walls, but a pristine Silver Shield hangs on a central plaque."
+        }
+      ]
+    },
+    {
+      "id": "search-armory",
+      "type": "compute",
+      "autoResolve": true,
+      "enterEffects": [
+        {
+          "type": "setVariable",
+          "key": "searchRoll",
+          "value": 20
+        },
+        {
+          "type": "setFlag",
+          "key": "searchRoll",
+          "value": 20
+        }
+      ]
+    },
+    {
+      "id": "secret-alcove",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "alcove-desc",
+          "type": "paragraph",
+          "text": "You find a hidden stone alcove behind a loose weapon rack!"
+        }
+      ]
+    },
+    {
+      "id": "secret-chest",
+      "type": "chest",
+      "blocks": [
+        {
+          "id": "chest-desc",
+          "type": "paragraph",
+          "text": "A small wooden chest sits in the alcove, covered in cobwebs."
+        }
+      ],
+      "possibleLoot": [
+        {
+          "itemId": "spirit-elixir",
+          "dropChance": 1
+        }
+      ]
+    },
+    {
+      "id": "riddle-chamber",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "riddle-desc",
+          "type": "paragraph",
+          "text": "A circular room with a giant stone face carved into the wall. As you step inside, the stone eyes open and a booming voice asks: 'I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?'"
+        }
+      ]
+    },
+    {
+      "id": "archives",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "archives-desc",
+          "type": "paragraph",
+          "text": "Towering shelves hold forgotten lore. Magical tomes rest on reading pedestals, and a spectral librarian floats nearby."
+        },
+        {
+          "id": "archives-heal-tome",
+          "type": "paragraph",
+          "text": "On a brass stand rests the glowing 'Tome of Heal Spell'."
+        },
+        {
+          "id": "archives-light-tome",
+          "type": "paragraph",
+          "text": "On a nearby desk rests the 'Tome of Mage Light Spell'."
+        },
+        {
+          "id": "archives-librarian",
+          "type": "paragraph",
+          "text": "The spectral librarian gazes at you, offering lockpicks for trade."
+        }
+      ]
+    },
+    {
+      "id": "alchemists-lab",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "lab-desc",
+          "type": "paragraph",
+          "text": "A cluttered laboratory smelling of sulfur and ozone. Beakers bubble with colorful liquids, and a heavy stone mortar sits on the table."
+        },
+        {
+          "id": "lab-brewing",
+          "type": "paragraph",
+          "text": "An alchemical brewing stand is active, containing ingredients for a powerful Elixir of Healing."
+        },
+        {
+          "id": "lab-hidden-passage",
+          "type": "paragraph",
+          "text": "A dusty trapdoor in the corner leads down into a damp, flooded tunnel."
+        }
+      ]
+    },
+    {
+      "id": "secret-study",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "study-desc",
+          "type": "paragraph",
+          "text": "The private study of the head alchemist. A massive desk is covered in scrolls, and a glowing chest sits in the corner."
+        }
+      ]
+    },
+    {
+      "id": "sunken-passage",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "sunken-desc",
+          "type": "paragraph",
+          "text": "A flooded stone tunnel. The water is freezing cold, and you can see glowing moss growing on the submerged walls."
+        }
+      ]
+    },
+    {
+      "id": "submerged-shrine",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "shrine-desc",
+          "type": "paragraph",
+          "text": "A beautiful, air-filled dome hidden beneath the flooded passage. Glowing blue crystals illuminate an altar holding a water-infused rune."
+        }
+      ]
+    },
+    {
+      "id": "dark-chapter",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "chapter-desc",
+          "type": "paragraph",
+          "text": "A narrow passage drops into darkness. You hear the crackle of ancient magic."
+        }
+      ]
+    },
+    {
+      "id": "chamber-of-runes",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "runes-desc",
+          "type": "paragraph",
+          "text": "Glowing glyphs pulsate on the walls. A central stone pedestal holds a shining key."
+        }
+      ]
+    },
+    {
+      "id": "collapsed-bridge",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "bridge-desc",
+          "type": "paragraph",
+          "text": "A stone bridge has collapsed over a bottomless chasm. Dust and rubble are everywhere."
+        }
+      ]
+    },
+    {
+      "id": "forgotten-crypt",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "crypt-desc",
+          "type": "paragraph",
+          "text": "An ancient crypt, smelling of age. A massive iron casket lies in the center."
+        }
+      ]
+    },
+    {
+      "id": "treasury-vault",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "vault-desc",
+          "type": "paragraph",
+          "text": "The legendary treasury vault of Alexandria. Piles of gold coins, glowing chalices, and ancient relics fill the room."
+        }
+      ]
+    },
+    {
+      "id": "victory",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "victory-desc",
+          "type": "paragraph",
+          "text": "You successfully unlocked the iron casket, revealing the legendary treasure of the Library!"
+        }
+      ]
+    },
+    {
+      "id": "death",
+      "type": "scene",
+      "blocks": [
+        {
+          "id": "death-desc",
+          "type": "paragraph",
+          "text": "The dark forces of the passage overwhelm you. Your journey ends here."
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "enter-entrance",
+      "source": "courtyard",
+      "target": "entrance",
+      "anchorBlockId": "courtyard-desc",
+      "effects": [
+        {
+          "type": "addResource",
+          "key": "health",
+          "amount": 100
+        },
+        {
+          "type": "addResource",
+          "key": "mana",
+          "amount": 50
+        },
+        {
+          "type": "addResource",
+          "key": "gold",
+          "amount": 30
+        },
+        {
+          "type": "addResource",
+          "key": "turns",
+          "amount": 0
+        }
+      ],
+      "label": "Approach the grand obsidian doors",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "enter-hall",
+      "source": "entrance",
+      "target": "main-hall",
+      "anchorBlockId": "entrance-desc",
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "lantern"
+        }
+      ],
+      "label": "Step inside",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "explore-archives",
+      "source": "main-hall",
+      "target": "archives",
+      "anchorBlockId": "hall-archives",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "archives"
+        }
+      ],
+      "label": "Explore the Dusty Archives",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "climb-staircase",
+      "source": "main-hall",
+      "target": "grand-staircase",
+      "anchorBlockId": "hall-stairs",
+      "label": "Climb the marble staircase",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "go-west",
+      "source": "grand-staircase",
+      "target": "observatory",
+      "anchorBlockId": "stairs-desc",
+      "label": "Head West toward the Observatory",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "go-east",
+      "source": "grand-staircase",
+      "target": "gallery-of-kings",
+      "anchorBlockId": "stairs-desc",
+      "label": "Head East toward the Gallery of Kings",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-hall-from-stairs",
+      "source": "grand-staircase",
+      "target": "main-hall",
+      "anchorBlockId": "stairs-desc",
+      "label": "Go back down to the Main Hall",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "align-telescope",
+      "source": "observatory",
+      "target": "observatory",
+      "anchorBlockId": "observatory-desc",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "align-telescope"
+        }
+      ],
+      "effects": [
+        {
+          "type": "setFlag",
+          "key": "observatory-switch",
+          "value": true
+        },
+        {
+          "type": "grantEntity",
+          "entityId": "spirit-elixir"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "align-telescope"
+        }
+      ],
+      "label": "Align the telescope to the glowing constellation",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-stairs-from-observatory",
+      "source": "observatory",
+      "target": "grand-staircase",
+      "anchorBlockId": "observatory-desc",
+      "label": "Return to the Grand Staircase",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "go-to-armory",
+      "source": "gallery-of-kings",
+      "target": "armory",
+      "anchorBlockId": "gallery-desc",
+      "label": "Enter the dusty Armory",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "search-armory-choice",
+      "source": "armory",
+      "target": "search-armory",
+      "anchorBlockId": "armory-desc",
+      "label": "Search the weapon racks",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "search-success",
+      "source": "search-armory",
+      "target": "secret-alcove",
+      "conditions": [
+        {
+          "type": "greaterThanOrEqual",
+          "key": "searchRoll",
+          "value": 15
+        }
+      ],
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "search-fail",
+      "source": "search-armory",
+      "target": "armory",
+      "conditions": [
+        {
+          "type": "lessThan",
+          "key": "searchRoll",
+          "value": 15
+        }
+      ],
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "open-chest",
+      "source": "secret-chest",
+      "target": "armory",
+      "anchorBlockId": "chest-desc",
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "spirit-elixir"
+        }
+      ],
+      "label": "Open the chest and return",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "enter-alcove",
+      "source": "secret-alcove",
+      "target": "secret-chest",
+      "anchorBlockId": "alcove-desc",
+      "label": "Examine the glowing chest",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-from-alcove",
+      "source": "secret-alcove",
+      "target": "armory",
+      "anchorBlockId": "alcove-desc",
+      "label": "Go back to the Armory",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "place-shield",
+      "source": "gallery-of-kings",
+      "target": "gallery-of-kings",
+      "anchorBlockId": "gallery-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "silver-shield"
+        },
+        {
+          "type": "notVisited",
+          "nodeId": "place-shield"
+        }
+      ],
+      "effects": [
+        {
+          "type": "setFlag",
+          "key": "statues-deactivated",
+          "value": true
+        },
+        {
+          "type": "revokeEntity",
+          "entityId": "silver-shield"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "place-shield"
+        }
+      ],
+      "label": "Place the Silver Shield on the pedestal",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "run-past-statues",
+      "source": "gallery-of-kings",
+      "target": "riddle-chamber",
+      "anchorBlockId": "gallery-desc",
+      "conditions": [
+        {
+          "type": "notFlag",
+          "key": "statues-deactivated"
+        }
+      ],
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "health",
+          "amount": 40,
+          "clampToZero": true
+        }
+      ],
+      "label": "Run past the stone statues",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "walk-past-statues-safely",
+      "source": "gallery-of-kings",
+      "target": "riddle-chamber",
+      "anchorBlockId": "gallery-desc",
+      "conditions": [
+        {
+          "type": "hasFlag",
+          "key": "statues-deactivated"
+        }
+      ],
+      "label": "Walk past the deactivated statues safely",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-stairs-from-gallery",
+      "source": "gallery-of-kings",
+      "target": "grand-staircase",
+      "anchorBlockId": "gallery-desc",
+      "label": "Return to the Grand Staircase",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "take-shield",
+      "source": "armory",
+      "target": "armory",
+      "anchorBlockId": "armory-desc",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "take-shield"
+        }
+      ],
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "silver-shield"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "take-shield"
+        }
+      ],
+      "label": "Take the Silver Shield",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "take-iron-key",
+      "source": "armory",
+      "target": "armory",
+      "anchorBlockId": "armory-desc",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "take-iron-key"
+        }
+      ],
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "key"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "take-iron-key"
+        }
+      ],
+      "label": "Take the rusty iron key",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-gallery-from-armory",
+      "source": "armory",
+      "target": "gallery-of-kings",
+      "anchorBlockId": "armory-desc",
+      "label": "Return to the Gallery of Kings",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "answer-riddle",
+      "source": "riddle-chamber",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "riddle-desc",
+      "effects": [
+        {
+          "type": "addResource",
+          "key": "gold",
+          "amount": 30
+        },
+        {
+          "type": "grantEntity",
+          "entityId": "spirit-elixir"
+        }
+      ],
+      "label": "Answer: 'An Echo'",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "drink-spirit-elixir",
+      "source": "riddle-chamber",
+      "target": "riddle-chamber",
+      "anchorBlockId": "riddle-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "spirit-elixir"
+        }
+      ],
+      "effects": [
+        {
+          "type": "addResource",
+          "key": "health",
+          "amount": 50
+        },
+        {
+          "type": "revokeEntity",
+          "entityId": "spirit-elixir"
+        }
+      ],
+      "label": "Drink the Spirit Elixir (+50 HP)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "fail-riddle",
+      "source": "riddle-chamber",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "riddle-desc",
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "health",
+          "amount": 20,
+          "clampToZero": true
+        }
+      ],
+      "label": "Answer: 'A Shadow'",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "study-heal",
+      "source": "archives",
+      "target": "archives",
+      "anchorBlockId": "archives-heal-tome",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "study-heal"
+        }
+      ],
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "heal-spell"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "study-heal"
+        }
+      ],
+      "label": "Study the Tome of Heal Spell",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "study-mage-light",
+      "source": "archives",
+      "target": "archives",
+      "anchorBlockId": "archives-light-tome",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "study-mage-light"
+        }
+      ],
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "mage-light"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "study-mage-light"
+        }
+      ],
+      "label": "Study the Tome of Mage Light Spell",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "buy-lockpick",
+      "source": "archives",
+      "target": "archives",
+      "anchorBlockId": "archives-librarian",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "buy-lockpick"
+        },
+        {
+          "type": "resourceAtLeast",
+          "key": "gold",
+          "value": 15
+        }
+      ],
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "gold",
+          "amount": 15,
+          "clampToZero": true
+        },
+        {
+          "type": "grantEntity",
+          "entityId": "lockpick"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "buy-lockpick"
+        }
+      ],
+      "label": "Buy a lockpick from the spectral librarian (-15 gold)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-from-archives",
+      "source": "archives",
+      "target": "main-hall",
+      "anchorBlockId": "archives-desc",
+      "label": "Return to the Main Hall",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "descend",
+      "source": "main-hall",
+      "target": "dark-chapter",
+      "anchorBlockId": "hall-passage",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "lantern"
+        }
+      ],
+      "label": "Descend into the passage using the lantern",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "examine-glyphs",
+      "source": "dark-chapter",
+      "target": "chamber-of-runes",
+      "anchorBlockId": "chapter-desc",
+      "label": "Examine the glowing glyphs",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "cast-mage-light",
+      "source": "dark-chapter",
+      "target": "chamber-of-runes",
+      "anchorBlockId": "chapter-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "mage-light"
+        },
+        {
+          "type": "resourceAtLeast",
+          "key": "mana",
+          "value": 15
+        }
+      ],
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "mana",
+          "amount": 15,
+          "clampToZero": true
+        }
+      ],
+      "label": "Cast Mage Light Spell and proceed safely (-15 MP)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "cross-bridge",
+      "source": "dark-chapter",
+      "target": "collapsed-bridge",
+      "anchorBlockId": "chapter-desc",
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "health",
+          "amount": 40,
+          "clampToZero": true
+        }
+      ],
+      "label": "Cross the crumbling bridge",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "translate-runes",
+      "source": "chamber-of-runes",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "runes-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "lantern"
+        }
+      ],
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "key"
+        }
+      ],
+      "label": "Translate the runes using the lantern",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "touch-pedestal",
+      "source": "chamber-of-runes",
+      "target": "chamber-of-runes",
+      "anchorBlockId": "runes-desc",
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "health",
+          "amount": 30,
+          "clampToZero": true
+        }
+      ],
+      "label": "Touch the central pedestal",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-chapter",
+      "source": "chamber-of-runes",
+      "target": "dark-chapter",
+      "anchorBlockId": "runes-desc",
+      "label": "Return to the Dark Chapter",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "heal-with-elixir",
+      "source": "collapsed-bridge",
+      "target": "collapsed-bridge",
+      "anchorBlockId": "bridge-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "elixir"
+        }
+      ],
+      "effects": [
+        {
+          "type": "addResource",
+          "key": "health",
+          "amount": 50
+        },
+        {
+          "type": "revokeEntity",
+          "entityId": "elixir"
+        }
+      ],
+      "label": "Drink the healing elixir (+50 HP)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "cast-heal",
+      "source": "collapsed-bridge",
+      "target": "collapsed-bridge",
+      "anchorBlockId": "bridge-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "heal-spell"
+        },
+        {
+          "type": "resourceAtLeast",
+          "key": "mana",
+          "value": 20
+        },
+        {
+          "type": "resourceLessThan",
+          "key": "heal_cooldown",
+          "value": 1
+        }
+      ],
+      "effects": [
+        {
+          "type": "addResource",
+          "key": "health",
+          "amount": 40
+        },
+        {
+          "type": "spendResource",
+          "key": "mana",
+          "amount": 20,
+          "clampToZero": true
+        },
+        {
+          "type": "addResource",
+          "key": "heal_cooldown",
+          "amount": 3
+        }
+      ],
+      "label": "Cast Heal Spell (+40 HP, -20 MP, 3t CD)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "climb-rubble",
+      "source": "collapsed-bridge",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "bridge-desc",
+      "conditions": [
+        {
+          "type": "resourceAtLeast",
+          "key": "health",
+          "value": 30
+        }
+      ],
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "health",
+          "amount": 20,
+          "clampToZero": true
+        }
+      ],
+      "label": "Climb through the rubble (-20 HP)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "use-water-rune",
+      "source": "collapsed-bridge",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "bridge-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "rune-of-water"
+        }
+      ],
+      "label": "Use the Rune of Water to cross safely",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "succumb-to-injuries",
+      "source": "collapsed-bridge",
+      "target": "death",
+      "anchorBlockId": "bridge-desc",
+      "label": "Succumb to your injuries",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "unlock-casket",
+      "source": "forgotten-crypt",
+      "target": "victory",
+      "anchorBlockId": "crypt-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "key"
+        }
+      ],
+      "label": "Unlock the iron casket",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "lockpick-casket",
+      "source": "forgotten-crypt",
+      "target": "victory",
+      "anchorBlockId": "crypt-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "lockpick"
+        }
+      ],
+      "label": "Lockpick the iron casket",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "enter-treasury",
+      "source": "forgotten-crypt",
+      "target": "treasury-vault",
+      "anchorBlockId": "crypt-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "obsidian-key"
+        }
+      ],
+      "label": "Enter the private Treasury Vault",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "claim-legendary-treasure",
+      "source": "treasury-vault",
+      "target": "victory",
+      "anchorBlockId": "vault-desc",
+      "label": "Claim the legendary treasure of Alexandria!",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "die-at-crypt",
+      "source": "forgotten-crypt",
+      "target": "death",
+      "anchorBlockId": "crypt-desc",
+      "label": "Succumb to your wounds in the crypt",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "drink-spirit-elixir-crypt",
+      "source": "forgotten-crypt",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "crypt-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "spirit-elixir"
+        }
+      ],
+      "effects": [
+        {
+          "type": "addResource",
+          "key": "health",
+          "amount": 50
+        },
+        {
+          "type": "revokeEntity",
+          "entityId": "spirit-elixir"
+        }
+      ],
+      "label": "Drink the Spirit Elixir (+50 HP)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "enter-lab",
+      "source": "archives",
+      "target": "alchemists-lab",
+      "anchorBlockId": "archives-desc",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "alchemists-lab"
+        }
+      ],
+      "label": "Step through the hidden door into the Alchemist's Lab",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "brew-elixir",
+      "source": "alchemists-lab",
+      "target": "alchemists-lab",
+      "anchorBlockId": "lab-brewing",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "brew-elixir"
+        },
+        {
+          "type": "resourceAtLeast",
+          "key": "gold",
+          "value": 10
+        }
+      ],
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "gold",
+          "amount": 10,
+          "clampToZero": true
+        },
+        {
+          "type": "grantEntity",
+          "entityId": "elixir"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "brew-elixir"
+        }
+      ],
+      "label": "Brew a Healing Elixir (-10 gold)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "enter-study",
+      "source": "alchemists-lab",
+      "target": "secret-study",
+      "anchorBlockId": "lab-desc",
+      "conditions": [
+        {
+          "type": "hasFlag",
+          "key": "observatory-switch"
+        }
+      ],
+      "label": "Step into the private Secret Study",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "take-obsidian-key",
+      "source": "secret-study",
+      "target": "secret-study",
+      "anchorBlockId": "study-desc",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "take-obsidian-key"
+        }
+      ],
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "obsidian-key"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "take-obsidian-key"
+        }
+      ],
+      "label": "Take the glowing Obsidian Key",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-lab-from-study",
+      "source": "secret-study",
+      "target": "alchemists-lab",
+      "anchorBlockId": "study-desc",
+      "label": "Return to the Alchemist's Lab",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "descend-trapdoor",
+      "source": "alchemists-lab",
+      "target": "sunken-passage",
+      "anchorBlockId": "lab-hidden-passage",
+      "label": "Descend through the trapdoor into the flooded tunnel",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "swim-passage",
+      "source": "sunken-passage",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "sunken-desc",
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "health",
+          "amount": 30,
+          "clampToZero": true
+        }
+      ],
+      "label": "Swim through the freezing water (-30 HP)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "cast-water-walk",
+      "source": "sunken-passage",
+      "target": "forgotten-crypt",
+      "anchorBlockId": "sunken-desc",
+      "conditions": [
+        {
+          "type": "hasEntity",
+          "entityId": "mage-light"
+        },
+        {
+          "type": "resourceAtLeast",
+          "key": "mana",
+          "value": 10
+        }
+      ],
+      "effects": [
+        {
+          "type": "spendResource",
+          "key": "mana",
+          "amount": 10,
+          "clampToZero": true
+        }
+      ],
+      "label": "Cast Mage Light to illuminate the path and wade safely (-10 MP)",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "dive-deeper",
+      "source": "sunken-passage",
+      "target": "submerged-shrine",
+      "anchorBlockId": "sunken-desc",
+      "label": "Dive deeper into the glowing blue waters",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "take-water-rune",
+      "source": "submerged-shrine",
+      "target": "submerged-shrine",
+      "anchorBlockId": "shrine-desc",
+      "conditions": [
+        {
+          "type": "notVisited",
+          "nodeId": "take-water-rune"
+        }
+      ],
+      "effects": [
+        {
+          "type": "grantEntity",
+          "entityId": "rune-of-water"
+        },
+        {
+          "type": "markVisited",
+          "nodeId": "take-water-rune"
+        }
+      ],
+      "label": "Claim the Rune of Water from the altar",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-passage",
+      "source": "submerged-shrine",
+      "target": "sunken-passage",
+      "anchorBlockId": "shrine-desc",
+      "label": "Swim back up to the Sunken Passage",
+      "metadata": {
+        "type": "choice"
+      }
+    },
+    {
+      "id": "return-to-archives",
+      "source": "alchemists-lab",
+      "target": "archives",
+      "anchorBlockId": "lab-desc",
+      "label": "Return to the Dusty Archives",
+      "metadata": {
+        "type": "choice"
+      }
+    }
+  ],
+  "endings": ["victory", "death"]
+}

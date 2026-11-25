@@ -9,8 +9,7 @@ import {
   deriveEntityState,
   validateGraphSemantics,
 } from "@fiction-map/runtime"
-import { runtime } from "../../../../apps/literature-rpg/src/main"
-import { world } from "../../../../apps/literature-rpg/src/world"
+import { runtime, world } from "../fixtures/literature-rpg/runtime"
 
 function summarize(samples: number[]) {
   const sorted = [...samples].sort((left, right) => left - right)
@@ -46,6 +45,9 @@ console.log(
 
 const output = mkdtempSync(join(tmpdir(), "fiction-map-cutover-"))
 try {
+  // The CLI half of this benchmark intentionally targets the real consumer
+  // app's source tree; only the in-process runtime/world come from the
+  // self-contained fixture in ../fixtures/literature-rpg/.
   function runCLI() {
     const before = performance.now()
     const result = Bun.spawnSync([
