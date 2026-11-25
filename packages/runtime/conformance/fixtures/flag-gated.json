@@ -1,0 +1,171 @@
+{
+  "name": "flag-gated",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start",
+          "type": "scene"
+        },
+        {
+          "id": "lever",
+          "type": "scene"
+        },
+        {
+          "id": "door",
+          "type": "scene"
+        },
+        {
+          "id": "end_win",
+          "type": "scene"
+        },
+        {
+          "id": "end_lose",
+          "type": "scene"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "source": "start",
+          "target": "lever"
+        },
+        {
+          "id": "e2",
+          "source": "start",
+          "target": "door"
+        },
+        {
+          "id": "e3",
+          "source": "lever",
+          "target": "door",
+          "effects": [
+            {
+              "type": "setFlag",
+              "key": "unlocked",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "e4",
+          "source": "door",
+          "target": "end_win",
+          "conditions": [
+            {
+              "type": "hasFlag",
+              "key": "unlocked"
+            }
+          ]
+        },
+        {
+          "id": "e5",
+          "source": "door",
+          "target": "end_lose"
+        }
+      ],
+      "endings": ["end_win", "end_lose"],
+      "startNode": "start"
+    },
+    "maxDepth": 10,
+    "maxPaths": 100
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "e1",
+            "fromNodeId": "start",
+            "toNodeId": "lever",
+            "success": true
+          },
+          {
+            "transitionId": "e3",
+            "fromNodeId": "lever",
+            "toNodeId": "door",
+            "success": true
+          },
+          {
+            "transitionId": "e4",
+            "fromNodeId": "door",
+            "toNodeId": "end_win",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end_win",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end_win",
+          "history": ["start", "lever", "door"],
+          "variables": {},
+          "flags": {
+            "unlocked": true
+          },
+          "visited": ["start", "lever", "door", "end_win"]
+        }
+      },
+      {
+        "steps": [
+          {
+            "transitionId": "e1",
+            "fromNodeId": "start",
+            "toNodeId": "lever",
+            "success": true
+          },
+          {
+            "transitionId": "e3",
+            "fromNodeId": "lever",
+            "toNodeId": "door",
+            "success": true
+          },
+          {
+            "transitionId": "e5",
+            "fromNodeId": "door",
+            "toNodeId": "end_lose",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end_lose",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end_lose",
+          "history": ["start", "lever", "door"],
+          "variables": {},
+          "flags": {
+            "unlocked": true
+          },
+          "visited": ["start", "lever", "door", "end_lose"]
+        }
+      },
+      {
+        "steps": [
+          {
+            "transitionId": "e2",
+            "fromNodeId": "start",
+            "toNodeId": "door",
+            "success": true
+          },
+          {
+            "transitionId": "e5",
+            "fromNodeId": "door",
+            "toNodeId": "end_lose",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end_lose",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end_lose",
+          "history": ["start", "door"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "door", "end_lose"]
+        }
+      }
+    ]
+  }
+}

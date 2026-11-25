@@ -1,0 +1,81 @@
+{
+  "name": "dead-end",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start",
+          "type": "scene"
+        },
+        {
+          "id": "end",
+          "type": "scene"
+        },
+        {
+          "id": "trap",
+          "type": "scene"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "source": "start",
+          "target": "end"
+        },
+        {
+          "id": "e2",
+          "source": "start",
+          "target": "trap"
+        }
+      ],
+      "endings": ["end"],
+      "startNode": "start"
+    },
+    "maxDepth": 10,
+    "maxPaths": 100
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "e1",
+            "fromNodeId": "start",
+            "toNodeId": "end",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end",
+          "history": ["start"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "end"]
+        }
+      },
+      {
+        "steps": [
+          {
+            "transitionId": "e2",
+            "fromNodeId": "start",
+            "toNodeId": "trap",
+            "success": true
+          }
+        ],
+        "finalNodeId": "trap",
+        "endedAt": "dead-end",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "trap",
+          "history": ["start"],
+          "variables": {},
+          "flags": {},
+          "visited": ["start", "trap"]
+        }
+      }
+    ]
+  }
+}

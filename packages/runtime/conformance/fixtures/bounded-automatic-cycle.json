@@ -1,0 +1,43 @@
+{
+  "name": "bounded-automatic-cycle",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start"
+        },
+        {
+          "id": "done"
+        },
+        {
+          "id": "loop",
+          "autoResolve": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "finish",
+          "source": "start",
+          "target": "done"
+        },
+        {
+          "id": "enter-loop",
+          "source": "start",
+          "target": "loop"
+        },
+        {
+          "id": "loop",
+          "source": "loop",
+          "target": "loop"
+        }
+      ]
+    },
+    "maxPaths": 1
+  },
+  "expected": {
+    "error": {
+      "code": "ERR_RUNTIME_INFINITE_LOOP",
+      "message": "Infinite loop detected: exceeded 100 automatic transitions at node \"loop\""
+    }
+  }
+}

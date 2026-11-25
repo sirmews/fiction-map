@@ -1,0 +1,714 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fiction Map path enumeration wire contract",
+  "description": "JSON requests and observable results for GraphRuntime.enumeratePaths and the Rust path engine.",
+  "$ref": "#/$defs/EnumerationRequest",
+  "$defs": {
+    "Condition": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["equals", "notEquals"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key", "value"],
+            "properties": {
+              "key": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "greaterThan",
+                  "greaterThanOrEqual",
+                  "lessThan",
+                  "lessThanOrEqual",
+                  "resourceAtLeast",
+                  "resourceLessThan"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": ["key", "value"],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["hasFlag", "notFlag", "hasVariable"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key"],
+            "properties": {
+              "key": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["flagEquals"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key", "value"],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": ["boolean", "string", "number"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["visited", "notVisited", "currentNode"]
+              }
+            }
+          },
+          "then": {
+            "required": ["nodeId"],
+            "properties": {
+              "nodeId": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["hasEntity", "entityActive", "entityUnlocked"]
+              }
+            }
+          },
+          "then": {
+            "required": ["entityId"],
+            "properties": {
+              "entityId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Effect": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["setVariable", "deleteVariable", "clearFlag", "setExtension"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key"],
+            "properties": {
+              "key": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["mergeExtension"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key"],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["increment", "decrement"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key", "delta"],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "delta": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["clamp"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key", "min", "max"],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["setFlag"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key"],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": ["boolean", "string", "number"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["markVisited", "navigate"]
+              }
+            }
+          },
+          "then": {
+            "required": ["nodeId"],
+            "properties": {
+              "nodeId": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "grantEntity",
+                  "revokeEntity",
+                  "activateEntity",
+                  "deactivateEntity",
+                  "unlockEntity",
+                  "lockEntity"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": ["entityId"],
+            "properties": {
+              "entityId": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["addResource", "spendResource"]
+              }
+            }
+          },
+          "then": {
+            "required": ["key"],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "formula": {
+                "type": "string"
+              },
+              "allowNegative": {
+                "type": "boolean"
+              },
+              "clampToZero": {
+                "type": "boolean"
+              }
+            },
+            "anyOf": [
+              {
+                "required": ["amount"]
+              },
+              {
+                "required": ["formula"]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "ContentBlock": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["paragraph", "header", "image", "video"]
+        },
+        "content": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "alt": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "NodeBlueprint": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContentBlock"
+          }
+        },
+        "autoResolve": {
+          "type": "boolean"
+        },
+        "enterEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "EdgeBlueprint": {
+      "type": "object",
+      "required": ["id", "source"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "anchorBlockId": {
+          "type": "string"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "visibility": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        },
+        "failureEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        },
+        "failureTarget": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "GraphBlueprint": {
+      "type": "object",
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeBlueprint"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EdgeBlueprint"
+          }
+        },
+        "endings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "startNode": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StateTrigger": {
+      "type": "object",
+      "required": ["id", "conditions", "effects"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "DerivedState": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "ownedEntityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "activeEntityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effectiveEntityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "EnumerationContext": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "derivedState": {
+          "$ref": "#/$defs/DerivedState"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EnumerationRequest": {
+      "type": "object",
+      "required": ["blueprint"],
+      "properties": {
+        "blueprint": {
+          "$ref": "#/$defs/GraphBlueprint"
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StateTrigger"
+          }
+        },
+        "context": {
+          "$ref": "#/$defs/EnumerationContext"
+        },
+        "maxDepth": {
+          "type": "number"
+        },
+        "maxPaths": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ExtensionObject": {
+      "type": "object",
+      "description": "Extensions preserve JSON string escapes from JavaScript object spread.",
+      "additionalProperties": true
+    },
+    "SerializedEntityState": {
+      "type": "object",
+      "required": ["owned", "active", "unlocked", "resources"],
+      "properties": {
+        "owned": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "active": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unlocked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "extensions": {
+          "$ref": "#/$defs/ExtensionObject"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SerializedState": {
+      "type": "object",
+      "required": ["schemaVersion", "history", "variables", "flags", "visited"],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer"
+        },
+        "currentNodeId": {
+          "type": "string"
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "flags": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "visited": {
+          "type": "array",
+          "items": {
+            "type": ["string", "null"]
+          }
+        },
+        "entityState": {
+          "$ref": "#/$defs/SerializedEntityState"
+        },
+        "extensions": {
+          "$ref": "#/$defs/ExtensionObject"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PathStep": {
+      "type": "object",
+      "required": ["transitionId", "fromNodeId", "toNodeId", "success"],
+      "properties": {
+        "transitionId": {
+          "type": "string"
+        },
+        "fromNodeId": {
+          "type": "string"
+        },
+        "toNodeId": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TraversalPath": {
+      "type": "object",
+      "required": ["steps", "endedAt", "state"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "finalNodeId": {
+          "type": "string"
+        },
+        "endedAt": {
+          "type": "string",
+          "enum": ["ending", "dead-end", "max-depth"]
+        },
+        "state": {
+          "$ref": "#/$defs/SerializedState"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EnumerationError": {
+      "type": "object",
+      "required": ["code", "message"],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EnumerationResponse": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TraversalPath"
+          }
+        },
+        "error": {
+          "$ref": "#/$defs/EnumerationError"
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": ["paths"]
+        },
+        {
+          "required": ["error"]
+        }
+      ]
+    },
+    "Fixture": {
+      "type": "object",
+      "required": ["name", "request", "expected"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/EnumerationRequest"
+        },
+        "expected": {
+          "$ref": "#/$defs/EnumerationResponse"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

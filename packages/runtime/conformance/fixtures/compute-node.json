@@ -1,0 +1,71 @@
+{
+  "name": "compute-node",
+  "request": {
+    "blueprint": {
+      "nodes": [
+        {
+          "id": "start",
+          "type": "scene"
+        },
+        {
+          "id": "compute",
+          "type": "compute",
+          "autoResolve": true,
+          "enterEffects": [
+            {
+              "type": "setFlag",
+              "key": "done",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "end",
+          "type": "scene"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "source": "start",
+          "target": "compute"
+        },
+        {
+          "id": "e2",
+          "source": "compute",
+          "target": "end"
+        }
+      ],
+      "endings": ["end"],
+      "startNode": "start"
+    },
+    "maxDepth": 10,
+    "maxPaths": 100
+  },
+  "expected": {
+    "paths": [
+      {
+        "steps": [
+          {
+            "transitionId": "e1",
+            "fromNodeId": "start",
+            "toNodeId": "end",
+            "success": true
+          }
+        ],
+        "finalNodeId": "end",
+        "endedAt": "ending",
+        "state": {
+          "schemaVersion": 1,
+          "currentNodeId": "end",
+          "history": ["start", "compute"],
+          "variables": {},
+          "flags": {
+            "done": true
+          },
+          "visited": ["start", "compute", "end"]
+        }
+      }
+    ]
+  }
+}
