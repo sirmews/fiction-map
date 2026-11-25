@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    # The pinned Playwright release supports Ubuntu 24.04.
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Check out repository
@@ -28,7 +29,7 @@ jobs:
           go-version: 1.22
 
       - name: Set up Rust
-        run: rustup toolchain install 1.93.0 --profile minimal
+        run: rustup toolchain install 1.93.0 --profile minimal --target wasm32-unknown-unknown
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -40,6 +41,8 @@ jobs:
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Run validation checks
+        env:
+          RUSTUP_TOOLCHAIN: 1.93.0
         run: |
           bun run build
           bun run check
@@ -50,7 +53,8 @@ jobs:
           (cd packages/protocol && bun run generate --check)
           bun run packages/runtime/conformance/generate.ts --check
           cargo +1.93.0 test --locked --manifest-path packages/runtime-rs/Cargo.toml
-          RUSTUP_TOOLCHAIN=1.93.0 bun run packages/runtime/conformance/compare.ts
+          bun run packages/runtime/conformance/compare.ts
+          bun run packages/runtime/conformance/cutover/contract.ts
 
           (cd apps/literature-rpg && (bun run generate --check || (cp .fiction-map/metadata.json /tmp/old-metadata.json && cp SEMANTICS.md /tmp/old-semantics.md && bun run generate && diff -u /tmp/old-metadata.json .fiction-map/metadata.json && diff -u /tmp/old-semantics.md SEMANTICS.md && exit 1)))
           (cd apps/literature-rpg && bun run validate)
@@ -58,3 +62,27 @@ jobs:
           (cd packages/protocol/go && go test -v ./...)
           (cd apps/literature-rpg-tui && golangci-lint run --timeout 5m ./...)
           (cd packages/protocol/go && golangci-lint run --timeout 5m ./...)
+
+      - name: Verify the Rust runtime in Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/fiction-map-playwright" --no-audit --no-fund playwright@1.59.1
+          "$RUNNER_TEMP/fiction-map-playwright/node_modules/.bin/playwright" install --with-deps chromium
+          PLAYWRIGHT_MODULE="$RUNNER_TEMP/fiction-map-playwright/node_modules/playwright/index.mjs" bun run packages/runtime/conformance/cutover/browser.ts
+
+  self-hosting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and play a turn in the self-hosted container
+        shell: bash
+        run: |
+          docker build -t fiction-map-engine .
+          docker run --detach --name fiction-map-engine --publish 127.0.0.1::8080 fiction-map-engine
+          trap 'docker logs fiction-map-engine; docker rm --force fiction-map-engine' EXIT
+          endpoint="http://$(docker port fiction-map-engine 8080/tcp)"
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --max-time 5 "$endpoint/health" \
+            | jq -e '.status == "ok"'
+          curl --fail --silent --show-error --max-time 5 \
+            --header 'Content-Type: application/json' \
+            --data '{"intent":{"type":"selectChoice","choiceId":"enter-entrance"}}' "$endpoint/intent" \
+            | jq -e '.frame.currentNode.id == "entrance"'

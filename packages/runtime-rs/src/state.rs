@@ -152,8 +152,10 @@ impl RuntimeState {
     }
 }
 
+pub(crate) const FORBIDDEN_STATE_KEYS: [&str; 3] = ["__proto__", "prototype", "constructor"];
+
 pub fn is_forbidden_state_key(key: &str) -> bool {
-    matches!(key, "__proto__" | "prototype" | "constructor")
+    FORBIDDEN_STATE_KEYS.contains(&key)
 }
 
 /// JavaScript's `String(value)` for JSON-compatible values.

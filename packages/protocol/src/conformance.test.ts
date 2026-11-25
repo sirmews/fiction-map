@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest"
 describe("Architecture Conformance", () => {
   const rootDir = path.resolve(__dirname, "../../..")
 
+  const SOURCE_EXTENSIONS = [".ts", ".tsx", ".go", ".js", ".mjs", ".cjs"]
+
   function getFiles(dir: string, fileList: string[] = []): string[] {
     const files = fs.readdirSync(dir)
     for (const file of files) {
@@ -20,7 +22,7 @@ describe("Architecture Conformance", () => {
         ) {
           getFiles(filePath, fileList)
         }
-      } else if (file.endsWith(".ts") || file.endsWith(".tsx") || file.endsWith(".go")) {
+      } else if (SOURCE_EXTENSIONS.some((ext) => file.endsWith(ext))) {
         fileList.push(filePath)
       }
     }

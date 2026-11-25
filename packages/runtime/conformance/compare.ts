@@ -2,12 +2,11 @@ import { deepStrictEqual, equal, ok } from "node:assert/strict"
 import { spawnSync } from "node:child_process"
 import { readdirSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
-import type { GraphDefinition } from "@fiction-map/core"
 import Ajv2020 from "ajv/dist/2020"
+import type { GraphBlueprint } from "../src/adapter"
 import { serializeState } from "../src/core/state"
 import { builtinEvaluators, builtinHandlers } from "../src/default-bindings"
 import type { DerivedEntityState } from "../src/entities/derived"
-import { graphDefinitionToBlueprint } from "../src/graph-definition"
 import { GraphRuntime } from "../src/runtime"
 import type {
   DerivedState,
@@ -42,7 +41,7 @@ function decodeContext(state: DerivedState): DerivedEntityState {
   }
 }
 
-export function typescriptPaths(request: EnumerationRequest): EnumerationResponse {
+function wasmPaths(request: EnumerationRequest): EnumerationResponse {
   const runtime = new GraphRuntime(request.blueprint)
   for (const trigger of request.triggers ?? []) runtime.addTrigger(trigger)
   const derivedState = request.context?.derivedState
@@ -99,12 +98,11 @@ if (import.meta.main) {
   )
   deepStrictEqual(testedEffects, new Set(builtinHandlers.keys()), "Built-in effect coverage")
 
-  const appGraph = new URL(
-    "../../../apps/literature-rpg/src/graphs/story.graph.ts",
-    import.meta.url,
-  )
-  const { story } = (await import(fileURLToPath(appGraph))) as { story: GraphDefinition }
-  const blueprint = graphDefinitionToBlueprint(story)
+  // Snapshot of the Literature RPG story graph's runtime blueprint, kept in
+  // fixtures/ so this suite does not depend on consumer app source.
+  const blueprint = JSON.parse(
+    readFileSync(new URL("fixtures/literature-rpg/story.blueprint.json", import.meta.url), "utf8"),
+  ) as GraphBlueprint
   const appCases = [4, 8, 12].map((maxDepth) => ({
     name: `Literature RPG at depth ${maxDepth}`,
     request: { blueprint, maxDepth, maxPaths: 30 },
@@ -129,12 +127,12 @@ if (import.meta.main) {
   const output = results.stdout.trim().split("\n")
   equal(output.length, cases.length)
   for (const [index, { name }] of cases.entries()) {
-    // Decode independent copies so both engines see the same wire input.
-    const tsResult = assertValid(validateResponse, typescriptPaths(JSON.parse(input[index])), name)
+    // Decode independent copies so both hosts see the same wire input.
+    const wasmResult = assertValid(validateResponse, wasmPaths(JSON.parse(input[index])), name)
     const rsResult = assertValid(validateResponse, JSON.parse(output[index]), name)
-    deepStrictEqual(rsResult, tsResult, `Rust differs from TypeScript for ${name}`)
+    deepStrictEqual(rsResult, wasmResult, `Native Rust differs from Rust/Wasm for ${name}`)
     if (index < fixtures.length) {
-      deepStrictEqual(tsResult, fixtures[index].expected, `Golden result changed for ${name}`)
+      deepStrictEqual(wasmResult, fixtures[index].expected, `Golden result changed for ${name}`)
     }
   }
   console.log(

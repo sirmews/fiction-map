@@ -9,6 +9,10 @@ use crate::conditions;
 use crate::effects;
 use crate::fingerprint::{Fingerprint, visit_checks};
 use crate::state::RuntimeState;
+use crate::traversal::{
+    AUTOMATIC_LOOP_CODE, PathEnding, PathHost, automatic_loop_message, enumerate, finish_transition,
+};
+use crate::validation::terminal_nodes;
 
 pub fn enumerate_paths(request: &EnumerationRequest) -> EnumerationResponse {
     let graph = ParsedGraph::new(&request.blueprint);
@@ -46,12 +50,13 @@ impl<'a> ParsedGraph<'a> {
         }
         let endings = match &blueprint.endings {
             Some(endings) => endings.iter().map(String::as_str).collect(),
-            None => blueprint
-                .nodes
-                .iter()
-                .map(|node| node.id.as_str())
-                .filter(|id| Some(*id) != first_node && !outgoing.contains_key(id))
-                .collect(),
+            None => terminal_nodes(
+                blueprint.nodes.iter().map(|node| node.id.as_str()),
+                outgoing.keys().copied(),
+                first_node,
+            )
+            .into_iter()
+            .collect(),
         };
         Self {
             start: blueprint.start_node.as_deref().or(first_node),
@@ -92,43 +97,40 @@ impl<'a> ParsedGraph<'a> {
         let mut state = state.clone();
         apply_edge(&mut state, edge);
         let mut fired = HashSet::new();
-        for _ in 0..5 {
-            let Some(trigger) = triggers.iter().find(|trigger| {
-                !fired.contains(&trigger.id)
-                    && conditions_match(&state, Some(&trigger.conditions), context)
-            }) else {
-                break;
-            };
-            fired.insert(&trigger.id);
-            effects::apply_all(&mut state, &trigger.effects);
-        }
-
-        for step in 0..=100 {
-            let Some(node) = self.nodes.get(state.current_node.as_str()) else {
-                break;
-            };
-            if !node.auto_resolve.unwrap_or(false) {
-                break;
-            }
-            if step == 100 {
-                return Err(EnumerationError {
-                    code: "ERR_RUNTIME_INFINITE_LOOP".into(),
-                    message: format!(
-                        "Infinite loop detected: exceeded 100 automatic transitions at node \"{}\"",
-                        state.current_node,
-                    ),
-                });
-            }
-            effects::apply_all(
-                &mut state,
-                node.enter_effects.as_deref().unwrap_or_default(),
-            );
-            let Some(next_edge) = self.available(&state, context).next() else {
-                break;
-            };
-            apply_edge(&mut state, next_edge);
-        }
-        Ok(state)
+        finish_transition(
+            state,
+            |state| {
+                let Some(trigger) = triggers.iter().find(|trigger| {
+                    !fired.contains(&trigger.id)
+                        && conditions_match(state, Some(&trigger.conditions), context)
+                }) else {
+                    return Ok(false);
+                };
+                fired.insert(&trigger.id);
+                effects::apply_all(state, &trigger.effects);
+                Ok(true)
+            },
+            |state, at_limit| {
+                let Some(node) = self.nodes.get(state.current_node.as_str()) else {
+                    return Ok(false);
+                };
+                if !node.auto_resolve.unwrap_or(false) {
+                    return Ok(false);
+                }
+                if at_limit {
+                    return Err(EnumerationError {
+                        code: AUTOMATIC_LOOP_CODE.into(),
+                        message: automatic_loop_message(&state.current_node),
+                    });
+                }
+                effects::apply_all(state, node.enter_effects.as_deref().unwrap_or_default());
+                let Some(next_edge) = self.available(state, context).next() else {
+                    return Ok(false);
+                };
+                apply_edge(state, next_edge);
+                Ok(true)
+            },
+        )
     }
 
     fn enumerate(
@@ -160,91 +162,71 @@ impl<'a> ParsedGraph<'a> {
             }]);
         };
 
-        let visit_checks = visit_checks(self.blueprint, triggers);
-        let start_state = RuntimeState::initial(start);
-        let mut pending = vec![Frame::Enter {
-            fingerprint: Fingerprint::of(&start_state, &visit_checks)?,
-            state: Box::new(start_state),
-            step: None,
-        }];
-        let mut paths = Vec::new();
-        let mut steps = Vec::new();
-        let mut ancestors = HashSet::new();
-
-        while let Some(frame) = pending.pop() {
-            let Frame::Enter {
-                fingerprint,
-                state,
-                step,
-            } = frame
-            else {
-                if let Frame::Leave(fingerprint) = frame {
-                    ancestors.remove(&fingerprint);
-                    steps.pop();
-                }
-                continue;
-            };
-
-            if let Some(step) = step {
-                steps.push(step);
-                pending.push(Frame::Leave(fingerprint.clone()));
-            }
-            ancestors.insert(fingerprint);
-
-            let ended_at = if steps.len() as f64 >= max_depth {
-                Some("max-depth")
-            } else if self.endings.contains(state.current_node.as_str()) {
-                Some("ending")
-            } else {
-                let mut available = self.available(&state, context).rev().peekable();
-                if available.peek().is_none() {
-                    Some("dead-end")
-                } else {
-                    // TypeScript evaluates every sibling in reverse declaration order
-                    // before traversing the first child, even when maxPaths is small.
-                    for edge in available {
-                        let next = self.step(&state, edge, context, triggers)?;
-                        let fingerprint = Fingerprint::of(&next, &visit_checks)?;
-                        if !ancestors.contains(&fingerprint) {
-                            pending.push(Frame::Enter {
-                                step: Some(PathStep {
-                                    transition_id: edge.id.clone(),
-                                    from_node_id: state.current_node.clone(),
-                                    to_node_id: next.current_node.clone(),
-                                    success: true,
-                                }),
-                                state: Box::new(next),
-                                fingerprint,
-                            });
-                        }
-                    }
-                    None
-                }
-            };
-
-            if let Some(ended_at) = ended_at {
-                paths.push(TraversalPath {
-                    steps: steps.clone(),
-                    final_node_id: Some(state.current_node.clone()),
-                    ended_at: ended_at.into(),
-                    state: serialize(&state),
-                });
-                if paths.len() as f64 >= max_paths {
-                    break;
-                }
-            }
-        }
-        Ok(paths)
+        let host = NativePathHost {
+            graph: self,
+            context,
+            triggers,
+            visit_checks: visit_checks(self.blueprint, triggers),
+        };
+        enumerate(&host, RuntimeState::initial(start), max_depth, max_paths)
     }
 }
 
-enum Frame {
-    Enter {
-        fingerprint: Fingerprint,
-        state: Box<RuntimeState>,
-        step: Option<PathStep>,
-    },
-    Leave(Fingerprint),
+struct NativePathHost<'a> {
+    graph: &'a ParsedGraph<'a>,
+    context: Option<&'a EnumerationContext>,
+    triggers: &'a [StateTrigger],
+    visit_checks: Vec<&'a str>,
+}
+
+impl<'a> PathHost for NativePathHost<'a> {
+    type State = RuntimeState;
+    type Transition = &'a EdgeBlueprint;
+    type PathStep = PathStep;
+    type Path = TraversalPath;
+    type Fingerprint = Fingerprint;
+    type Error = EnumerationError;
+
+    fn fingerprint(&self, state: &Self::State) -> Result<Self::Fingerprint, Self::Error> {
+        Fingerprint::of(state, &self.visit_checks)
+    }
+
+    fn ending(&self, state: &Self::State) -> Result<bool, Self::Error> {
+        Ok(self.graph.endings.contains(state.current_node.as_str()))
+    }
+
+    fn available(&self, state: &Self::State) -> Result<Vec<Self::Transition>, Self::Error> {
+        Ok(self.graph.available(state, self.context).collect())
+    }
+
+    fn take(
+        &self,
+        state: &Self::State,
+        edge: &Self::Transition,
+    ) -> Result<Option<(Self::State, Self::PathStep)>, Self::Error> {
+        let next = self.graph.step(state, edge, self.context, self.triggers)?;
+        let step = PathStep {
+            transition_id: edge.id.clone(),
+            from_node_id: state.current_node.clone(),
+            to_node_id: next.current_node.clone(),
+            success: true,
+        };
+        Ok(Some((next, step)))
+    }
+
+    fn path(
+        &self,
+        state: &Self::State,
+        steps: &[Self::PathStep],
+        ending: PathEnding,
+    ) -> Result<Self::Path, Self::Error> {
+        Ok(TraversalPath {
+            steps: steps.to_vec(),
+            final_node_id: Some(state.current_node.clone()),
+            ended_at: ending.as_str().into(),
+            state: serialize(state),
+        })
+    }
 }
 
 fn conditions_match(

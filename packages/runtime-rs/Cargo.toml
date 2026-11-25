@@ -2,14 +2,19 @@
 name = "fiction-map-runtime"
 version = "0.1.0"
 edition = "2024"
-description = "Rust port of the fiction-map runtime path enumeration engine"
+description = "Headless Fiction Map runtime"
 license = "MIT"
 
 [lib]
 name = "fiction_map_runtime"
 path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["float_roundtrip", "raw_value"] }
 ryu-js = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.130"
+js-sys = "0.3.107"

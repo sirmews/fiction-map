@@ -1,4 +1,5 @@
 import type { Condition, ContentBlock, Effect, NodeDefinition, Transition } from "./types"
+import { wasm } from "./wasm"
 
 export interface EdgeBlueprint {
   id: string
@@ -53,7 +54,12 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
   const startNodeId = blueprint.startNode ?? blueprint.nodes[0]?.id
 
   const endingNodeIds = new Set(
-    blueprint.endings ?? findTerminalNodes(blueprint.nodes, transitions),
+    blueprint.endings ??
+      (wasm.inferEndingNodes(
+        blueprint.nodes.map((node) => node.id),
+        transitions,
+        true,
+      ) as string[]),
   )
 
   const nodes = new Map<string, NodeDefinition>(
@@ -76,19 +82,11 @@ export function parseGraph(blueprint: GraphBlueprint): ParsedGraph {
   return { transitions, nodes, startNodeId, endingNodeIds }
 }
 
-function findTerminalNodes(nodes: NodeBlueprint[], transitions: Transition[]): string[] {
-  const sources = new Set(transitions.map((t) => t.sourceNodeId))
-  return nodes.map((n) => n.id).filter((id) => !sources.has(id) && id !== nodes[0]?.id)
-}
-
 export function determineEndings(
   nodes: NodeBlueprint[] | Map<string, NodeDefinition>,
   transitions: Transition[],
 ): Set<string> {
   const nodeIds = nodes instanceof Map ? new Set(nodes.keys()) : new Set(nodes.map((n) => n.id))
 
-  const sources = new Set(transitions.map((t) => t.sourceNodeId))
-  const endings = [...nodeIds].filter((id) => !sources.has(id))
-
-  return new Set(endings)
+  return new Set(wasm.inferEndingNodes(nodeIds, transitions, false) as string[])
 }

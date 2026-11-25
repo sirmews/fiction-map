@@ -85,6 +85,21 @@ fiction-map validate
 fiction-map validate --strict
 ```
 
+### Native runtime path enumeration
+
+`fiction-map enumerate-paths` runs graph traversal in the native Rust runtime
+instead of the TypeScript/Wasm runtime. It requires the `fiction-map-runtime`
+binary built from `packages/runtime-rs`:
+
+```bash
+bun run build:rust   # from the repository root
+fiction-map enumerate-paths --graph <graph-id> --json
+```
+
+The binary is located via `FICTION_MAP_RUNTIME_RS`, then
+`packages/runtime-rs/target/{release,debug}/fiction-map-runtime`. `query paths`
+remains the lightweight static-path listing and needs no native binary.
+
 ## Root Directory Discipline
 
 Many projects keep Fiction Map source under `src/`.

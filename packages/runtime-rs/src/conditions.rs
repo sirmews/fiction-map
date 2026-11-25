@@ -1,139 +1,213 @@
-use crate::blueprint::Condition;
+use crate::blueprint::{Condition, EnumerationContext};
 use crate::state::{RuntimeState, RuntimeValue, js_truthy, strict_value_equal};
+use std::convert::Infallible;
 
-/// Evaluate a built-in condition. Unknown condition names deliberately return
-/// false, matching the TS runtime's registry lookup behavior.
+#[derive(Clone, Copy)]
+pub(crate) enum NumericTest {
+    Greater,
+    AtLeast,
+    Less,
+    AtMost,
+}
+
+impl NumericTest {
+    pub(crate) fn compare(self, a: f64, b: f64) -> bool {
+        match self {
+            Self::Greater => a > b,
+            Self::AtLeast => a >= b,
+            Self::Less => a < b,
+            Self::AtMost => a <= b,
+        }
+    }
+}
+
+/// The entity collections an entity condition can consult. Both the native
+/// host and the live JavaScript host interpret these variants, so the mapping
+/// from condition kind to derived-state key and entity-state collection lives
+/// in exactly one place.
+#[derive(Clone, Copy)]
+pub(crate) enum EntitySet {
+    Owned,
+    Active,
+    Unlocked,
+}
+
+impl EntitySet {
+    /// Key of this collection in the derived-state record produced by
+    /// `deriveEntityState`. Only the JavaScript host reads it by name.
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) fn derived_key(self) -> &'static str {
+        match self {
+            Self::Owned => "ownedEntityIds",
+            Self::Active => "activeEntityIds",
+            Self::Unlocked => "effectiveEntityIds",
+        }
+    }
+}
+
+/// The native host reads JSON and the browser host reads live JavaScript values.
+/// Both evaluate the same predicates, precedence and short-circuit rules.
+pub(crate) trait ConditionHost {
+    type Error;
+    fn variable_equals(&self, flags: bool) -> Result<Option<bool>, Self::Error>;
+    fn variable_number(&self, test: NumericTest) -> Result<bool, Self::Error>;
+    fn has_key(&self, flags: bool) -> Result<bool, Self::Error>;
+    fn flag_unset(&self) -> Result<bool, Self::Error>;
+    fn visited(&self) -> Result<Option<bool>, Self::Error>;
+    fn at_current_node(&self) -> Result<bool, Self::Error>;
+    fn entity(&self, set: EntitySet) -> Result<bool, Self::Error>;
+    fn resource(&self, test: NumericTest) -> Result<bool, Self::Error>;
+}
+
+pub(crate) fn evaluate_with<H: ConditionHost>(kind: &str, host: &H) -> Result<bool, H::Error> {
+    Ok(match kind {
+        "equals" => host.variable_equals(false)? == Some(true),
+        "notEquals" => host.variable_equals(false)? == Some(false),
+        "flagEquals" => host.variable_equals(true)? == Some(true),
+        "greaterThan" => host.variable_number(NumericTest::Greater)?,
+        "greaterThanOrEqual" => host.variable_number(NumericTest::AtLeast)?,
+        "lessThan" => host.variable_number(NumericTest::Less)?,
+        "lessThanOrEqual" => host.variable_number(NumericTest::AtMost)?,
+        "hasFlag" => host.has_key(true)?,
+        "notFlag" => host.flag_unset()?,
+        "hasVariable" => host.has_key(false)?,
+        "visited" => host.visited()? == Some(true),
+        "notVisited" => host.visited()? == Some(false),
+        "currentNode" => host.at_current_node()?,
+        "hasEntity" => host.entity(EntitySet::Owned)?,
+        "entityActive" => host.entity(EntitySet::Active)?,
+        "entityUnlocked" => host.entity(EntitySet::Unlocked)?,
+        "resourceAtLeast" => host.resource(NumericTest::AtLeast)?,
+        "resourceLessThan" => host.resource(NumericTest::Less)?,
+        _ => false,
+    })
+}
+
+struct NativeCondition<'a> {
+    state: &'a RuntimeState,
+    condition: &'a Condition,
+    context: Option<&'a EnumerationContext>,
+}
+
+impl NativeCondition<'_> {
+    fn string(&self, key: &str) -> Option<&str> {
+        self.condition.params.get(key)?.as_str()
+    }
+}
+
+impl ConditionHost for NativeCondition<'_> {
+    type Error = Infallible;
+    fn variable_equals(&self, flags: bool) -> Result<Option<bool>, Infallible> {
+        let map = if flags {
+            &self.state.flags
+        } else {
+            &self.state.variables
+        };
+        Ok(self
+            .string("key")
+            .map(|key| match self.condition.params.get("value") {
+                Some(expected) => map
+                    .get(key)
+                    .is_some_and(|value| strict_value_equal(value, expected)),
+                None => map
+                    .get(key)
+                    .is_none_or(|value| matches!(value, RuntimeValue::Undefined)),
+            }))
+    }
+    fn variable_number(&self, test: NumericTest) -> Result<bool, Infallible> {
+        let actual = self
+            .string("key")
+            .and_then(|key| self.state.variables.get(key))
+            .and_then(RuntimeValue::as_number);
+        let expected = self
+            .condition
+            .params
+            .get("value")
+            .and_then(serde_json::Value::as_f64);
+        Ok(actual
+            .zip(expected)
+            .is_some_and(|(a, b)| test.compare(a, b)))
+    }
+    fn has_key(&self, flags: bool) -> Result<bool, Infallible> {
+        let map = if flags {
+            &self.state.flags
+        } else {
+            &self.state.variables
+        };
+        Ok(self.string("key").is_some_and(|key| map.contains_key(key)))
+    }
+    fn flag_unset(&self) -> Result<bool, Infallible> {
+        Ok(self.string("key").is_some_and(|key| {
+            self.state
+                .flags
+                .get(key)
+                .is_none_or(|value| !js_truthy(value))
+        }))
+    }
+    fn visited(&self) -> Result<Option<bool>, Infallible> {
+        Ok(self
+            .string("nodeId")
+            .map(|id| self.state.visited.contains(&id.to_owned())))
+    }
+    fn at_current_node(&self) -> Result<bool, Infallible> {
+        Ok(self.string("nodeId") == Some(&self.state.current_node))
+    }
+    fn entity(&self, set: EntitySet) -> Result<bool, Infallible> {
+        let Some(id) = self.string("entityId") else {
+            return Ok(false);
+        };
+        let derived_ids = self
+            .context
+            .and_then(|c| c.derived_state.as_ref())
+            .and_then(|d| match set {
+                EntitySet::Owned => d.owned_entity_ids.as_ref(),
+                EntitySet::Active => d.active_entity_ids.as_ref(),
+                EntitySet::Unlocked => d.effective_entity_ids.as_ref(),
+            });
+        Ok(derived_ids.is_some_and(|ids| ids.iter().any(|v| v == id))
+            || self.state.entity_state.as_ref().is_some_and(|entities| {
+                let ids = match set {
+                    EntitySet::Owned => &entities.owned,
+                    EntitySet::Active => &entities.active,
+                    EntitySet::Unlocked => &entities.unlocked,
+                };
+                ids.contains(&id.to_owned())
+            }))
+    }
+    fn resource(&self, test: NumericTest) -> Result<bool, Infallible> {
+        let key = self.string("key");
+        let expected = self
+            .condition
+            .params
+            .get("value")
+            .and_then(serde_json::Value::as_f64);
+        Ok(key.zip(expected).is_some_and(|(key, expected)| {
+            let actual = self
+                .state
+                .entity_state
+                .as_ref()
+                .and_then(|e| e.resources.get(key))
+                .copied()
+                .unwrap_or(0.0);
+            test.compare(actual, expected)
+        }))
+    }
+}
+
 pub fn evaluate(
     state: &RuntimeState,
-    cond: &Condition,
-    context: Option<&crate::blueprint::EnumerationContext>,
+    condition: &Condition,
+    context: Option<&EnumerationContext>,
 ) -> bool {
-    let key = || cond.params.get("key").and_then(|value| value.as_str());
-    let node_id = || cond.params.get("nodeId").and_then(|value| value.as_str());
-    let value = || cond.params.get("value");
-
-    match cond.r#type.as_str() {
-        "visited" => node_id().is_some_and(|node| state.visited.contains(&node.to_string())),
-        "notVisited" => node_id().is_some_and(|node| !state.visited.contains(&node.to_string())),
-        "currentNode" => node_id().is_some_and(|node| state.current_node == node),
-        "hasFlag" => key().is_some_and(|key| state.flags.contains_key(key)),
-        "notFlag" => {
-            key().is_some_and(|key| state.flags.get(key).is_none_or(|value| !js_truthy(value)))
-        }
-        "flagEquals" => match (key(), value()) {
-            (Some(key), Some(expected)) => state
-                .flags
-                .get(key)
-                .is_some_and(|actual| strict_value_equal(actual, expected)),
-            (Some(key), None) => state
-                .flags
-                .get(key)
-                .is_none_or(|actual| matches!(actual, RuntimeValue::Undefined)),
-            _ => false,
+    evaluate_with(
+        &condition.r#type,
+        &NativeCondition {
+            state,
+            condition,
+            context,
         },
-        "hasVariable" => key().is_some_and(|key| state.variables.contains_key(key)),
-        "equals" => match (key(), value()) {
-            (Some(key), Some(expected)) => state
-                .variables
-                .get(key)
-                .is_some_and(|actual| strict_value_equal(actual, expected)),
-            (Some(key), None) => state
-                .variables
-                .get(key)
-                .is_none_or(|actual| matches!(actual, RuntimeValue::Undefined)),
-            _ => false,
-        },
-        "notEquals" => match (key(), value()) {
-            (Some(key), Some(expected)) => state
-                .variables
-                .get(key)
-                .is_none_or(|actual| !strict_value_equal(actual, expected)),
-            (Some(key), None) => state
-                .variables
-                .get(key)
-                .is_some_and(|actual| !matches!(actual, RuntimeValue::Undefined)),
-            _ => false,
-        },
-        "greaterThan" | "greaterThanOrEqual" | "lessThan" | "lessThanOrEqual" => {
-            let actual = key()
-                .and_then(|key| state.variables.get(key))
-                .and_then(RuntimeValue::as_number);
-            let expected = value().and_then(serde_json::Value::as_f64);
-            match (actual, expected) {
-                (Some(actual), Some(expected)) => match cond.r#type.as_str() {
-                    "greaterThan" => actual > expected,
-                    "greaterThanOrEqual" => actual >= expected,
-                    "lessThan" => actual < expected,
-                    "lessThanOrEqual" => actual <= expected,
-                    _ => false,
-                },
-                _ => false,
-            }
-        }
-        "hasEntity" => cond
-            .params
-            .get("entityId")
-            .and_then(|value| value.as_str())
-            .is_some_and(|id| {
-                context
-                    .and_then(|context| context.derived_state.as_ref())
-                    .and_then(|derived| derived.owned_entity_ids.as_ref())
-                    .is_some_and(|ids| ids.iter().any(|candidate| candidate == id))
-                    || state
-                        .entity_state
-                        .as_ref()
-                        .is_some_and(|entities| entities.owned.contains(&id.to_string()))
-            }),
-        "entityActive" => cond
-            .params
-            .get("entityId")
-            .and_then(|value| value.as_str())
-            .is_some_and(|id| {
-                context
-                    .and_then(|context| context.derived_state.as_ref())
-                    .and_then(|derived| derived.active_entity_ids.as_ref())
-                    .is_some_and(|ids| ids.iter().any(|candidate| candidate == id))
-                    || state
-                        .entity_state
-                        .as_ref()
-                        .is_some_and(|entities| entities.active.contains(&id.to_string()))
-            }),
-        "entityUnlocked" => cond
-            .params
-            .get("entityId")
-            .and_then(|value| value.as_str())
-            .is_some_and(|id| {
-                context
-                    .and_then(|context| context.derived_state.as_ref())
-                    .and_then(|derived| derived.effective_entity_ids.as_ref())
-                    .is_some_and(|ids| ids.iter().any(|candidate| candidate == id))
-                    || state
-                        .entity_state
-                        .as_ref()
-                        .is_some_and(|entities| entities.unlocked.contains(&id.to_string()))
-            }),
-        "resourceAtLeast" | "resourceLessThan" => {
-            let resource_key = key();
-            let expected = value().and_then(serde_json::Value::as_f64);
-            match (resource_key, expected) {
-                (Some(resource_key), Some(expected)) => {
-                    let actual = state
-                        .entity_state
-                        .as_ref()
-                        .and_then(|entities| entities.resources.get(resource_key))
-                        .copied()
-                        .unwrap_or(0.0);
-                    if cond.r#type == "resourceAtLeast" {
-                        actual >= expected
-                    } else {
-                        actual < expected
-                    }
-                }
-                _ => false,
-            }
-        }
-        _ => false,
-    }
+    )
+    .unwrap_or_else(|never| match never {})
 }
 
 #[cfg(test)]

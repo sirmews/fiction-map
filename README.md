@@ -163,9 +163,15 @@ Fiction Map applies [Encore's](https://encore.dev) "infrastructure from code" ap
 
 ## Development
 
+Builds require Bun, Rust, and the Rust `wasm32-unknown-unknown` target. The runtime build generates its JavaScript bindings and embeds the Wasm for synchronous browser and CLI use.
+
 ```bash
 # Install dependencies
 bun install
+rustup target add wasm32-unknown-unknown
+
+# Build all packages and generate the runtime bindings
+bun run build
 
 # Run tests
 bun test
@@ -173,8 +179,6 @@ bun test
 # Type check
 bun typecheck
 
-# Build all packages
-bun run build
 ```
 
 ---

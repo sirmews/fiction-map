@@ -6,9 +6,10 @@
 
 import { parseArgs } from "node:util"
 import { ascii } from "./commands/ascii"
+import { debug } from "./commands/debug"
+import { enumeratePaths } from "./commands/enumerate-paths"
 import { generate } from "./commands/generate"
 import { installHooks } from "./commands/hooks"
-import { debug } from "./commands/debug"
 import { explain, query, showGraph } from "./commands/query"
 import { validate } from "./commands/validate"
 
@@ -30,6 +31,7 @@ Commands:
   explain     Explain a graph, node, or edge by id
   ascii       Draw a beautiful ASCII map of the story graph
   debug       Interactively step through transitions for a graph
+  enumerate-paths  Enumerate traversal paths with the native Rust runtime
 
 Options:
   --help, -h        Show this help
@@ -62,6 +64,18 @@ Debug Options:
   --root-dir        Root directory (default: current directory)
   --output-dir      Output directory containing .fiction-map/metadata.json
 
+Enumerate Paths Options:
+  --root-dir        Root directory (default: current directory)
+  --output-dir      Output directory containing .fiction-map/metadata.json
+  --graph           Limit enumeration to one graph id
+  --max-depth       Maximum traversal depth sent to the runtime
+  --max-paths       Maximum number of paths sent to the runtime
+  --json            Print machine-readable JSON
+
+  Requires the native runtime binary. Build it with:
+    cargo build --release --manifest-path packages/runtime-rs/Cargo.toml
+  or set FICTION_MAP_RUNTIME_RS to a prebuilt binary.
+
 Examples:
   fiction-map generate
   fiction-map generate --check
@@ -92,6 +106,8 @@ async function main(): Promise<void> {
       to: { type: "string" },
       json: { type: "boolean" },
       format: { type: "string", short: "f" },
+      "max-depth": { type: "string" },
+      "max-paths": { type: "string" },
     },
   })
 
@@ -192,6 +208,18 @@ async function main(): Promise<void> {
       await debug(positionals[1], {
         rootDir: values["root-dir"],
         outputDir: values["output-dir"],
+      })
+      break
+
+    case "enumerate-paths":
+    case "enumerate":
+      await enumeratePaths({
+        rootDir: values["root-dir"],
+        outputDir: values["output-dir"],
+        graph: values.graph,
+        maxDepth: values["max-depth"] ? Number(values["max-depth"]) : undefined,
+        maxPaths: values["max-paths"] ? Number(values["max-paths"]) : undefined,
+        json: values.json,
       })
       break
 

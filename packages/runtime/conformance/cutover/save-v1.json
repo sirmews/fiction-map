@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "currentNodeId": "entrance",
+  "history": ["courtyard"],
+  "variables": { "note": { "text": "saved" }, "__proto__": "discard", "constructor": "discard" },
+  "flags": { "greeted": true },
+  "visited": ["courtyard", "entrance", "entrance"],
+  "entityState": {
+    "owned": ["rusty-key"],
+    "active": ["lantern"],
+    "unlocked": ["journal"],
+    "resources": { "health": 50, "mana": 35, "turns": 1, "prototype": 9 },
+    "extensions": { "journal": ["entry"] }
+  },
+  "extensions": { "chapter": "prologue" }
+}
