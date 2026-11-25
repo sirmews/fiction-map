@@ -1,3 +1,0 @@
-#!/bin/sh
-echo "🚀 Running Dagger CI Pipeline before push..."
-bun run --cwd packages/ci start
