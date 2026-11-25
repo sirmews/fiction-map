@@ -68,3 +68,18 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/fiction-map-playwright" --no-audit --no-fund playwright@1.59.1
           "$RUNNER_TEMP/fiction-map-playwright/node_modules/.bin/playwright" install --with-deps chromium
           PLAYWRIGHT_MODULE="$RUNNER_TEMP/fiction-map-playwright/node_modules/playwright/index.mjs" bun run packages/runtime/conformance/cutover/browser.ts
+
+  self-hosting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and play a turn in the self-hosted container
+        run: |
+          docker build -t fiction-map-engine .
+          docker run --detach --name fiction-map-engine --publish 127.0.0.1::8080 fiction-map-engine
+          trap 'docker logs fiction-map-engine && docker rm --force fiction-map-engine' EXIT
+          endpoint="http://$(docker port fiction-map-engine 8080/tcp)/intent"
+          curl --fail --silent --show-error --retry 5 --retry-connrefused --max-time 10 \
+            --header 'Content-Type: application/json' \
+            --data '{"intent":{"type":"selectChoice","choiceId":"enter-entrance"}}' "$endpoint" \
+            | jq -e '.frame.currentNode.id == "entrance"'
